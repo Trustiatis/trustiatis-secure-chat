@@ -46,12 +46,48 @@ ce poste.
 
 ## Étape 2, vérifier l'état local
 
+Le dépôt local **existe déjà** : il a été initialisé le 2026-11-15, et la couche Trustiatis
+y est committée. Il n'y a donc pas de `git init` à faire.
+
 ```bash
 cd ~/Documents/claude/trustiatis-secure
 git status --short          # doit être vide
-git log --oneline           # doit montrer le commit de la couche Trustiatis
+git log --oneline           # doit montrer les commits de la couche Trustiatis
+git config --local user.email   # doit répondre une adresse que vous acceptez de rendre publique
 df -h .                     # il faut au moins 2 Go libres
 ```
+
+Deux points relevés le 2026-11-15 sur ce poste, à traiter avant l'envoi.
+
+**L'adresse de commit sera publique.** L'identité locale a été alignée sur celle du dépôt de
+l'espace de travail, soit `Mathieu URBITSCH <23182124-Trustiatis@users.noreply.gitlab.com>`. Ce dépôt
+devant devenir public (obligation AGPL, voir l'étape 7), cette adresse apparaîtra dans
+l'historique, de façon permanente et moissonnable. Si ce n'est pas voulu, le changer
+**maintenant**, avant le premier envoi :
+
+```bash
+git config --local user.email "<adresse de redirection GitLab>"
+git commit --amend --reset-author --no-edit     # à répéter sur chaque commit existant
+```
+
+**L'espace disque est juste.** Le poste avait 5 927 Mo libres, soit 85 % du disque occupé.
+La voie A (greffe locale) tient, mais laisse peu de marge, et les compilations ultérieures
+(chaîne Gradle, et surtout la chaîne Haskell par Nix) en demanderont bien davantage. C'est un
+argument de plus pour la **voie B** décrite en annexe.
+
+## Étape 2 bis, éprouver la greffe à vide
+
+La greffe réécrit `main`. Avant de la lancer pour de vrai, on vérifie sa mécanique contre un
+amont synthétique, ce qui ne récupère rien depuis GitHub et ne touche pas ce dépôt :
+
+```bash
+bash tools/essai-greffe.sh
+```
+
+Onze contrôles doivent passer, dont les quatre qui cassent en silence : les droits
+d'exécution conservés, la concaténation du `.gitignore`, la branche de référence identique à
+l'amont, et l'absence de fichier d'amont modifié. Cet essai a été passé avec succès le
+2026-11-15. Il n'atteste **rien** sur la greffe réelle, qui reste à faire une fois.
 
 ## Étape 3, greffer l'amont
 
@@ -70,6 +106,11 @@ l'espace disque est insuffisant. Il produit :
 | `develop` | créée depuis `main` |
 | `feature/branding`, `feature/desktop`, `feature/android`, `feature/ios`, `feature/distribution`, `feature/server-configuration` | créées depuis `develop` |
 | `couche-trustiatis-initiale` | la couche avant greffe, conservée pour traçabilité |
+
+Le tag et la branche que le script réclame ont été vérifiés à distance le 2026-11-15 sur
+`github.com/simplex-chat/simplex-chat` : `refs/tags/v7.1.3` existe et vaut bien
+`19889b1a0ee11b6071c41146b6549f46e2b5b6af`, le commit audité en Phase 1, et `refs/heads/stable`
+existe aussi.
 
 Il affiche en fin de course la liste des fichiers de l'amont que la greffe aurait modifiés.
 **Cette liste doit être vide**, hormis `.gitignore` qui est concaténé. Si elle ne l'est pas,

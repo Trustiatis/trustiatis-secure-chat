@@ -17,8 +17,10 @@
 set -euo pipefail
 
 TAG="${1:-v7.1.3}"
-UPSTREAM_URL="https://github.com/simplex-chat/simplex-chat.git"
-ESPACE_MINIMAL_MO=2000
+# Les deux variables suivantes ne sont surchargées que pour éprouver ce script contre un
+# amont synthétique, voir le bas de ce fichier. En usage normal, on ne les touche pas.
+UPSTREAM_URL="${TS_UPSTREAM_URL:-https://github.com/simplex-chat/simplex-chat.git}"
+ESPACE_MINIMAL_MO="${TS_ESPACE_MINIMAL_MO:-2000}"
 
 cd "$(dirname "$0")/.."
 RACINE="$(pwd)"
@@ -57,9 +59,13 @@ if ! git remote get-url upstream >/dev/null 2>&1; then
   git remote add upstream "$UPSTREAM_URL"
 fi
 git remote set-url upstream "$UPSTREAM_URL"
+echo "== amont : $(git remote get-url upstream)"
 echo "== récupération de l'amont (plusieurs centaines de Mo, patience)"
 git fetch --no-tags upstream "refs/tags/$TAG:refs/tags/$TAG"
-git fetch --no-tags upstream 'refs/heads/stable:refs/remotes/upstream/stable'
+# La branche `stable` de l'amont sert de repère pour les reports (docs/UPSTREAM_SYNC.md).
+# Son absence n'est pas bloquante : on ne greffe que le tag.
+git fetch --no-tags upstream 'refs/heads/stable:refs/remotes/upstream/stable' \
+  || echo "   (branche stable absente chez l'amont, sans conséquence pour la greffe)"
 
 AMONT="$(git rev-parse "refs/tags/$TAG^{commit}")"
 echo "== commit d'amont : $AMONT"
@@ -72,11 +78,17 @@ echo "== branche upstream-$TAG créée sur l'amont pur"
 # ---- main = amont + couche Trustiatis
 git checkout -q -B main "$AMONT"
 
-# .gitignore : concaténer celui de l'amont et le nôtre
+# Toute la couche Trustiatis est restituée d'un coup. `git checkout <commit> -- .`
+# restaure aussi les droits enregistrés, ce qu'une boucle de `git show > fichier`
+# perdrait : les deux scripts de tools/ doivent rester exécutables.
+git checkout -q "$COUCHE" -- .
+
+# .gitignore est le seul fichier que l'on ne veut pas écraser : on concatène celui de
+# l'amont et le nôtre, pour garder les exclusions de compilation de l'amont.
 if git cat-file -e "$COUCHE:.gitignore" 2>/dev/null; then
   {
-    if [ -f .gitignore ]; then
-      cat .gitignore
+    if git cat-file -e "$AMONT:.gitignore" 2>/dev/null; then
+      git show "$AMONT:.gitignore"
       printf '\n'
     fi
     printf '# ---- ajouts Trustiatis Secure ----\n'
@@ -85,14 +97,16 @@ if git cat-file -e "$COUCHE:.gitignore" 2>/dev/null; then
   mv .gitignore.fusion .gitignore
 fi
 
-# tout le reste de la couche : la version Trustiatis gagne
-for f in $(git ls-tree -r --name-only "$COUCHE"); do
-  [ "$f" = ".gitignore" ] && continue
-  mkdir -p "$(dirname "$f")"
-  git show "$COUCHE:$f" > "$f"
-done
-
 git add -A
+
+# Contrôle immédiat : les scripts de la couche doivent être exécutables dans l'index.
+for s in tools/greffer-upstream.sh tools/verifier-marque.py; do
+  mode=$(git ls-files -s "$s" | awk '{print $1}')
+  if [ "$mode" != "100755" ]; then
+    echo "ERREUR : $s n'est pas exécutable dans l'index (mode $mode)." >&2
+    exit 1
+  fi
+done
 git commit -q -F - <<MSG
 Greffer la couche Trustiatis Secure sur l'amont $TAG
 
@@ -130,3 +144,17 @@ echo "== branches"
 git branch -v
 echo
 echo "== terminé. Étape suivante : docs/GIT-SETUP.md étape 4 (envoi vers GitLab)."
+
+# ---------------------------------------------------------------------------
+# Comment ce script a été éprouvé, le 2026-11-15
+#
+# La greffe réelle récupère plusieurs centaines de Mo. Pour vérifier la mécanique sans
+# cette récupération, on fabrique un amont synthétique et on lance le script contre lui :
+#
+#   bash tools/essai-greffe.sh
+#
+# L'essai contrôle les points qui peuvent casser en silence : les droits d'exécution des
+# scripts, la concaténation du .gitignore, l'intactitude de la branche de référence, et
+# l'absence de fichier d'amont modifié. Il ne remplace pas la greffe réelle, qui reste à
+# faire une fois, et qui est décrite à l'étape 3 de docs/GIT-SETUP.md.
+# ---------------------------------------------------------------------------
