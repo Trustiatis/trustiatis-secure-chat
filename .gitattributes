@@ -1,0 +1,14 @@
+# Normalisation des fins de ligne
+* text=auto eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# Binaires de marque : pas de diff textuel
+*.png binary
+*.jpg binary
+*.ico binary
+*.icns binary
+*.ttf binary
+*.otf binary
+*.mp3 binary
+*.pdf binary

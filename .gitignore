@@ -1,0 +1,38 @@
+# Secrets et clés de signature : jamais dans ce dépôt
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.p8
+*.mobileprovision
+*.cer
+AuthKey_*.p8
+local.properties
+keystore.properties
+.env
+.env.*
+
+# Sorties de compilation
+build/
+.gradle/
+apps/multiplatform/release/
+apps/multiplatform/build/
+dist/
+dist-*/
+*.apk
+*.aab
+*.msi
+*.dmg
+*.deb
+*.AppImage
+*.ipa
+
+# Bibliothèques natives récupérées de l'amont (non versionnées, voir docs/INITIAL_AUDIT.md chapitre 5)
+apps/multiplatform/common/src/commonMain/cpp/android/libs/
+apps/multiplatform/common/src/commonMain/cpp/desktop/libs/
+
+# Outillage local
+.DS_Store
+__pycache__/
+*.pyc
+.idea/workspace.xml
