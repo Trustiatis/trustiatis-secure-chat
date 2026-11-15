@@ -69,23 +69,25 @@ compose {
           appCategory = "Messenger"
         }
         windows {
-          packageName = "SimpleX"
+          packageName = "Trustiatis Secure"
           iconFile.set(project.file("src/jvmMain/resources/distribute/simplex.ico"))
           console = false
           perUserInstall = false
           dirChooser = true
           shortcut = true
-          upgradeUuid = "CC9EFBC8-AFFF-40D8-BB69-FCD7CE99EFB9"
+          // Identifiant propre à Trustiatis Secure. Garder celui de l'amont ferait
+          // remplacer une installation de l'application officielle par celle ci.
+          upgradeUuid = "2C6261D9-FDF7-49DF-9117-EC489125BD6F"
         }
         macOS {
-          packageName = "SimpleX"
+          packageName = "Trustiatis Secure"
           iconFile.set(project.file("src/jvmMain/resources/distribute/simplex.icns"))
           appCategory = "public.app-category.social-networking"
-          bundleID = "chat.simplex.app"
+          bundleID = "com.trustiatis.secure"
           infoPlist {
             extraKeysRawXml = """
               <key>NSMicrophoneUsageDescription</key>
-              <string>SimpleX needs microphone access to record voice messages</string>
+              <string>Trustiatis Secure needs microphone access to record voice messages</string>
               <key>CFBundleURLTypes</key>
               <array>
                 <dict>
@@ -119,9 +121,9 @@ compose {
           }
         }
         if (os.contains("mac") || os.contains("win")) {
-          packageName = "SimpleX"
+          packageName = "Trustiatis Secure"
         } else {
-          packageName = "simplex"
+          packageName = "trustiatis-secure"
         }
         // Packaging requires to have version like MAJOR.MINOR.PATCH
         var adjustedVersion = rootProject.extra["desktop.version_name"] as String

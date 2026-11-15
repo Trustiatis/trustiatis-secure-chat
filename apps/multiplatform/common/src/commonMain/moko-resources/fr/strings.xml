@@ -2,7 +2,7 @@
 <resources>
     <string name="thousand_abbreviation">k</string>
     <string name="connect_via_contact_link">Se connecter via l\'adresse du contact ?</string>
-    <string name="app_name" translatable="false">SimpleX</string>
+    <string name="app_name" translatable="false">Trustiatis Secure</string>
     <string name="profile_will_be_sent_to_contact_sending_link">Votre profil va être envoyé au contact qui vous a envoyé ce lien.</string>
     <string name="you_will_join_group">Vous vous connecterez à tous les membres du groupe.</string>
     <string name="connect_via_group_link">Rejoindre le groupe ?</string>
@@ -2360,7 +2360,7 @@
     <string name="channel_webpage">Page web du canal</string>
     <string name="delete_channel_for_all_subscribers_cannot_undo_warning">Le canal sera supprimé pour tous les abonnés — cette action est irréversible !</string>
     <string name="action_button_channel_link">Lien</string>
-    <string name="why_built_p7">Parce que nous avons détruit le pouvoir de vous identifier. Pour que votre pouvoir ne puisse jamais vous être enlevé.</string>
+    <string name="why_built_p7">Certains seconds facteurs seront également remis ici. Un code à usage unique qui arrive dans cette application n\'est passé ni par votre boîte aux lettres, ni par le réseau mobile, qui sont les deux endroits où ces codes se volent d\'habitude.</string>
     <string name="chat_banner_bot">Bot</string>
     <string name="info_row_signed">Signé</string>
     <string name="info_row_signed_verified">Signé et vérifié</string>
@@ -2530,25 +2530,25 @@
     <string name="save_admission_question">Enregistrer les paramètres d\'admission ?</string>
     <string name="save_and_notify_channel_subscribers">Enregistrer et avertir les abonnés du canal</string>
     <string name="short_descr">Votre bio :</string>
-    <string name="onboarding_be_free">Soyez libre\ndans votre réseau</string>
-    <string name="onboarding_private_and_secure">Messagerie privée et sécurisée.</string>
-    <string name="onboarding_first_network">Le premier réseau où vous possédez\nvos contacts et vos groupes.</string>
+    <string name="onboarding_be_free">Votre canal\nconfidentiel</string>
+    <string name="onboarding_private_and_secure">Chiffré de bout en bout, sans compte.</string>
+    <string name="onboarding_first_network">Le canal que Trustiatis emploie pour tout ce qui est sensible,\net celui dont vous pouvez vous servir en interne.</string>
     <string name="get_started">Commencer</string>
-    <string name="why_simplex_is_built">Pourquoi SimpleX a été créé.</string>
+    <string name="why_simplex_is_built">Pourquoi cette application, et comment elle fonctionne.</string>
     <string name="onboarding_your_profile">Votre profil</string>
     <string name="onboarding_on_your_phone">Sur votre téléphone, pas sur les serveurs.</string>
     <string name="onboarding_no_account">Pas de compte. Pas de numéro de téléphone. Pas d\'email. Pas d\'identité.\nLe chiffrement le plus sécurisé.</string>
     <string name="enter_profile_name">Saisissez le nom du profil…</string>
     <string name="migrate">Migrer</string>
-    <string name="why_built_heading">Vous êtes né·e sans compte.</string>
-    <string name="why_built_p1">Personne n\'a tracé vos conversations. Personne n\'a dressé la carte de vos déplacements. La confidentialité n\'a jamais été une fonctionnalité — c\'était un mode de vie.</string>
-    <string name="why_built_p2">Puis nous sommes passés en ligne, et chaque plateforme a réclamé une partie de vous : votre nom, votre numéro, vos amis. Nous avons accepté que le prix à payer pour parler aux autres soit de permettre à quelqu\'un de savoir avec qui nous parlons. Chaque génération, humaine et technologique, a fonctionné ainsi : téléphone, email, messageries, réseaux sociaux. Il semblait que ce fût la seule voie possible.</string>
-    <string name="why_built_p3">Il existe une autre voie. Un réseau sans numéros de téléphone. Sans noms d\'utilisateur. Sans comptes. Sans aucune identité utilisateur. Un réseau qui connecte les personnes et achemine des messages chiffrés sans savoir qui est connecté.</string>
-    <string name="why_built_p4">Pas une meilleure serrure sur la porte de quelqu\'un d\'autre. Pas un propriétaire plus attentionné qui respecte votre vie privée, mais conserve toujours le registre de tous les visiteurs. Vous n\'êtes pas un invité. Vous êtes chez vous. Aucun roi ne peut y entrer — vous êtes souverain.</string>
-    <string name="why_built_p5">Vos conversations vous appartiennent, comme c\'était toujours le cas avant Internet. Le réseau n\'est pas un lieu que vous visitez. C\'est un lieu que vous créez et possédez. Et personne ne peut vous l\'enlever, que vous le rendiez privé ou public.</string>
+    <string name="why_built_heading">Un canal qu\'on ne peut pas lire en route.</string>
+    <string name="why_built_p1">Trustiatis travaille sur votre infrastructure, vos serveurs et vos comptes. Ce travail produit des choses qui n\'ont rien à faire dans une boîte aux lettres ordinaire : des identifiants d\'accès, des constats d\'audit, des schémas de réseau, des clés de récupération. Le courriel n\'a pas été conçu pour les transporter, et les messageries habituelles réclament un numéro de téléphone avant de transporter quoi que ce soit.</string>
+    <string name="why_built_p2">Cette application est une version Trustiatis d\'une messagerie libre qui fonctionne sur le réseau SimpleX. Le nom, les couleurs et ces explications sont les nôtres. La cryptographie et le protocole ne sont pas touchés, et l\'intégralité du code source est publiée, pour que personne n\'ait à nous croire sur parole.</string>
+    <string name="why_built_p3">Il n\'y a ni compte, ni identifiant, ni numéro de téléphone. Vous vous connectez une fois à quelqu\'un, par un lien ou un code QR à usage unique, et cette liaison dispose ensuite de ses propres files de remise. Les messages sont chiffrés sur votre appareil et déchiffrés sur celui de votre correspondant. Les serveurs relais les transmettent sans savoir qui parle à qui, et Trustiatis n\'en exploite aucun : nous ne pourrions pas lire vos messages, même si on nous le demandait.</string>
+    <string name="why_built_p4">Vous n\'êtes pas limité à vos échanges avec les départements de Trustiatis. La même application porte vos conversations internes, entre vos collègues, avec les mêmes garanties et sans coût supplémentaire. Aucune licence à acheter, aucun compte à créer, aucun administrateur qui lise par dessus votre épaule.</string>
+    <string name="why_built_p5">Comme le réseau ne détient aucune identité, l\'identité se prouve en dehors de lui. Chaque interlocuteur de Trustiatis présente sa carte d\'identité issue de id.trustiatis.com à l\'ouverture d\'une conversation, et nous vous demandons d\'en faire autant avec vos propres interlocuteurs. Réclamez la carte, vérifiez que le nom et la fonction correspondent à la personne attendue, et n\'abordez rien de sensible avant de l\'avoir.</string>
     <string name="group_invitations">Invitations de groupe</string>
-    <string name="why_built_p6">La plus ancienne liberté humaine : parler à une autre personne sans être surveillé — bâtie sur une infrastructure qui ne peut la trahir.</string>
-    <string name="why_built_tagline">Soyez libre dans votre réseau.</string>
+    <string name="why_built_p6">C\'est le canal à privilégier avec Trustiatis, et pour les informations et les données sensibles c\'est le seul que nous employons. Personne chez Trustiatis ne vous demandera jamais un mot de passe, une clé ou un code d\'accès par courriel, par téléphone ou par une autre messagerie. Une demande qui vous parvient par une autre voie ne vient pas de nous.</string>
+    <string name="why_built_tagline">Ouvrez l\'application, réclamez la carte, puis parlez librement.</string>
     <string name="onboarding_conditions_by_using_you_agree">Vous vous engagez à :\n- Ne publier que du contenu légal dans les groupes publics\n- Respecter les autres utilisateurs — pas de spam</string>
     <string name="onboarding_conditions_accept">Accepter</string>
     <string name="onboarding_network_routers_cannot_know">Les routeurs du réseau ne peuvent savoir\nqui parle à qui</string>
@@ -2848,7 +2848,7 @@
     <string name="badges_billing_footer_one_month">Se termine le %1$s.</string>
     <string name="badges_support_simplex_title">Soutenir SimpleX</string>
     <string name="badges_support_simplex_body">Obtenez un badge pour envoyer des fichiers plus volumineux (2-5 Go) qui restent disponibles plus longtemps (7-21 jours), et pour l’afficher sur votre profil.</string>
-    <string name="badges_why_simplex_is_built">Pourquoi SimpleX a été créé.</string>
+    <string name="badges_why_simplex_is_built">Pourquoi cette application, et comment elle fonctionne.</string>
     <string name="badges_redeem_code_button">Utiliser un code de badge</string>
     <string name="badges_continue">Continuer</string>
     <string name="badges_how_it_works_button">Comment les badges protègent votre vie privée</string>

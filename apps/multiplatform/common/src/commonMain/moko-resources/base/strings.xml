@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">SimpleX</string>
+  <string name="app_name">Trustiatis Secure</string>
 
   <string name="thousand_abbreviation">k</string>
 
@@ -1332,11 +1332,11 @@
   <string name="make_private_connection">Make a private connection</string>
   <string name="migrate_from_another_device">Migrate from another device</string>
   <string name="how_it_works">How it works</string>
-  <string name="onboarding_be_free">Be free\nin your network</string>
-  <string name="onboarding_private_and_secure">Private and secure messaging.</string>
-  <string name="onboarding_first_network">The first network where you own\nyour contacts and groups.</string>
+  <string name="onboarding_be_free">Your confidential\nchannel</string>
+  <string name="onboarding_private_and_secure">Encrypted end to end, with no account.</string>
+  <string name="onboarding_first_network">The channel Trustiatis uses for anything sensitive,\nand the one you can use inside your own company.</string>
   <string name="get_started">Get started</string>
-  <string name="why_simplex_is_built">Why SimpleX is built.</string>
+  <string name="why_simplex_is_built">Why this application, and how it works.</string>
   <string name="onboarding_your_profile">Your profile</string>
   <string name="onboarding_on_your_phone">On your phone, not on servers.</string>
   <string name="onboarding_no_account">No account. No phone. No email. No ID.\nThe most secure encryption.</string>
@@ -1344,15 +1344,15 @@
   <string name="migrate">Migrate</string>
 
   <!-- Why SimpleX is built -->
-  <string name="why_built_heading">You were born without an account.</string>
-  <string name="why_built_p1">Nobody tracked your conversations. No one drew a map of where you\'d been. Privacy was never a feature — it was the way of life.</string>
-  <string name="why_built_p2">Then we moved online, and every platform asked for a piece of you — your name, your number, your friends. We accepted that the price of talking to others is letting someone know who we talk to. Every generation, people and tech, had it this way — telephone, email, messengers, social media. It seemed the only way possible.</string>
-  <string name="why_built_p3">There is another way. A network with no phone numbers. No usernames. No accounts. No user identities of any kind. A network that connects people and carries encrypted messages without knowing who is connected.</string>
-  <string name="why_built_p4">Not a better lock on someone else\'s door. Not a nicer landlord that respects your privacy, but still keeps the record of all visitors. You are not a guest. You are home. No king can enter it — you are sovereign.</string>
-  <string name="why_built_p5">Your conversations belong to you, as it had always been before the Internet. The network is not a place you visit. It is a place you create and own. And nobody can take it from you, whether you make it private or public.</string>
-  <string name="why_built_p6">The oldest human freedom — to speak to another person without being watched — built on infrastructure that cannot betray it.</string>
-  <string name="why_built_p7">Because we destroyed the power to know who you are. So that your power can never be taken.</string>
-  <string name="why_built_tagline">Be free in your network.</string>
+  <string name="why_built_heading">A channel that cannot be read in transit.</string>
+  <string name="why_built_p1">Trustiatis works on your infrastructure, your servers and your accounts. That work produces things that must never travel through an ordinary mailbox: access credentials, audit findings, network diagrams, recovery keys. Email was not built to carry them, and the usual messengers ask you to hand over a phone number before they will carry anything at all.</string>
+  <string name="why_built_p2">This application is a Trustiatis build of an open source messenger that runs on the SimpleX network. The name, the colours and these explanations are ours. The cryptography and the protocol are untouched, and the whole source code is published, so that nobody has to take our word for any of it.</string>
+  <string name="why_built_p3">There are no accounts, no usernames and no phone numbers. You connect to someone once, through a link or a QR code used a single time, and that connection then has delivery queues of its own. Messages are encrypted on your device and decrypted on your correspondent\'s. The relay servers pass them on without knowing who is talking to whom, and Trustiatis runs none of those servers: we could not read your messages even if we were asked to.</string>
+  <string name="why_built_p4">You are not limited to talking with the Trustiatis departments. The same application carries your own internal conversations, between your colleagues, with the same guarantees and at no extra cost. There is no licence to buy, no account to create, and no administrator reading along.</string>
+  <string name="why_built_p5">Because the network holds no identity of its own, identity is proved outside it. Every Trustiatis contact presents their identity card from id.trustiatis.com when a conversation opens, and we ask you to do the same with the people you talk to. Ask for the card, check that the name and the role match the person you expect, and discuss nothing sensitive before you have it.</string>
+  <string name="why_built_p6">This is the channel to prefer with Trustiatis, and for sensitive information and data it is the only one we use. Nobody at Trustiatis will ever ask you for a password, a key or an access code by email, by telephone, or through another messenger. A request that reaches you by another route did not come from us.</string>
+  <string name="why_built_p7">Some second factors will be delivered here as well. A one time code that arrives in this application has passed neither through your mailbox nor through the mobile network, which are the two places such codes are usually stolen.</string>
+  <string name="why_built_tagline">Open the application, ask for the card, then speak freely.</string>
 
   <!-- SetNotificationsMode.kt -->
   <string name="onboarding_notifications_mode_title">Private notifications</string>
@@ -3207,7 +3207,7 @@
   <string name="badges_how_long_title">How long?</string>
   <string name="badges_support_simplex_title">Support SimpleX</string>
   <string name="badges_support_simplex_body">Get a badge to send larger files (2-5GB) that stay available longer (7-21 days), and to show it on your profile.</string>
-  <string name="badges_why_simplex_is_built">Why SimpleX is built.</string>
+  <string name="badges_why_simplex_is_built">Why this application, and how it works.</string>
   <string name="badges_redeem_code_button">Redeem badge code</string>
   <string name="badges_continue">Continue</string>
   <string name="badges_how_it_works_button">How badges protect your privacy</string>

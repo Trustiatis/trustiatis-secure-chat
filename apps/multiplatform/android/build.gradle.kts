@@ -12,7 +12,13 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "chat.simplex.app"
+        // L'identifiant de distribution est celui de Trustiatis : une version
+        // dérivée ne peut pas porter celui de l'amont, ni sur un magasin, ni sur
+        // un appareil où les deux doivent pouvoir cohabiter.
+        applicationId = "com.trustiatis.secure"
+        // Le namespace reste celui de l'amont : il ne nomme que les classes R et
+        // BuildConfig, il n'est pas vu de l'utilisateur, et le changer obligerait
+        // à déplacer les sources Kotlin, donc à rendre chaque report conflictuel.
         namespace = "chat.simplex.app"
         minSdk = 26
         targetSdk = 36
@@ -31,7 +37,7 @@ android {
             }
         }
         manifestPlaceholders["app_name"] = "@string/app_name"
-        manifestPlaceholders["provider_authorities"] = "chat.simplex.app.provider"
+        manifestPlaceholders["provider_authorities"] = "com.trustiatis.secure.provider"
         manifestPlaceholders["extract_native_libs"] = rootProject.extra["compression.level"] as Int != 0
     }
 
@@ -56,7 +62,7 @@ android {
             isDebuggable = rootProject.extra["enable_debuggable"] as Boolean
             manifestPlaceholders["app_name"] = rootProject.extra["app.name"] as String
             // Provider can"t be the same for different apps on the same device
-            manifestPlaceholders["provider_authorities"] = "chat.simplex.app${rootProject.extra["application_id.suffix"]}.provider"
+            manifestPlaceholders["provider_authorities"] = "com.trustiatis.secure${rootProject.extra["application_id.suffix"]}.provider"
         }
         release {
             isMinifyEnabled = false

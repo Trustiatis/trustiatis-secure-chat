@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Trustiatis Secure
+Comment=Canal confidentiel de Trustiatis, chiffré de bout en bout, sans compte
+Exec=/opt/trustiatis-secure/bin/trustiatis-secure %u
+Icon=/opt/trustiatis-secure/lib/trustiatis-secure
+Categories=Network;Chat;
+MimeType=x-scheme-handler/simplexchat;x-scheme-handler/simplex;

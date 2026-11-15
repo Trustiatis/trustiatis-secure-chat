@@ -59,12 +59,24 @@ l'espace de travail, hors de ce dépôt.
 **Rien n'est inventé.** Aucune couleur, aucun logo, aucune police n'est créé pour ce projet :
 tout est extrait de cette charte, puis décliné aux formats exigés par chaque plateforme.
 
-Première tâche de la Phase 2, non encore faite :
+Première tâche de la Phase 2, **faite le 2026-11-15** :
 
-- [ ] extraire les couleurs de `id-trustiatis/` vers `branding/colors/palette.json`
-- [ ] extraire la ou les polices vers `branding/typography/`
-- [ ] récupérer le logo détramé depuis `design-system/` (voir `design-system/detramer.py`)
-- [ ] définir les deux thèmes, clair et sombre
+- [x] couleurs extraites de `id-trustiatis/src/brand.ts` vers `branding/colors/palette.json`,
+      complétées du thème clair relevé sur `trustiatis.com`. Chaque valeur cite sa source
+- [x] typographie : **rien n'est embarqué**. `brand.ts` demande Roboto, qui est la police
+      système d'Android et une police courante ailleurs. Embarquer des fichiers de police
+      alourdirait chaque report sans rien apporter
+- [x] monogramme détramé récupéré dans `branding/logo/monogramme.png`. Il n'existait pas :
+      `design-system/trustiatis/logo-icon.png` est aplati sur une plaque blanche. Une
+      recette a été ajoutée à `design-system/detramer.py` pour le reconstruire
+- [x] deux thèmes définis dans `palette.json`, `theme_sombre` et `theme_clair`
+
+Deux défauts de `detramer.py` ont été corrigés au passage, et ils valaient d'être trouvés :
+son diagnostic plantait sur une cible absente au lieu de dire qu'elle était à construire, et
+surtout **il moyennait la couleur des pixels de bord avant de la comparer aux aplats**. Sur un
+logo fait de deux aplats, comme le monogramme Trustiatis, la moyenne tombe entre les deux et
+accuse un liseré qui n'existe pas. Mesurer chaque pixel contre l'aplat le plus proche donne
+un écart de 0 sur les six logos du groupe.
 
 ## 2. Référentiel et propagation
 
@@ -83,12 +95,23 @@ branding/
 └── store-assets/    textes et visuels de fiche de magasin
 ```
 
-- [ ] écrire `tools/propager-branding.py`, sur le modèle de `design-system/detramer.py`, qui
-      génère et copie vers les chemins exacts listés au chapitre 7.1 de l'audit de Phase 1
+- [x] `tools/propager-branding.py` écrit le 2026-11-15. Il génère **39 ressources** : les
+      icônes Android aux cinq densités et dans les deux variantes que propose l'amont, les
+      deux couleurs de fond des icônes adaptatives, le monogramme employé dans
+      l'application, les deux logos des écrans d'accueil, et les trois icônes du Desktop.
+      `python3 tools/propager-branding.py` compare sans écrire, `--ecrire` écrit
 
 **Aucune ressource ne doit être modifiée à la main dans les arbres de code.** Toute
 modification se fait dans `branding/`, puis se propage. C'est ce qui rend les reports de
 l'amont tenables.
+
+Trois choses apprises en l'écrivant, qui ne se devinent pas :
+
+| Piège | Ce qu'il faut savoir |
+|---|---|
+| `vertical_logo@{1,2,3}x.png` | malgré son nom, **ce n'est pas un logo** : 8, 16 et 24 pixels de côté, utilisé par `TextItemView.kt` comme motif de remplissage pour masquer un texte secret. Ne pas y toucher |
+| `logo` et `logo_light` | `SimpleXInfo.kt` choisit `logo_light` quand le thème est **sombre**. Le suffixe dit la couleur de l'encre, pas celle du fond. Le même dessin sert aux deux : les deux encres de la charte tiennent sur blanc comme sur le fond sombre |
+| `.icns` | Pillow ne sait écrire ce format que sur macOS, où il délègue à `iconutil`. Le format est pourtant trivial, un en-tête et des blocs typés contenant des PNG : `propager-branding.py` l'écrit lui même, sans Mac |
 
 ## 3. Registre des modifications
 
@@ -103,6 +126,15 @@ entrées du **cercle 3** doivent être argumentées, ce sont elles qui coûtent 
 | **3** | `apps/ios/Shared/Views/Onboarding/SetNotificationsMode.swift` | `SetNotificationsMode` et `NtfModeSelector` retirés, `NotificationsInfoView` conservée et complétée | P-5. L'écran d'information reste, c'est lui qui porte l'explication | `feature/ios` |
 | **3** | `apps/ios/Shared/Model/SimpleXAPI.swift` | `registerToken` ne pose plus de jeton et ramène le mode à `.off`, garde ajoutée dans `reRegisterToken` | P-5. Verrou de dernier recours : une base importée d'une autre application peut annoncer `instant`, et c'est ce chemin qui enverrait alors le jeton | `feature/ios` |
 | **3** | `apps/ios/Shared/Views/UserSettings/AppSettings.swift` | un mode importé autre que `.off` est ignoré | P-5. Un fichier de réglages ne doit pas pouvoir rallumer ce que l'interface a retiré | `feature/ios` |
+| 1 | 30 fichiers `mipmap-*/icon*.png`, et les deux `values/icon*_background.xml` | icônes d'application régénérées | générées par `tools/propager-branding.py`, jamais à la main. Les deux variantes que l'amont offre par `activity-alias` sont conservées : même dessin, deux fonds, le manifeste n'a pas à bouger | `feature/branding` |
+| 1 | `moko-resources/images/{logo,logo_light,icon_foreground_common}@4x.png`, `androidMain/res/drawable/icon_foreground_android_common.png` | logos et monogramme de l'application | idem, générés | `feature/branding` |
+| 1 | `desktop/src/jvmMain/resources/distribute/simplex.{png,ico,icns}` | icônes du Desktop | idem. Le nom des fichiers reste celui de l'amont : il n'est vu de personne et le changer n'apporterait qu'un conflit de report | `feature/branding` |
+| 1 | `moko-resources/{base,fr}/strings.xml`, 15 clés | nom de l'application et textes d'accueil réécrits | posés par `tools/textes-trustiatis.py`, qui refuse une clé qu'il ne trouve pas. Décision D-6 : référence et français d'abord. Contenu demandé par le Membre : pourquoi l'application, comment elle fonctionne, l'usage interne, la présentation de la carte d'identité, le canal à privilégier, les seconds facteurs |
+| 2 | `android/build.gradle.kts` | `applicationId` passé à `com.trustiatis.secure`, autorités du fournisseur de contenu alignées | une version dérivée ne peut pas porter l'identifiant de l'amont : ni sur un magasin, ni sur un appareil où les deux doivent cohabiter. Le `namespace`, lui, **reste** celui de l'amont : il ne nomme que `R` et `BuildConfig`, et le changer obligerait à déplacer les sources Kotlin | `feature/branding` |
+| 2 | `values/themes.xml`, `values-night/themes.xml`, `AndroidManifest.xml` | `Theme.SimpleX` renommé `Theme.TrustiatisSecure` | nom de style, interne, non persisté. À ne pas confondre avec `DefaultTheme.SIMPLEX`, qui est persisté par son nom et **ne doit pas** être renommé | `feature/branding` |
+| 2 | `desktop/build.gradle.kts` | `packageName`, `bundleID` et `upgradeUuid` | le `upgradeUuid` est le point à ne pas manquer : gardé tel quel, l'installateur Windows **remplacerait** une installation de l'application officielle | `feature/branding` |
+| 2 | `distribute/TrustiatisSecure.desktop`, `distribute/com.trustiatis.secure.appdata.xml` | renommés et réécrits | les chemins d'installation suivent `packageName`, donc `/opt/trustiatis-secure/`. La fiche AppStream de l'amont était une page de publicité renvoyant à son site : réécrite | `feature/branding` |
+| 2 | `scripts/desktop/make-appimage-linux.sh` | motifs `*imple*` remplacés par le nom exact | le script devinait le nom du répertoire, du binaire et de l'icône par un motif qui ne correspond plus. Nommer vaut mieux que deviner | `feature/branding` |
 | 2 | `apps/ios/SimpleX Snapshots/SnapshotTests.swift` | scène `NotificationsModeView_Previews` remplacée par `NotificationsInfoView_Previews` | conséquence mécanique du retrait ci dessus, sans quoi la cible de test ne compile pas | `feature/ios` |
 
 ## 4. Points de vigilance relevés à l'audit
@@ -116,6 +148,7 @@ entrées du **cercle 3** doivent être argumentées, ce sont elles qui coûtent 
 | Style Android | `Theme.SimpleX` dans `values/themes.xml` et `values-night/themes.xml`, référencé par le manifeste |
 | Icônes adaptatives | deux jeux (`icon` et `icon_dark_blue`), sélectionnables dans l'application par deux `activity-alias`. Décider si Trustiatis en conserve deux |
 | Interface d'appel | `common/src/commonMain/resources/assets/www/call.html` et `style.css` portent leurs propres couleurs, faciles à oublier |
+| Liens web du manifeste | `AndroidManifest.xml` revendique `https://simplex.chat` avec `autoVerify="true"`. Pour Trustiatis Secure, cette revendication **ne peut pas aboutir** : la vérification lit le `assetlinks.json` du domaine, qui ne listera jamais notre signature. Elle reste donc inerte, mais elle revendique le domaine d'autrui. La retirer casserait en revanche l'ouverture des liens d'invitation reçus par navigateur, qui sont des liens `simplex.chat`. Les schémas `simplex:` et `simplexchat:`, eux, sont le protocole et se gardent. C'est la **décision ouverte P-2**, non bloquante, déjà instruite dans `DECISIONS.md` : ne rien changer ici tant qu'elle n'est pas rendue |
 | Chaînes | 141 lignes du fichier de référence et 3 407 occurrences sur les 41 fichiers de chaînes. Trier en trois catégories, voir `NOTICE-AGPL.md`, et ne jamais remplacer en bloc |
 
 ## 5. Contrôle
