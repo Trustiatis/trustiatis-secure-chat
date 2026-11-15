@@ -189,13 +189,12 @@ Aucun appareil n'a installé ces APK. « Compile » n'est pas « fonctionne ».
 
 ## 7. Résultat de la première compilation Desktop
 
-Trois étapes lancées, deux réussies.
-
 | Étape | Résultat | Durée |
 |---|---|---|
 | `:desktop:cmakeBuildAndCopy` | **BUILD SUCCESSFUL** | 34 s |
 | `:desktop:compileKotlinJvm` | **BUILD SUCCESSFUL** | 6 min 25 s |
 | `:desktop:createDistributable` | **BUILD FAILED**, place disque | 1 min 30 s |
+| `:desktop:packageDistributionForCurrentOS`, après ajout de disque | **BUILD SUCCESSFUL** | 2 min 49 s |
 
 La pièce native est compilée sur ce poste et se lie bien à la bibliothèque extraite :
 
@@ -213,26 +212,68 @@ Le Kotlin suit : 8 319 classes dans `common/build/classes`, et
 `common/build/libs/common-desktop-7.1.2.jar` à 35 534 481 octets. Le numéro de version du
 nom du fichier vient de `gradle.properties` et confirme la base v7.1.2.
 
-### L'échec, en toutes lettres
+### Le paquet
+
+| Fichier | Taille | SHA-256 |
+|---|---|---|
+| `release/main/deb/simplex_7.1.2-1_amd64.deb` | 221 473 624 o | `f6fbd49cd26bdb87ec6d2f132d607ffbe482ed9e7931e6917412e71814b5e66f` |
+
+Il contient `opt/simplex/lib/app/resources/libapp-lib.so` à 26 752 octets, c'est à dire la
+pièce compilée ici, à côté du coeur d'amont extrait. Son champ `Maintainer` dit
+`Unknown <Unknown>` et le paquet s'appelle `simplex` : la Phase 2 n'a pas commencé, le paquet
+le déclare lui-même.
+
+Le premier essai d'empaquetage avait échoué, et le message valait d'être gardé :
 
 ```
 java.nio.file.FileSystemException: .../libskiko-linux-x64.so
   -> .../release/main/app/simplex/lib/app/libskiko-linux-x64.so: No space left on device
 ```
 
-`jpackage` recopie l'image complète de l'application : les 392 Mo de bibliothèques du coeur,
-le jar commun, Skiko et une image réduite du JDK. Il restait 1,3 Gio, il en fallait davantage.
-Ce n'est ni un défaut du code, ni un problème de chaîne : l'empaquetage n'a jamais commencé à
-compiler quoi que ce soit, il copiait.
+`jpackage` ne compile rien, il recopie : les 392 Mo de bibliothèques du coeur, le jar commun,
+Skiko et une image réduite du JDK. Le disque de la VM est passé de 40 à 70 Gio et l'étape est
+passée du premier coup.
 
-Le répertoire `release/` partiel a été supprimé. **La compilation Desktop est faite, pas
-l'empaquetage.** Il demande un disque plus grand ou un poste dédié, à voir avec la refonte
-de l'infrastructure.
+### L'application démarre, et son coeur fonctionne
+
+C'est le seul endroit de ce document qui dépasse « compile ».
+
+Premier lancement : **plantage**, `SIGSEGV`, dans
+`org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawerKt.createContext`. Le cadre natif accusait
+`libHSzstd`, ce qui est trompeur : la pile Java, elle, est sans ambiguïté. C'est l'accélération
+OpenGL qui manque, sur une VM dont le serveur X tourne sur `modesetting`.
+
+Avec le rendu logiciel, l'application tient :
+
+```
+$ DISPLAY=:0 SKIKO_RENDER_API=SOFTWARE ./opt/simplex/bin/simplex
+$ xwininfo -id 0x60001e
+  xwininfo: Window id: 0x60001e "SimpleX"
+  Width: 1498   Height: 890   Map State: IsViewable
+```
+
+Une fenêtre réelle, affichée, et aucun rapport de plantage. Attention au passage : le
+lanceur de `jpackage` **ne transmet pas** un `-D` à la machine virtuelle, il le passe à
+l'application comme argument. Il faut la variable d'environnement, ou `-J-D`.
+
+Et le coeur a travaillé. L'application a créé `~/.local/share/simplex/` avec
+`simplex_v1_chat.db` (1 388 544 o) et `simplex_v1_agent.db` (479 232 o). Leurs premiers
+octets ne sont pas `SQLite format 3` mais du bruit : les bases sont **chiffrées par
+SQLCipher**, comme prévu. Autrement dit, `libsimplex.so` extraite du paquet d'amont ne fait
+pas que se lier, elle s'initialise et applique ses migrations.
+
+Le répertoire de données et l'arborescence d'essai ont été supprimés après le test : aucun
+profil n'a été créé, aucune connexion n'a été établie, et ces bases n'avaient pas à rester.
 
 ### Ce que le Desktop n'a pas encore
 
 `prepare-vlc-linux.sh` n'a pas été exécuté, faute de `patchelf` : la lecture vidéo des
-appels manquera au premier paquet distribuable. À traiter avec l'empaquetage, pas avant.
+appels manquera. Les bibliothèques VLC du paquet d'amont ont été extraites avec les autres,
+mais sans le `patchelf` qui réécrit leur `rpath` elles ne seront pas trouvées à l'exécution.
+À traiter avec la distribution, pas avant.
+
+Le paquet n'est pas signé, et sur ce poste le rendu matériel ne fonctionne pas : un
+utilisateur sur une machine normale n'aura pas besoin de `SKIKO_RENDER_API`.
 
 ## 8. Reproduire
 

@@ -38,12 +38,23 @@ modifications et leur date.
 
 > **À lire avant de pousser `upstream-vX.Y.Z`.** Le motif `upstream-*` est une branche
 > protégée dont la poussée est fermée à **personne**, mainteneurs compris, et GitLab compte la
-> **création** d'une branche comme une poussée. La nouvelle référence d'amont pur ne pourra
-> donc pas partir telle quelle. La marche à suivre, dans
-> `Settings > Repository > Protected branches` : retirer la protection `upstream-*`, pousser
-> la branche, puis la reposer à l'identique (fusion : Maintainers, poussée : No one, envoi
-> forcé interdit). C'est volontairement pénible : cette référence est la preuve que le coeur
-> de l'amont n'a pas été touché, et le job `coeur-intact` s'appuie sur elle.
+> **création** d'une branche comme une poussée. `git push` est donc refusé :
+>
+> ```
+> remote: GitLab: You can only create protected branches using the web interface and API.
+>  ! [remote rejected]     upstream-v7.1.2 -> upstream-v7.1.2 (pre-receive hook declined)
+> ```
+>
+> Le message dit la marche à suivre, et elle est meilleure que celle écrite ici d'abord :
+> **créer la branche par l'interface ou par l'API, sans jamais retirer la protection.**
+> `Repository > Branches > New branch`, nom `upstream-vX.Y.Z`, créée depuis l'empreinte du
+> commit d'amont, qui est déjà sur le distant puisque `develop` le contient. Ne pas retirer
+> puis reposer la protection : cela ouvre une fenêtre pendant laquelle la référence qui
+> prouve l'intégrité du coeur est modifiable.
+>
+> Cela demande une session GitLab, donc le Membre : l'agent ne s'authentifie pas à sa place.
+> C'est volontairement pénible : cette référence est la preuve que le coeur de l'amont n'a
+> pas été touché, et le job `coeur-intact` s'appuie sur elle.
 
 ```bash
 cd ~/Documents/claude/trustiatis-secure
