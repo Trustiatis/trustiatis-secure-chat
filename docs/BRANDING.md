@@ -75,7 +75,13 @@ entrées du **cercle 3** doivent être argumentées, ce sont elles qui coûtent 
 
 | Cercle | Fichier | Modification | Justification | Commit |
 |---|---|---|---|---|
-| | | | | |
+| **3** | `apps/ios/Shared/Model/AppAPITypes.swift` | `NotificationsMode.values` réduit à `[.off]` | P-5. Les cas `instant` et `periodic` de l'énumération sont **conservés**, ils sont échangés avec le coeur sous forme de chaînes (interdit n° 3 de `CONTRIBUTING.md`). Seule la liste offerte à l'interface change, ce qui neutralise d'un coup tous les sélecteurs, présents et futurs | `feature/ios` |
+| **3** | `apps/ios/Shared/Views/UserSettings/NotificationsView.swift` | sélecteur de mode remplacé par un texte, et retrait de `setNotificationsMode` | P-5. `setNotificationsMode` était le chemin qui appelait `apiRegisterToken` depuis les réglages | `feature/ios` |
+| **3** | `apps/ios/Shared/Views/Onboarding/YourNetwork.swift` | défaut `.instant` passé à `.off`, feuille de sélection remplacée par l'écran d'information, `applyNotificationMode` réduit | P-5, et c'est **le point de fuite principal** : l'amont arme `instant` par défaut et enregistre le jeton dès que l'utilisateur touche « Continue », sans l'avoir demandé | `feature/ios` |
+| **3** | `apps/ios/Shared/Views/Onboarding/SetNotificationsMode.swift` | `SetNotificationsMode` et `NtfModeSelector` retirés, `NotificationsInfoView` conservée et complétée | P-5. L'écran d'information reste, c'est lui qui porte l'explication | `feature/ios` |
+| **3** | `apps/ios/Shared/Model/SimpleXAPI.swift` | `registerToken` ne pose plus de jeton et ramène le mode à `.off`, garde ajoutée dans `reRegisterToken` | P-5. Verrou de dernier recours : une base importée d'une autre application peut annoncer `instant`, et c'est ce chemin qui enverrait alors le jeton | `feature/ios` |
+| **3** | `apps/ios/Shared/Views/UserSettings/AppSettings.swift` | un mode importé autre que `.off` est ignoré | P-5. Un fichier de réglages ne doit pas pouvoir rallumer ce que l'interface a retiré | `feature/ios` |
+| 2 | `apps/ios/SimpleX Snapshots/SnapshotTests.swift` | scène `NotificationsModeView_Previews` remplacée par `NotificationsInfoView_Previews` | conséquence mécanique du retrait ci dessus, sans quoi la cible de test ne compile pas | `feature/ios` |
 
 ## 4. Points de vigilance relevés à l'audit
 

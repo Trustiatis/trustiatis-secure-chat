@@ -26,7 +26,10 @@ struct YourNetworkView: View {
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var serverOperators: [ServerOperator] = []
     @State private var selectedOperatorIds = Set<Int64>()
-    @State private var notificationMode: NotificationsMode = .instant
+    // Trustiatis Secure: off, and no longer selectable, see docs/DECISIONS.md P-5.
+    // Upstream defaults to .instant, which registers the device token with a notification
+    // server as soon as the user taps Continue, without ever asking.
+    @State private var notificationMode: NotificationsMode = .off
     @State private var sheetItem: YourNetworkSheet? = nil
     @State private var nextStepNavLinkActive = false
     @State private var justOpened = true
@@ -103,7 +106,7 @@ struct YourNetworkView: View {
                 ChooseServerOperators(serverOperators: serverOperators, selectedOperatorIds: $selectedOperatorIds)
                     .modifier(ThemedBackground())
             case .configureNotifications:
-                SetNotificationsMode(notificationMode: $notificationMode)
+                NotificationsInfoView()
                     .modifier(ThemedBackground())
             }
         }
@@ -134,7 +137,7 @@ struct YourNetworkView: View {
             sheetItem = .configureNotifications
         } label: {
             HStack(spacing: 4) {
-                Text("Setup notifications")
+                Text("About notifications")
                     .fontWeight(.medium)
                 Image(systemName: notificationMode.icon)
             }
@@ -164,28 +167,13 @@ struct YourNetworkView: View {
         }
     }
 
+    // Trustiatis Secure: the branch that registered the device token with a notification
+    // server is removed, see docs/DECISIONS.md P-5. Onboarding never sends the token.
     private func applyNotificationMode() {
         let m = ChatModel.shared
-        if let token = m.deviceToken {
-            switch notificationMode {
-            case .off:
-                m.tokenStatus = .new
-                m.notificationMode = .off
-            default:
-                Task {
-                    do {
-                        let status = try await apiRegisterToken(token: token, notificationMode: notificationMode)
-                        await MainActor.run {
-                            m.tokenStatus = status
-                            m.notificationMode = notificationMode
-                        }
-                    } catch let error {
-                        await MainActor.run {
-                            showErrorAlert(error, NSLocalizedString("Error enabling notifications", comment: ""))
-                        }
-                    }
-                }
-            }
+        if m.deviceToken != nil {
+            m.tokenStatus = .new
+            m.notificationMode = .off
         }
     }
 }

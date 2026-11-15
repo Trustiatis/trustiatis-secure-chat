@@ -56,6 +56,32 @@ Ce que cette décision implique, et qui n'était pas dans le cadrage du matin.
    annoncée sur le portail de téléchargement, sur la fiche de distribution et dans
    l'application. Rattaché à D-8.
 
+### 2026-11-15, P-5 rendue : le parcours de notification iOS est neutralisé
+
+Décidé par le Membre : « Pour P-5, retire les notifications instantanées et périodiques
+d'iOS ». La recommandation est suivie telle quelle.
+
+| N° | Décision | Portée |
+|---|---|---|
+| **P-5** | **Les modes « instantané » et « périodique » sont retirés de l'interface iOS.** Le mode est « désactivé », il n'est plus choisissable, et un texte explique pourquoi | `feature/ios`, première modification de cercle 3 du projet. Registre détaillé dans `BRANDING.md` chapitre 3 |
+
+Ce que la mise en oeuvre a appris, et qui n'était pas dans l'énoncé de la décision.
+
+1. **Le point de fuite n'était pas l'écran de réglages, c'était l'accueil.**
+   `YourNetworkView` arme `instant` par défaut et appelle `apiRegisterToken` dès que
+   l'utilisateur touche « Continue ». Un nouvel utilisateur n'avait donc rien à activer pour
+   que son jeton d'appareil parte chez un tiers : il lui suffisait de ne rien faire.
+2. **Une base importée d'une autre application rouvre le parcours.** `apiGetNtfToken` lit le
+   mode dans le coeur, pas dans nos réglages, et peut donc ramener `instant`. Le verrou a
+   été posé dans `registerToken`, le seul chemin qui enregistre le jeton au démarrage : il
+   ne pose plus rien et ramène le mode à `.off`.
+3. **Les cas `instant` et `periodic` de l'énumération sont conservés.** Ils sont échangés
+   avec le coeur sous forme de chaînes (`/_ntf register ... INSTANT`). Les supprimer
+   violerait l'interdit n° 3 de `CONTRIBUTING.md`. Seule la liste offerte à l'interface est
+   réduite.
+4. **Rien de tout cela n'est compilé.** La chaîne iOS exige Xcode, donc un Mac, que le
+   groupe n'a pas encore (voir P-1, conséquence 1). Le changement est relu, pas éprouvé.
+
 ### Décisions devenues sans objet pour la version 1
 
 `S-3` à `S-16` portent toutes sur l'exploitation de serveurs Trustiatis. Elles sont **gelées**,
@@ -69,7 +95,6 @@ l'audit des serveurs reste la référence à ce moment là.
 | N° | Décision | Ce qu'elle bloque | Recommandation |
 |---|---|---|---|
 | **D-1** | **Publication App Store d'une oeuvre AGPLv3 dont Trustiatis n'est pas titulaire** (risque J-02). À soumettre à un conseil juridique | la **publication** iOS, et elle seule. Depuis P-1, le développement de `feature/ios` n'est plus bloqué | faire examiner **avant** d'engager les frais de compte éditeur et de matériel Apple, puisque c'est cette réponse qui dit si ces frais servent à quelque chose. Replis possibles : TestFlight interne, distribution d'entreprise, ou publication iOS abandonnée pendant que le reste sort |
-| **P-5** | **Que fait l'interface de notification iOS, puisqu'elle ne peut pas aboutir.** Née de P-1 combinée à D-2 et D-4. Le coeur n'étant pas recompilé, il porte toujours les serveurs de notification de la communauté. Si l'utilisateur active les notifications, le parcours de l'audit des serveurs (§2.4) se déroule ainsi : l'application obtient un jeton Apple, l'**envoie** au serveur communautaire par `TNEW`, et le serveur tente une poussée de vérification vers l'identifiant d'application `chat.simplex.app` et l'équipe `5NN7GUYB6T`, qui ne seront jamais les nôtres. Apple répond `DeviceTokenNotForTopic` ou `TopicDisallowed`. Le jeton n'atteint donc **jamais** l'état `ACTIVE` et finit `INVALID`, motif `TOPIC`. Deux conséquences : l'utilisateur reçoit une erreur obscure au lieu d'une explication, et **le jeton d'appareil de nos utilisateurs a été transmis à un serveur tiers pour rien** | le contenu de `feature/ios`, pas son ouverture | **retirer les modes « instantané » et « périodique » de l'interface iOS, forcer le mode « désactivé », et afficher à la place un texte expliquant la restriction.** Laisser le parcours en place ferait envoyer des jetons d'appareil à un tiers en échange d'un message d'erreur. C'est une modification de cercle 3, la première du projet, à inscrire au registre de `BRANDING.md` et à justifier dans la demande de fusion |
 
 ---
 
