@@ -206,6 +206,32 @@ téléphone, dans `Préférences > Compte`, ou à l'adresse
 `https://gitlab.com/-/identity_verification`. **Une carte n'est pas débitée** par cette
 vérification, elle sert de preuve d'identité.
 
+### Quel compte, exactement
+
+Deux comptes GitLab interviennent ici, et ce sont bien **deux comptes distincts**, pas un
+compte et un groupe.
+
+| Compte | Rôle | Identifiant |
+|---|---|---|
+| **`Trustiatis`**, affiché « Trustiatis.com » | **propriétaire de l'espace de noms** du projet, donc celui qui porte la consommation de CI. C'est un **compte utilisateur**, pas un groupe : `GET /groups/Trustiatis` répond 404 | id 23182124 |
+| le **compte personnel du Membre** | le compte dont la clé SSH pousse depuis ce poste, et celui qui est enregistré comme déclencheur des pipelines | non nommé ici : ce dépôt est public |
+
+**C'est `Trustiatis` qui doit être vérifié, pas le compte personnel.** La démonstration est
+dans les faits, relevés le 2026-11-15 : dans l'espace personnel du Membre, des pipelines
+déclenchés par lui **réussissent**, le plus récent le 2026-10-27. Le même
+utilisateur, sur `Trustiatis/trustiatis-secure-chat`, se voit répondre que l'utilisateur
+n'est pas vérifié. La seule variable qui change est l'espace de noms qui porte la
+consommation.
+
+Donc : **se connecter en tant que `Trustiatis`** et faire la vérification sur ce compte là.
+Il faut prévoir que ce compte n'a probablement jamais servi à faire tourner de CI, et donc
+que rien n'a encore été vérifié dessus.
+
+Réserve honnête : le message de GitLab dit « the user », et la conclusion ci dessus est une
+déduction par contraste, pas une lecture directe du statut des deux comptes, qui n'est pas
+lisible sans être connecté. La page `https://gitlab.com/-/identity_verification`, ouverte
+une fois connecté en tant que `Trustiatis`, donne la réponse en une seconde.
+
 **C'est au Membre de la faire.** L'agent ne saisit jamais de coordonnées bancaires ni de
 pièce d'identité, quelle que soit la demande.
 
