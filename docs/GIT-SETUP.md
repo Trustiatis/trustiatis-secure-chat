@@ -7,6 +7,13 @@ mises à jour de sécurité.
 
 **Ordre imposé.** Ne pas pousser avant l'étape 3 : la greffe réécrit `main`.
 
+> **État au 2026-11-15 : les étapes 1 à 4 sont faites.** Le projet existe
+> (`git@gitlab.com:Trustiatis/trustiatis-secure-chat.git`), l'amont `v7.1.3` est greffé, et
+> les onze références sont envoyées. **Restent les étapes 5 à 7**, qui se font dans
+> l'interface GitLab et que l'agent ne peut pas exécuter : protection des branches et des
+> tags, réglages des demandes de fusion, et la liste de rappels. Voir aussi le journal de
+> greffe en bas de `UPSTREAM_SYNC.md`.
+
 ---
 
 ## Pourquoi ce découpage
@@ -122,6 +129,13 @@ Il affiche en fin de course la liste des fichiers de l'amont que la greffe aurai
 ne pas pousser et comprendre pourquoi.
 
 ## Étape 4, envoyer vers GitLab
+
+**Fait le 2026-11-15.** Onze références envoyées, vérifiées par `git ls-remote origin` :
+`main`, `develop`, `upstream-v7.1.3`, `couche-trustiatis-initiale`, les six `feature/*` et
+le tag `v7.1.3`. La référence d'amont distante vaut bien
+`19889b1a0ee11b6071c41146b6549f46e2b5b6af`.
+
+Pour mémoire, les commandes employées :
 
 ```bash
 git push -u origin main

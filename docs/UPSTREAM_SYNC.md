@@ -102,4 +102,4 @@ modifications et leur date.
 
 | Date | Version d'amont | Version Trustiatis | Nature du report | Auteur | Demande de fusion |
 |---|---|---|---|---|---|
-| 2026-11-15 | `v7.1.3` | (aucune livraison) | **greffe initiale.** Point de départ du fork, aucune modification du code de l'amont hormis `.gitignore` | Trustiatis | sans objet, mise en place |
+| 2026-11-15 | `v7.1.3` | (aucune livraison) | **greffe initiale, exécutée.** Point de départ du fork. Commit d'amont `19889b1a0ee11b6071c41146b6549f46e2b5b6af`, daté du 2026-11-11. Deux fichiers de l'amont touchés, et deux seulement : `.gitignore` concaténé, et `README.md` remplacé par le nôtre (son contenu est conservé dans `README-AMONT.md`). `git diff upstream-v7.1.3 main -- src/ scripts/ flake.nix flake.lock cabal.project` est **vide** | Trustiatis | sans objet, mise en place |
