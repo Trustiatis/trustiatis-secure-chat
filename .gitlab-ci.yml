@@ -85,14 +85,24 @@ coeur-intact:
   # branche de référence de l'amont serait absente, le contrôle passerait sans rien
   # contrôler, et un garde-fou qui passe en silence est pire que pas de garde-fou. On
   # récupère donc explicitement cette référence depuis le distant.
+  #
+  # La référence est lue dans tools/amont-courant.txt et non devinée. La version
+  # précédente prenait la branche upstream-* de plus haut numéro, ce qui supposait que
+  # l'on n'avance jamais que vers l'avant. Le 2026-11-15, la greffe est repassée de
+  # v7.1.3 à v7.1.2 : l'heuristique aurait comparé le dépôt à une version que nous
+  # n'utilisons plus, et le contrôle aurait échoué sans qu'il y ait de faute.
   variables:
     GIT_DEPTH: 0
   script:
     - |
-      ref=$(git ls-remote --heads origin 'refs/heads/upstream-*' \
-            | awk '{print $2}' | sed 's|refs/heads/||' | sort -V | tail -1)
+      ref=$(tr -d '[:space:]' < tools/amont-courant.txt)
       if [ -z "$ref" ]; then
-        echo "ERREUR : aucune branche upstream-* sur le distant."
+        echo "ERREUR : tools/amont-courant.txt est vide."
+        echo "Ce fichier nomme la branche d'amont pur sur laquelle la greffe repose."
+        exit 1
+      fi
+      if ! git ls-remote --exit-code --heads origin "refs/heads/$ref" >/dev/null 2>&1; then
+        echo "ERREUR : la branche $ref est absente du distant."
         echo "Elle est la preuve de ce que vaut l'amont. Sans elle, rien n'est vérifiable."
         exit 1
       fi

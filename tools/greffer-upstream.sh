@@ -75,6 +75,12 @@ echo "== $(git log -1 --format='%ad %s' --date=short "$AMONT")"
 git branch -f "upstream-$TAG" "$AMONT"
 echo "== branche upstream-$TAG créée sur l'amont pur"
 
+# La base d'amont est écrite, pas devinée. Le contrôle coeur-intact de la CI lit ce
+# fichier. Une heuristique « la branche upstream-* de plus haut numéro » supposerait que
+# l'on n'avance jamais que vers l'avant, ce qui s'est révélé faux dès le 2026-11-15.
+printf 'upstream-%s\n' "$TAG" > tools/amont-courant.txt
+echo "== base d'amont inscrite dans tools/amont-courant.txt"
+
 # ---- main = amont + couche Trustiatis
 git checkout -q -B main "$AMONT"
 
