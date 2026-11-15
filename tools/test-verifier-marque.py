@@ -41,12 +41,19 @@ CAS = [
     ('<string name="x">SimpleX Lock</string>', True, "nom du produit, verrou"),
     ('<string name="x">Logo SimpleX</string>', True, "nom du produit, description d image"),
     ("""<string name="x">Merci d\\'avoir installé SimpleX Chat !</string>""", True, "nom du produit"),
-    # Catégorie 3 : renvoi vers l'éditeur amont. Doit sortir aussi.
-    ('<string name="x">Support SimpleX Chat</string>', True, "appel aux dons de l amont"),
-    ('<string name="x">Install SimpleX Chat for terminal</string>', True, "renvoi vers l amont"),
-    ('<string name="x">SimpleX Team</string>', True, "équipe de l amont"),
-    ('<string name="x">Own a part of SimpleX Chat!</string>', True, "financement de l\\'amont"),
-    ('<string name="x">Contacter l’équipe SimpleX</string>', True, "équipe de l amont"),
+    # Catégorie 3 : renvoi vers l'éditeur amont. Doit sortir...
+    ('<string name="x">Visit the SimpleX Chat website</string>', True, "renvoi non couvert par P-7"),
+    ('<string name="x">Rate SimpleX Chat on the store</string>', True, "renvoi non couvert par P-7"),
+    # ...SAUF l'appel au soutien, que la décision P-7 conserve. Si l'un de ces
+    # cas se met à signaler, c'est que la dérogation a été retirée sans que la
+    # décision soit révisée.
+    ('<string name="x">Support SimpleX Chat</string>', False, "P-7, appel au soutien conservé"),
+    ('<string name="x">Install SimpleX Chat for terminal</string>', False, "P-7"),
+    ('<string name="x">SimpleX Team</string>', False, "P-7, équipe de l amont"),
+    ('<string name="x">Own a part of SimpleX Chat!</string>', False, "P-7, financement en capital"),
+    ('<string name="x">Contacter l’équipe SimpleX</string>', False, "P-7"),
+    ('<string name="x">Soutenez SimpleX et obtenez un badge.</string>', False, "P-7"),
+    ('<string name="x">%s a investi dans le financement participatif de SimpleX Chat.</string>', False, "P-7"),
     # Catégorie 2 : réseau et protocole. Doit rester.
     ('<string name="x">SimpleX group link</string>', False, "objet du protocole"),
     ('<string name="x">SimpleX contact address</string>', False, "objet du protocole"),

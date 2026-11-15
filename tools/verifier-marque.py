@@ -143,9 +143,41 @@ OPERATEUR_AUTORISE = [
     r"(?:La s|s)écurité de SimpleX Chat a été auditée",
 ]
 
+# Renvois vers l'éditeur amont que le Membre a décidé de CONSERVER.
+#
+# Décision P-7, rendue le 2026-11-15 : Trustiatis Secure garde l'appel au
+# soutien de SimpleX Chat. C'est la troisième catégorie de NOTICE-AGPL.md, que
+# ce document dit de retirer ou de réécrire ; la décision du Membre prime, et
+# cette liste est là pour que la dérogation soit nommée, bornée et relisible
+# plutôt que dispersée en commentaires dans quarante catalogues.
+#
+# Deux choses différentes y cohabitent, et la distinction compte :
+#   - le badge de soutien est un ACHAT qui rend un service à l'utilisateur
+#     (fichiers de 2 à 5 Gio conservés de 7 à 21 jours) ;
+#   - « Invest in SimpleX Chat » renvoie à un financement participatif en
+#     CAPITAL sur Wefunder, c'est à dire à une offre de titres, ouverte aux
+#     seules juridictions que l'offre couvre. Voir la note de P-7.
+#
+# Toute ligne ajoutée ici doit pouvoir se rattacher à P-7. Ce n'est pas une
+# liste où l'on range ce qui résiste.
+EDITEUR_CONSERVE_P7 = [
+    r"[Ss]upport(?:s|ed)? SimpleX(?: Chat)?",
+    r"[Ss]outen(?:ez|ir|u) SimpleX(?: Chat)?", r"soutient SimpleX(?: Chat)?",
+    r"Invest in SimpleX Chat", r"Own a part of SimpleX Chat",
+    r"[Dd]evenez copropriétaire de SimpleX Chat",
+    r"invested in SimpleX Chat crowdfunding",
+    r"investi dans le financement participatif de SimpleX Chat",
+    r"SimpleX Team", r"[ÉéEe]quipe SimpleX",
+    r"Install(?:er)? SimpleX Chat (?:for|pour) terminal",
+    r"SimpleX Chat develop(?:ers|eurs)", r"développeurs de SimpleX Chat",
+]
+
 MOTIF_MARQUE = re.compile(r"simplex", re.IGNORECASE)
 MOTIF_AUTORISE = re.compile(
-    "|".join(IDENTIFIANTS_AUTORISES + RESEAU_AUTORISE + OPERATEUR_AUTORISE), re.IGNORECASE
+    "|".join(
+        IDENTIFIANTS_AUTORISES + RESEAU_AUTORISE + OPERATEUR_AUTORISE + EDITEUR_CONSERVE_P7
+    ),
+    re.IGNORECASE,
 )
 MOTIF_AUTORISE_CASSE = re.compile("|".join(IDENTIFIANTS_AUTORISES_CASSE))
 

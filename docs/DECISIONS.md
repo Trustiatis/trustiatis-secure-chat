@@ -82,6 +82,34 @@ Ce que la mise en oeuvre a appris, et qui n'était pas dans l'énoncé de la dé
 4. **Rien de tout cela n'est compilé.** La chaîne iOS exige Xcode, donc un Mac, que le
    groupe n'a pas encore (voir P-1, conséquence 1). Le changement est relu, pas éprouvé.
 
+### 2026-11-15 au soir, P-7 rendue : l'appel au soutien de l'amont est conservé
+
+| N° | Décision | Portée |
+|---|---|---|
+| **P-7** | **Trustiatis Secure garde l'appel au soutien de SimpleX Chat.** Badges, bannière de financement, section « Support SimpleX Chat » des réglages, contact des développeurs, lien vers le client en ligne de commande, pictogramme de l'équipe : rien n'est retiré ni réécrit. Ma recommandation de masquer ces écrans n'est pas retenue | les six points d'entrée restent en place. La dérogation est nommée et bornée dans `EDITEUR_CONSERVE_P7` de `tools/verifier-marque.py`, et testée, plutôt que dispersée en commentaires dans quarante catalogues |
+
+**Ce que la décision gagne.** Le badge de soutien est un achat qui rend un service à
+l'utilisateur, des fichiers de 2 à 5 Gio conservés de 7 à 21 jours : le retirer aurait coûté
+une capacité réelle. Et un fork qui vit du travail de l'amont et en masque l'appel au soutien
+se met dans une position difficile à défendre.
+
+**Deux réserves à porter au dossier, non bloquantes.**
+
+1. **Une partie de cet appel n'est pas un don.** « Invest in SimpleX Chat » et « Own a part of
+   SimpleX Chat » renvoient à un financement participatif **en capital** sur Wefunder, c'est à
+   dire à une offre de titres, réservée aux juridictions que l'offre couvre. Relayer une offre
+   de titres d'un tiers à ses clients n'est pas le même acte que relayer un lien de don, et la
+   promotion financière est encadrée dans plusieurs des juridictions où Trustiatis opère. À
+   soumettre à la fonction GRC avant la première version publiée. Si la réponse est de ne
+   garder que le don et le badge, la modification se borne au bloc
+   `if (crowdfundingAvailable())` de `views/usersettings/SettingsView.desktop.kt` et aux deux
+   appels à `GetStakeBanner`.
+2. **La mention de non affiliation devient indispensable.** Garder « Soutenez SimpleX » dans
+   une application nommée Trustiatis Secure peut se lire comme une affiliation, que la
+   politique de marque de l'amont interdit expressément. Le texte existe déjà, dans
+   `NOTICE-AGPL.md`, et il doit figurer dans l'écran « À propos ». C'est la contrepartie
+   technique de cette décision, pas une formalité.
+
 ### 2026-11-15 au soir, P-6 : la greffe revient sur v7.1.2
 
 Décidé par le Membre, en réponse au constat fait pendant la première compilation : « Passe la
@@ -153,5 +181,4 @@ l'audit des serveurs reste la référence à ce moment là.
 | **D-8** | Nom exact, mentions légales et texte de compatibilité au réseau SimpleX dans l'application et sur les magasins | texte proposé dans [`../NOTICE-AGPL.md`](../NOTICE-AGPL.md), à valider par la fonction GRC |
 | **D-9** | Budget matériel et comptes éditeurs | **corrigée le 2026-11-15 par P-1** : iOS restant au périmètre, un **Mac redevient nécessaire** (Xcode n'existe que sur macOS) ainsi qu'un **compte Apple Developer payant**. Seule l'économie de la machine de construction Haskell subsiste (D-2). Restent aussi un appareil GrapheneOS réel, un certificat de signature de code Windows et un compte Google Play. À chiffrer **après** D-1 : si la publication iOS est impossible, le Mac et le compte Apple ne servent qu'à une distribution interne |
 | **P-3** | **Rétention des binaires sur le portail de téléchargement.** Le plan gratuit de Cloudflare R2 offre 10 Go de stockage par mois, et un jeu complet d'artefacts pèse de 1,5 à 2 Go par version | **conserver les 3 dernières versions** sur le portail, les plus anciennes restant disponibles sur les versions publiées du dépôt GitLab. Voir [`DISTRIBUTION.md`](DISTRIBUTION.md) |
-| **P-7** | **Ce que devient l'appel au financement de l'amont.** Le fichier de référence et le français ne contiennent plus, en fait de marque, que cette famille : badges de soutien, bannière d'investissement, section « Support SimpleX Chat » des réglages, contact des développeurs, lien vers le client en ligne de commande, pictogramme de l'équipe. Sept fichiers Kotlin les affichent. Les garder revient à solliciter de l'argent pour SimpleX Chat Ltd auprès des clients de Trustiatis, et à suggérer une affiliation que la politique de marque interdit expressément. Les retirer fait perdre une capacité réelle : le badge débloque des fichiers de 2 à 5 Gio conservés de 7 à 21 jours sur les serveurs de la communauté | **masquer les points d'entrée, ne pas supprimer le code.** Un seul drapeau garde les six endroits qui y mènent : la rubrique du badge et le bloc `if (crowdfundingAvailable())` de `views/usersettings/SettingsView.kt`, les sections « contact » et « soutenir le projet » de `HelpAndSupportView` dans le même fichier, l'appel à `GetStakeBanner` de `views/chatlist/ChatListView.kt` et celui de `views/newchat/OnboardingCards.kt`, enfin `BadgesSupportSimplexView` dans `views/badges/BadgesView.kt`. L'amont offre déjà la moitié du travail : `crowdfundingAvailable()`, dans `views/onboarding/WhatsNewView.kt`, est la fonction qui décide. Le code des écrans reste en place, donc chaque report reste trivial, et la décision se révise en changeant une constante. Le gain de quota se perd : à annoncer dans l'aide, et à reprendre si Trustiatis exploite un jour ses propres relais (la question rejoint alors S-1) |
 | **P-4** | **Point de départ du fork** : `v7.1.3`, dernier tag stable au jour de l'audit, ou suivi de la branche `stable` | **révisée le 2026-11-15 au soir, voir P-6 : la base est `v7.1.2`.** La règle de ne suivre que les tags stables, jamais `master`, reste entière |
