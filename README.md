@@ -13,7 +13,7 @@ libre **SimpleX Chat** et compatible avec le réseau SimpleX.
 | Amont | `https://github.com/simplex-chat/simplex-chat` |
 | Version d'amont de référence | `v7.1.3` |
 | Licence | GNU AGPL version 3 (voir `LICENSE` après la greffe de l'amont) |
-| Plateformes visées | Windows, macOS, Linux, Android, GrapheneOS, iOS |
+| Plateformes visées | Windows, macOS, Linux, Android, GrapheneOS, et iOS sans notification instantanée |
 | Statut | **Phase 2, personnalisation graphique.** Aucun binaire publié à ce jour |
 
 ## État du projet
@@ -31,9 +31,14 @@ Décidé par le Membre le 2026-11-15, voir [`docs/DECISIONS.md`](docs/DECISIONS.
 
 - **Serveurs : ceux de la communauté SimpleX.** Trustiatis n'héberge aucun relais en V1.
 - **Pas de notification instantanée sur iOS.** Aucun serveur de notification Trustiatis.
+- **iOS fait néanmoins partie de la version 1**, avec cette restriction assumée (décision
+  P-1). Sur iOS, l'application ne reçoit les messages qu'à son ouverture. Cette limite doit
+  être annoncée sur le portail de téléchargement, sur la fiche de distribution et dans
+  l'application elle même, pas seulement dans les notes de version.
 - **Conséquence : le coeur Haskell n'est pas modifié.** Les bibliothèques natives sont celles
   publiées par l'amont. La personnalisation reste confinée aux ressources, aux identifiants et
-  à un nombre réduit de fichiers d'interface.
+  à un nombre réduit de fichiers d'interface, plus la neutralisation du parcours de
+  notification iOS (décision P-5).
 
 ## Organisation du dépôt
 

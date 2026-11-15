@@ -40,7 +40,7 @@ justification écrite dans `docs/BRANDING.md`.**
 | `feature/branding` | identité graphique, cercle 1 |
 | `feature/desktop` | Windows, macOS, Linux |
 | `feature/android` | Android et GrapheneOS |
-| `feature/ios` | iOS, **bloquée** tant que la décision D-1 n'est pas rendue |
+| `feature/ios` | iOS, **ouverte au développement** depuis la décision P-1. La **publication** reste suspendue à D-1 (question juridique, pas technique) |
 | `feature/distribution` | empaquetage, signature, portail de téléchargement |
 | `feature/server-configuration` | configuration des serveurs, **sans objet en V1** (serveurs communautaires) |
 | `upstream/vX.Y.Z` | branches techniques de report d'une version d'amont |

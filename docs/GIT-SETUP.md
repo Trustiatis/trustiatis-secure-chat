@@ -30,19 +30,24 @@ ce poste.
 
 À faire par le Membre, dans l'interface GitLab de Trustiatis.
 
-1. Groupe `Trustiatis`, **nouveau projet vierge** nommé `trustiatis-secure`.
-   - Visibilité : **privée** pour l'instant. Elle devra passer à **publique** avant toute
-     distribution de binaire, pour satisfaire l'obligation de mise à disposition du code
-     source de l'AGPLv3 (voir `NOTICE-AGPL.md`).
-   - **Ne pas** cocher l'initialisation avec un README.
-2. Relever l'URL SSH exacte du projet. La convention observée sur le dépôt frère
-   `trustigateway` est `git@gitlab.com:Trustiatis/<projet>.git`, mais **ne pas la deviner** :
-   la recopier depuis l'interface.
-3. Noter cette URL ci dessous, pour la suite et pour les prochaines fois :
+**Fait.** Le Membre a créé le projet et transmis son URL le 2026-11-15 :
 
-   ```text
-   origin = git@gitlab.com:Trustiatis/trustiatis-secure.git     <- à confirmer
-   ```
+```text
+origin = git@gitlab.com:Trustiatis/trustiatis-secure-chat.git
+```
+
+Le projet GitLab s'appelle donc **`trustiatis-secure-chat`**, alors que le dossier local
+s'appelle `trustiatis-secure/`. L'écart est volontairement conservé : renommer le dossier
+casserait les exclusions du dépôt de l'espace de travail, l'entrée de `.claude/launch.json`
+et les liens de `INDEX-DOCUMENTATION.md`, pour un gain nul.
+
+Rappels qui restent valables :
+
+- Visibilité **privée** pour l'instant. Elle devra passer à **publique** avant toute
+  distribution de binaire, pour satisfaire l'obligation de mise à disposition du code source
+  de l'AGPLv3 (voir `NOTICE-AGPL.md`).
+- Le projet doit être **vierge**, sans README d'initialisation, sinon le premier envoi sera
+  refusé pour divergence.
 
 ## Étape 2, vérifier l'état local
 
@@ -119,7 +124,6 @@ ne pas pousser et comprendre pourquoi.
 ## Étape 4, envoyer vers GitLab
 
 ```bash
-git remote add origin <URL relevée à l'étape 1>
 git push -u origin main
 git push origin develop
 git push origin 'refs/heads/feature/*'
