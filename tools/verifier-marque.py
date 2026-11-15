@@ -14,7 +14,7 @@ Le contrôle est volontairement conservateur : il signale, il ne corrige jamais.
 Code de sortie 0 si aucun signalement, 1 sinon. Utilisé par .gitlab-ci.yml.
 
 Usage :
-    tools/verifier-marque.py [--racine .] [--json]
+    tools/verifier-marque.py [--racine .] [--json | --resume]
 """
 
 import argparse
@@ -141,16 +141,74 @@ def signalements(racine: str):
                     }
 
 
+def afficher_resume(trouves) -> None:
+    """Sortie bornée, pour un journal d'intégration continue.
+
+    Le rapport complet fait plusieurs milliers de lignes, et GitLab tronque les journaux :
+    un journal tronqué de 500 Kio n'apprend rien à personne. On affiche donc la répartition
+    et un échantillon, le détail partant en artefact JSON.
+    """
+    if not trouves:
+        print("Contrôle de marque : aucun signalement.")
+        return
+
+    import collections
+
+    def categorie(f: str) -> str:
+        if f.endswith("strings.xml"):
+            return "catalogues de traduction"
+        if f.endswith((".kt", ".kts")):
+            return "Kotlin, commun Android et Desktop"
+        if f.endswith(".swift"):
+            return "Swift, iOS"
+        if f.endswith(".pbxproj"):
+            return "projet Xcode"
+        return "autres"
+
+    cat = collections.Counter(categorie(s["fichier"]) for s in trouves)
+    fic = collections.Counter(s["fichier"] for s in trouves)
+
+    print(f"Contrôle de marque : {len(trouves)} signalement(s) sur {len(fic)} fichier(s).\n")
+    print("Répartition :")
+    for nom, n in cat.most_common():
+        print(f"  {n:6d}  {nom}")
+    print("\nFichiers les plus touchés :")
+    for nom, n in fic.most_common(10):
+        print(f"  {n:6d}  {nom}")
+
+    echantillon = 20
+    print(f"\nÉchantillon, {echantillon} premières lignes sur {len(trouves)} :")
+    for s in trouves[:echantillon]:
+        print(f"  {s['fichier']}:{s['ligne']}  {s['texte']}")
+
+    print(
+        "\nLe détail complet est dans l'artefact marque-complet.json de ce job.\n"
+        "Chaque ligne doit être traitée selon NOTICE-AGPL.md :\n"
+        "  - nom du produit        -> remplacer par « Trustiatis Secure »\n"
+        "  - réseau ou protocole   -> conserver, et ajouter le commentaire « marque-ok: reseau »\n"
+        "  - renvoi vers l'éditeur -> retirer ou réécrire vers Trustiatis\n"
+        "Une dérogation se pose en commentaire sur la ligne, sous la forme\n"
+        "« marque-ok: <raison> », et doit être justifiable."
+    )
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Contrôle de marque Trustiatis Secure")
     ap.add_argument("--racine", default=".")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument(
+        "--resume",
+        action="store_true",
+        help="sortie bornée : répartition et échantillon, au lieu des milliers de lignes",
+    )
     args = ap.parse_args()
 
     trouves = list(signalements(args.racine))
 
     if args.json:
         print(json.dumps(trouves, ensure_ascii=False, indent=2))
+    elif args.resume:
+        afficher_resume(trouves)
     else:
         if not trouves:
             print("Contrôle de marque : aucun signalement.")

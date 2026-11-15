@@ -45,7 +45,16 @@ marque:
   image: python:3.12-slim
   allow_failure: true          # à passer à false à la fin de la Phase 2
   script:
-    - python3 tools/verifier-marque.py
+    # Le détail part en artefact, pas dans le journal : 2 957 signalements font un
+    # journal de 500 Kio que GitLab tronque, et un journal tronqué n'apprend rien.
+    # `--resume` donne la répartition et un échantillon, et rend le même code de sortie.
+    - python3 tools/verifier-marque.py --json > marque-complet.json || true
+    - python3 tools/verifier-marque.py --resume
+  artifacts:
+    when: always
+    expire_in: 30 days
+    paths:
+      - marque-complet.json
 
 # ---------------------------------------------------------------------------
 # Typographie : la décision du Membre interdit le tiret long et le tiret
@@ -63,7 +72,15 @@ typographie:
 # ---------------------------------------------------------------------------
 coeur-intact:
   stage: controles
-  image: alpine/git:latest
+  # Deux précautions, chacune apprise à ses dépens le 2026-11-15 :
+  #   - `entrypoint: [""]` est obligatoire. L'image alpine/git déclare `git` comme point
+  #     d'entrée, donc sans cela le runner exécute `git sh` et le job meurt sur
+  #     « git: 'sh' is not a git command ». Ne pas retirer cette ligne.
+  #   - la version est figée. `latest` sur une image de contrôle de sécurité veut dire
+  #     que le contrôle peut changer sans que nous changions rien.
+  image:
+    name: alpine/git:v2.52.0
+    entrypoint: [""]
   # GitLab ne clone par défaut que la référence testée, et en profondeur réduite : la
   # branche de référence de l'amont serait absente, le contrôle passerait sans rien
   # contrôler, et un garde-fou qui passe en silence est pire que pas de garde-fou. On
