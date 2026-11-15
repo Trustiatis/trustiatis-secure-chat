@@ -14,6 +14,29 @@ default:
   interruptible: true
 
 # ---------------------------------------------------------------------------
+# Quels pipelines existent.
+#
+# Sans ce bloc, pousser six branches de travail d'un coup crée six pipelines, et chacun
+# échoue avec « 0 job » parce qu'aucune règle de job ne correspond à une branche de
+# travail. Un pipeline en échec qui n'avait rien à faire est du bruit, et le bruit finit
+# par faire ignorer les vrais échecs.
+#
+# Ici, la décision est prise une fois, à la création du pipeline, et non job par job.
+# ---------------------------------------------------------------------------
+workflow:
+  rules:
+    # Demande de fusion : c'est le pipeline qui compte pour la relecture.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Jamais de pipeline de branche en double quand une demande de fusion est ouverte.
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
+    # Les deux branches intégratrices.
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"
+    # Tout le reste, branches de travail, branches de référence et étiquettes : rien.
+    # Un pipeline qui n'existe pas vaut mieux qu'un pipeline vide en échec.
+    - when: never
+
+# ---------------------------------------------------------------------------
 # Contrôle de marque : aucune occurrence interdite de la marque de l'amont.
 # Avertissement tant que la Phase 2 n'est pas finie, bloquant ensuite.
 # ---------------------------------------------------------------------------
@@ -23,10 +46,6 @@ marque:
   allow_failure: true          # à passer à false à la fin de la Phase 2
   script:
     - python3 tools/verifier-marque.py
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_COMMIT_BRANCH == "main"
 
 # ---------------------------------------------------------------------------
 # Typographie : la décision du Membre interdit le tiret long et le tiret
@@ -37,10 +56,6 @@ typographie:
   image: alpine:3.20
   script:
     - sh tools/verifier-typographie.sh
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_COMMIT_BRANCH == "main"
 
 # ---------------------------------------------------------------------------
 # Garde-fou de la décision D-2 : le coeur Haskell n'est pas modifié.
@@ -74,10 +89,6 @@ coeur-intact:
         exit 1
       fi
       echo "Coeur intact."
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_COMMIT_BRANCH == "main"
 
 # ---------------------------------------------------------------------------
 # Aucun secret committé.
@@ -95,7 +106,3 @@ secrets:
         exit 1
       fi
       echo "Aucun secret versionné."
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_COMMIT_BRANCH == "main"

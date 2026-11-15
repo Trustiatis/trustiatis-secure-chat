@@ -50,9 +50,15 @@ et les liens de `INDEX-DOCUMENTATION.md`, pour un gain nul.
 
 Rappels qui restent valables :
 
-- Visibilité **privée** pour l'instant. Elle devra passer à **publique** avant toute
-  distribution de binaire, pour satisfaire l'obligation de mise à disposition du code source
-  de l'AGPLv3 (voir `NOTICE-AGPL.md`).
+- **Le projet a été créé PUBLIC**, constaté le 2026-11-15 : il se consulte sans être
+  connecté. Ce n'est pas la visibilité privée que cette procédure supposait. Ce n'est pas un
+  problème en soi, l'AGPLv3 exigera de toute façon la publication du code avant toute
+  distribution de binaire (voir `NOTICE-AGPL.md`), et c'est donc une étape prise d'avance.
+  Mais deux conséquences sont immédiates et il faut les vouloir : **tout l'historique poussé
+  est déjà lisible par n'importe qui**, adresse de commit comprise, et le fork est public
+  avant d'avoir commencé sa personnalisation, donc visible avec la marque de l'amont encore
+  partout. Si ce n'est pas voulu, repasser le projet en privé maintenant, dans
+  `Settings > General > Visibility`.
 - Le projet doit être **vierge**, sans README d'initialisation, sinon le premier envoi sera
   refusé pour divergence.
 
@@ -182,6 +188,43 @@ sh tools/verifier-typographie.sh
 
 Le contrôle de marque **doit** signaler beaucoup de lignes à ce stade : c'est précisément le
 travail de la Phase 2. Il devra être vert avant la première version publiée.
+
+## Étape 6 bis, débloquer l'intégration continue
+
+**Constaté le 2026-11-15 : aucun pipeline ne peut tourner.** Les quinze premiers ont tous
+échoué instantanément, sans démarrer un seul job. Ce n'est pas la configuration : interrogé
+par son API, GitLab répond `yamlErrors: false` et donne la raison, mot pour mot :
+
+```text
+The pipeline failed due to the user not being verified.
+```
+
+GitLab.com exige depuis plusieurs années que le compte soit **vérifié** avant de laisser
+tourner des pipelines sur ses exécuteurs partagés, y compris en plan gratuit, pour lutter
+contre le minage de cryptomonnaie. La vérification se fait par carte bancaire ou par
+téléphone, dans `Préférences > Compte`, ou à l'adresse
+`https://gitlab.com/-/identity_verification`. **Une carte n'est pas débitée** par cette
+vérification, elle sert de preuve d'identité.
+
+**C'est au Membre de la faire.** L'agent ne saisit jamais de coordonnées bancaires ni de
+pièce d'identité, quelle que soit la demande.
+
+Deux voies si cette vérification n'est pas souhaitée :
+
+| Voie | Ce qu'elle implique |
+|---|---|
+| **Vérifier le compte** | les exécuteurs partagés de GitLab deviennent disponibles, rien d'autre à faire |
+| **Déclarer un exécuteur à nous** | un `gitlab-runner` sur une machine du groupe, par exemple la VM d'exécution de l'agent d'infrastructure. Évite la dépendance et la vérification, mais la machine doit être disponible quand un pipeline tourne. À arbitrer avec le plan de refonte infra |
+
+Tant que l'un ou l'autre n'est pas fait, les quatre contrôles doivent être passés **à la
+main** avant chaque fusion, et la demande de fusion doit en porter la preuve :
+
+```bash
+sh tools/verifier-typographie.sh
+python3 tools/verifier-marque.py
+git diff --name-only upstream-v7.1.3 HEAD -- src/ scripts/ flake.nix flake.lock cabal.project
+git ls-files | grep -E '\.jks$|\.p12$|\.p8$|^local\.properties$'
+```
 
 ## Étape 7, ce qu'il ne faut pas oublier
 
