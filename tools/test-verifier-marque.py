@@ -1,0 +1,93 @@
+"""Vérifie que le contrôle de marque trie correctement.
+
+Pourquoi ce test existe
+-----------------------
+`verifier-marque.py` ne fait pas que chercher un mot : il porte une décision sur
+chaque ligne, celle de `NOTICE-AGPL.md` chapitre 2. Un nom de produit doit sortir,
+un objet du réseau doit rester. Les motifs qui tranchent cela sont des expressions
+rationnelles, et une expression rationnelle trop large ne se voit pas : elle rend
+simplement le contrôle silencieux, ce qui est pire que pas de contrôle du tout.
+
+Chaque cas ci dessous est une ligne réelle, prise dans les catalogues de l'amont.
+
+Usage
+-----
+    python3 tools/test-verifier-marque.py
+"""
+
+from __future__ import annotations
+
+import importlib.util
+import sys
+from pathlib import Path
+
+RACINE = Path(__file__).resolve().parent.parent
+
+
+def charger():
+    chemin = RACINE / "tools" / "verifier-marque.py"
+    spec = importlib.util.spec_from_file_location("verifier_marque", chemin)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+# (ligne, signalée ?, pourquoi)
+CAS = [
+    # Catégorie 1 : nom du produit. Doit sortir.
+    ('<string name="x">Open SimpleX Chat to accept call</string>', True, "nom du produit"),
+    ('<string name="tray_show">Show SimpleX</string>', True, "nom du produit, menu du bureau"),
+    ('<string name="theme_simplex">SimpleX</string>', True, "nom du produit, étiquette de thème"),
+    ('<string name="x">SimpleX Lock</string>', True, "nom du produit, verrou"),
+    ('<string name="x">Logo SimpleX</string>', True, "nom du produit, description d image"),
+    ("""<string name="x">Merci d\\'avoir installé SimpleX Chat !</string>""", True, "nom du produit"),
+    # Catégorie 3 : renvoi vers l'éditeur amont. Doit sortir aussi.
+    ('<string name="x">Support SimpleX Chat</string>', True, "appel aux dons de l amont"),
+    ('<string name="x">Install SimpleX Chat for terminal</string>', True, "renvoi vers l amont"),
+    ('<string name="x">SimpleX Team</string>', True, "équipe de l amont"),
+    ('<string name="x">Own a part of SimpleX Chat!</string>', True, "financement de l\\'amont"),
+    ('<string name="x">Contacter l’équipe SimpleX</string>', True, "équipe de l amont"),
+    # Catégorie 2 : réseau et protocole. Doit rester.
+    ('<string name="x">SimpleX group link</string>', False, "objet du protocole"),
+    ('<string name="x">SimpleX contact address</string>', False, "objet du protocole"),
+    ('<string name="x">SimpleX public names (BETA)</string>', False, "service de nommage du réseau"),
+    ('<string name="x">adresse SimpleX</string>', False, "objet du protocole"),
+    ('<string name="x">Invitation unique SimpleX</string>', False, "objet du protocole"),
+    ('<string name="x">Nom du canal SimpleX</string>', False, "objet du protocole"),
+    ('<string name="x">Les adresses SimpleX sont sûres</string>', False, "objet du protocole, pluriel"),
+    ('<string name="x">Les serveurs SimpleX ne voient pas votre profil.</string>', False, "réseau"),
+    # Opérateur du réseau, nécessaire à l'exactitude sous la décision D-4.
+    ('<string name="x">Use SimpleX Chat servers?</string>', False, "opérateur des serveurs proposés"),
+    ('<string name="x">SimpleX Chat and Flux made an agreement</string>', False, "opérateurs nommés"),
+    ('<string name="x">SimpleX Chat security was audited by Trail of Bits.</string>', False, "fait historique"),
+    # Identifiants. Invisibles d'un utilisateur, et coûteux à renommer.
+    ('<string name="simplex_name_error">Trustiatis Secure</string>', False, "clé de ressource"),
+    ("  <!-- API Error Responses - SimpleXAPI.kt -->", False, "commentaire, renvoi vers une source"),
+    ("  <!-- Images - chat.simplex.app.views.chat.item.CIImageView.kt -->", False, "commentaire"),
+    ('<string name="x">DefaultTheme.SIMPLEX</string>', False, "énumération persistée"),
+]
+
+
+def main() -> int:
+    module = charger()
+    rates = 0
+    for ligne, attendu, pourquoi in CAS:
+        reste = module.MOTIF_AUTORISE_CASSE.sub("", ligne)
+        reste = module.MOTIF_AUTORISE.sub("", reste)
+        if module.MOTIF_COMMENTAIRE_XML.search(ligne):
+            reste = module.MOTIF_COMMENTAIRE_XML.sub("", reste)
+        signale = bool(module.MOTIF_MARQUE.search(reste))
+        if signale == attendu:
+            continue
+        rates += 1
+        verbe = "signalée à tort" if signale else "laissée passer"
+        print(f"RATÉ  {verbe} ({pourquoi}) : {ligne.strip()}")
+    if rates:
+        print(f"\n{rates} cas raté(s) sur {len(CAS)}.")
+        return 1
+    print(f"Les {len(CAS)} cas de tri passent.")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

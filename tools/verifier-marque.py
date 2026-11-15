@@ -75,6 +75,13 @@ EXTENSIONS = {
 IDENTIFIANTS_AUTORISES = [
     r"chat\.simplex\.common",          # chemin de paquet du module commun
     r"chat\.simplex\.desktop",
+    r"chat\.simplex\.app",             # cité dans les commentaires des catalogues
+    r'name="[A-Za-z0-9_]*simplex[A-Za-z0-9_]*"',
+    # Clé de ressource. Une clé n'est jamais vue par un utilisateur, et la
+    # renommer obligerait à toucher tous les appels Kotlin et Swift qui la
+    # lisent : chaque report de l'amont deviendrait conflictuel pour un gain
+    # nul. Interdit n° 4 de CONTRIBUTING.md, même raisonnement.
+    r"\w*SimpleX\w*\.(?:kt|swift)",    # renvoi vers un fichier source de l'amont
     r"Simplex(App|Service|Link|Name|Theme|Info|Links|LinkMode|Chrome)\w*",
     r"simplexWindowState",
     r"simplexChatImage",
@@ -97,20 +104,68 @@ IDENTIFIANTS_AUTORISES_CASSE = [
 ]
 
 # Désignations du réseau et du protocole : autorisées par la politique de marque.
+#
+# Elles désignent un objet du protocole, pas le produit. Un lien, un nom, une
+# adresse ou un relais du réseau SimpleX restent des objets du réseau SimpleX
+# quand c'est Trustiatis Secure qui les affiche : les rebaptiser mentirait à
+# l'utilisateur, qui doit reconnaître un lien reçu d'ailleurs et comprendre que
+# n'importe quel client du réseau peut l'ouvrir.
 RESEAU_AUTORISE = [
     r"SimpleX network", r"réseau SimpleX", r"SimpleX-Netzwerk",
-    r"SimpleX address", r"adresse SimpleX",
+    r"SimpleX address", r"adresses? SimpleX",
+    r"SimpleX (?:invitation |group |channel )?links?",
+    r"liens? (?:d\W{0,2}invitation |de groupe |de canal |pour la voie )?SimpleX",
+    r"SimpleX (?:public )?names?",
+    r"noms? (?:du |de )?(?:canal |groupe |publics? )?SimpleX",
+    r"SimpleX domain", r"domaine SimpleX",
+    r"SimpleX relay", r"relais SimpleX",
+    r"SimpleX protocols?", r"protocoles? SimpleX",
+    r"SimpleX contacts?", r"contacts? SimpleX",
+    r"SimpleX servers?", r"serveurs? SimpleX",
+    r"SimpleX one-time invitation", r"invitation (?:unique )?SimpleX(?: à usage unique)?",
     r"compatible (?:avec le réseau |with (?:the )?)SimpleX",
     r"SimpleX Chat Ltd",               # attribution, obligation de licence
     r"Copyright .{0,12}\d{4} SimpleX Chat\. All rights reserved\.",   # idem, en tête de fichier
 ]
 
+# Désignations d'un opérateur du réseau, et faits historiques le concernant.
+#
+# La décision D-4 garde les serveurs de la communauté, dont ceux de SimpleX Chat
+# Ltd et de Flux. L'application doit donc pouvoir nommer l'opérateur dont elle
+# propose les serveurs : c'est une information que l'utilisateur a le droit
+# d'avoir, et l'attribuer à Trustiatis serait faux. Même raison pour l'audit de
+# sécurité mené sur le travail de l'amont : il a eu lieu, Trustiatis ne l'a pas
+# commandé et ne peut pas s'en attribuer le mérite.
+OPERATEUR_AUTORISE = [
+    r"SimpleX Chat (?:servers?|and Flux|et Flux)",
+    r"serveurs? (?:de )?SimpleX Chat",
+    r"SimpleX Chat security was audited",
+    r"(?:La s|s)écurité de SimpleX Chat a été auditée",
+]
+
 MOTIF_MARQUE = re.compile(r"simplex", re.IGNORECASE)
-MOTIF_AUTORISE = re.compile("|".join(IDENTIFIANTS_AUTORISES + RESEAU_AUTORISE), re.IGNORECASE)
+MOTIF_AUTORISE = re.compile(
+    "|".join(IDENTIFIANTS_AUTORISES + RESEAU_AUTORISE + OPERATEUR_AUTORISE), re.IGNORECASE
+)
 MOTIF_AUTORISE_CASSE = re.compile("|".join(IDENTIFIANTS_AUTORISES_CASSE))
 
 # Marqueur de dérogation explicite, à poser en commentaire sur la ligne, avec une raison.
 MOTIF_DEROGATION = re.compile(r"marque-ok\s*:\s*\S+")
+
+# Commentaire XML. Il n'atteint jamais un écran, et les catalogues de l'amont en
+# sont ponctués pour dire quel fichier Kotlin lit quelle série de clés. Les
+# réécrire ferait conflit à chaque report sans rien changer pour personne.
+MOTIF_COMMENTAIRE_XML = re.compile(r"<!--.*?-->", re.DOTALL)
+
+
+def _sans_commentaires_xml(texte: str) -> str:
+    """Vide les commentaires sans déplacer une seule ligne.
+
+    Le contrôle est ligne à ligne et rapporte des numéros de ligne : un
+    commentaire qui court sur plusieurs lignes doit donc être remplacé par
+    autant de lignes vides, et non supprimé.
+    """
+    return MOTIF_COMMENTAIRE_XML.sub(lambda m: re.sub(r"[^\n]", " ", m.group(0)), texte)
 
 
 def dans_perimetre(chemin: str) -> bool:
@@ -134,9 +189,13 @@ def signalements(racine: str):
                 continue
             try:
                 with open(absolu, encoding="utf-8", errors="replace") as f:
-                    lignes = f.readlines()
+                    contenu = f.read()
             except OSError:
                 continue
+            affiche = contenu.splitlines()
+            if relatif.endswith((".xml", ".html")):
+                contenu = _sans_commentaires_xml(contenu)
+            lignes = contenu.splitlines()
             for n, ligne in enumerate(lignes, 1):
                 if not MOTIF_MARQUE.search(ligne):
                     continue
@@ -148,7 +207,7 @@ def signalements(racine: str):
                     yield {
                         "fichier": relatif,
                         "ligne": n,
-                        "texte": ligne.strip()[:160],
+                        "texte": affiche[n - 1].strip()[:160],
                     }
 
 

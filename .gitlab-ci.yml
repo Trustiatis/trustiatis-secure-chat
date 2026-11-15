@@ -37,6 +37,21 @@ workflow:
     - when: never
 
 # ---------------------------------------------------------------------------
+# Test du contrôle de marque lui même, bloquant celui là.
+#
+# Le contrôle tranche, ligne à ligne, entre le nom du produit et un objet du
+# réseau, et il le fait avec des expressions rationnelles. Une expression trop
+# large ne se voit pas : elle rend le contrôle silencieux, ce qui est pire que
+# pas de contrôle. Le job « marque » étant en avertissement jusqu'à la fin de la
+# Phase 2, c'est ici que se trouve le garde-fou.
+# ---------------------------------------------------------------------------
+marque-test:
+  stage: controles
+  image: python:3.12-slim
+  script:
+    - python3 tools/test-verifier-marque.py
+
+# ---------------------------------------------------------------------------
 # Contrôle de marque : aucune occurrence interdite de la marque de l'amont.
 # Avertissement tant que la Phase 2 n'est pas finie, bloquant ensuite.
 # ---------------------------------------------------------------------------
