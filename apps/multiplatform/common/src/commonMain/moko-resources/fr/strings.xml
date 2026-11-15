@@ -3058,4 +3058,6 @@
     <string name="v7_1_channels_descr">Ajoutez des modérateurs et signez chaque message.</string>
     <string name="v7_1_flat_layout">Mise en page plate et Markdown</string>
     <string name="v7_1_flat_layout_descr">À activer dans les paramètres d’apparence.</string>
+  <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->
+  <string name="trustiatis_updates_from_portal">Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com. L\'application ne les cherche pas d\'elle même.</string>
 </resources>

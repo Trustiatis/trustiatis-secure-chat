@@ -136,9 +136,51 @@ TEXTES: dict[str, dict[str, str]] = {
     },
 }
 
+# Les clés que Trustiatis AJOUTE, parce qu'elles nomment une chose qui n'existe
+# pas chez l'amont. Elles portent toutes le préfixe « trustiatis_ », pour qu'une
+# recherche les distingue d'un coup des clés de l'amont, et elles s'écrivent à la
+# fin du catalogue, dans un bloc à elles : un report de l'amont ne touche donc
+# jamais la même région du fichier.
+#
+# Une langue non traitée n'en a pas besoin : Moko Resources retombe sur le
+# catalogue de référence pour une clé absente.
+AJOUTS: dict[str, dict[str, str]] = {
+    "base": {
+        "trustiatis_updates_from_portal": "Updates are published on the Trustiatis portal, downloads.trustiatis.com. The application does not check for them by itself.",
+    },
+    "fr": {
+        "trustiatis_updates_from_portal": "Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com. L\\'application ne les cherche pas d\\'elle même.",
+    },
+}
+
+MARQUEUR_AJOUTS = "  <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->"
+
 
 def fichier(langue: str) -> Path:
     return CATALOGUES / langue / "strings.xml"
+
+
+def ajouter(langue: str, ecrire: bool) -> int:
+    """Pose les clés propres à Trustiatis, sans doublon et sans rien déplacer."""
+    chemin = fichier(langue)
+    texte = chemin.read_text(encoding="utf-8")
+    manquantes = {
+        cle: valeur
+        for cle, valeur in AJOUTS.get(langue, {}).items()
+        if f'<string name="{cle}"' not in texte
+    }
+    if not manquantes:
+        return 0
+    bloc = "".join(
+        f'  <string name="{cle}">{valeur}</string>\n' for cle, valeur in manquantes.items()
+    )
+    if MARQUEUR_AJOUTS in texte:
+        texte = texte.replace(MARQUEUR_AJOUTS + "\n", MARQUEUR_AJOUTS + "\n" + bloc, 1)
+    else:
+        texte = texte.replace("</resources>", MARQUEUR_AJOUTS + "\n" + bloc + "</resources>", 1)
+    if ecrire:
+        chemin.write_text(texte, encoding="utf-8")
+    return len(manquantes)
 
 
 def appliquer(langue: str, ecrire: bool) -> tuple[int, list[str]]:
@@ -166,8 +208,13 @@ def main(ecrire: bool) -> int:
     souci = 0
     for langue in TEXTES:
         changes, absents = appliquer(langue, ecrire)
+        poses = ajouter(langue, ecrire)
         verbe = "écrites" if ecrire else "à écrire"
-        print(f"{langue:6} {changes:3} chaîne(s) {verbe}, sur {len(TEXTES[langue])}")
+        ligne = f"{langue:6} {changes:3} chaîne(s) {verbe}, sur {len(TEXTES[langue])}"
+        if poses or AJOUTS.get(langue):
+            attendus = len(AJOUTS.get(langue, {}))
+            ligne += f", et {poses} ajout(s) {verbe} sur {attendus}"
+        print(ligne)
         for cle in absents:
             souci += 1
             print(f"       ABSENTE du catalogue : {cle}")

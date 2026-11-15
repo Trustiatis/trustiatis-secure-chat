@@ -71,22 +71,22 @@ class AppLinkSchemeTest {
   fun windowsSchemeIsAUrlProtocolNamingItsProgId() {
     assertEquals(
       listOf(
-        RegistryValue(key = "Software\\Classes\\simplexchat", name = "", value = "URL:SimpleX Chat"),
+        RegistryValue(key = "Software\\Classes\\simplexchat", name = "", value = "URL:Trustiatis Secure"),
         RegistryValue(key = "Software\\Classes\\simplexchat", name = "URL Protocol", value = ""),
         RegistryValue(key = "Software\\Classes\\simplexchat\\DefaultIcon", name = "", value = "\"$windowsExe\",0"),
         RegistryValue(key = appLinkCommandKey, name = "", value = "\"$windowsExe\" \"%1\""),
-        RegistryValue(key = "Software\\chat.simplex.app\\Capabilities\\URLAssociations", name = "simplexchat", value = "SimpleX.simplexchat"),
+        RegistryValue(key = "Software\\com.trustiatis.secure\\Capabilities\\URLAssociations", name = "simplexchat", value = "TrustiatisSecure.simplexchat"),
       ),
       windowsSchemeValues("simplexchat", windowsExe),
       "app link scheme"
     )
     assertEquals(
       listOf(
-        RegistryValue(key = "Software\\Classes\\simplex", name = "", value = "URL:SimpleX Chat"),
+        RegistryValue(key = "Software\\Classes\\simplex", name = "", value = "URL:Trustiatis Secure"),
         RegistryValue(key = "Software\\Classes\\simplex", name = "URL Protocol", value = ""),
         RegistryValue(key = "Software\\Classes\\simplex\\DefaultIcon", name = "", value = "\"$windowsExe\",0"),
         RegistryValue(key = connectionCommandKey, name = "", value = "\"$windowsExe\" \"%1\""),
-        RegistryValue(key = "Software\\chat.simplex.app\\Capabilities\\URLAssociations", name = "simplex", value = "SimpleX.simplex"),
+        RegistryValue(key = "Software\\com.trustiatis.secure\\Capabilities\\URLAssociations", name = "simplex", value = "TrustiatisSecure.simplex"),
       ),
       windowsSchemeValues("simplex", windowsExe),
       "connection link scheme"
@@ -97,9 +97,9 @@ class AppLinkSchemeTest {
   fun windowsProgIdOpensTheExe() {
     assertEquals(
       listOf(
-        RegistryValue(key = "Software\\Classes\\SimpleX.simplexchat", name = "", value = "URL:SimpleX Chat"),
-        RegistryValue(key = "Software\\Classes\\SimpleX.simplexchat\\DefaultIcon", name = "", value = "\"$windowsExe\",0"),
-        RegistryValue(key = "Software\\Classes\\SimpleX.simplexchat\\shell\\open\\command", name = "", value = "\"$windowsExe\" \"%1\""),
+        RegistryValue(key = "Software\\Classes\\TrustiatisSecure.simplexchat", name = "", value = "URL:Trustiatis Secure"),
+        RegistryValue(key = "Software\\Classes\\TrustiatisSecure.simplexchat\\DefaultIcon", name = "", value = "\"$windowsExe\",0"),
+        RegistryValue(key = "Software\\Classes\\TrustiatisSecure.simplexchat\\shell\\open\\command", name = "", value = "\"$windowsExe\" \"%1\""),
       ),
       windowsProgIdValues("simplexchat", windowsExe)
     )
@@ -109,13 +109,13 @@ class AppLinkSchemeTest {
   fun windowsApplicationIsListedInDefaultAppsAfterItsCapabilities() {
     assertEquals(
       listOf(
-        RegistryValue(key = "Software\\chat.simplex.app\\Capabilities", name = "ApplicationName", value = "SimpleX Chat"),
+        RegistryValue(key = "Software\\com.trustiatis.secure\\Capabilities", name = "ApplicationName", value = "Trustiatis Secure"),
         RegistryValue(
-          key = "Software\\chat.simplex.app\\Capabilities",
+          key = "Software\\com.trustiatis.secure\\Capabilities",
           name = "ApplicationDescription",
-          value = "Private and secure open-source messenger - no user IDs (not even random numbers)"
+          value = "Confidential channel, encrypted end to end, with no account"
         ),
-        RegistryValue(key = "Software\\RegisteredApplications", name = "SimpleX Chat", value = "Software\\chat.simplex.app\\Capabilities"),
+        RegistryValue(key = "Software\\RegisteredApplications", name = "Trustiatis Secure", value = "Software\\com.trustiatis.secure\\Capabilities"),
       ),
       windowsApplicationValues
     )
@@ -153,7 +153,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun windowsRegistrationAnnouncesARepairedApplicationListing() {
-    val shell = FakeWindowsShell(user = registered().apply { remove("Software\\RegisteredApplications" to "SimpleX Chat") })
+    val shell = FakeWindowsShell(user = registered().apply { remove("Software\\RegisteredApplications" to "Trustiatis Secure") })
     registerWindowsSchemes(windowsExe, shell)
     assertEquals(windowsApplicationValues, shell.writes, "only the application listing is rewritten")
     assertTrue(shell.notified, "Windows is told that associations changed")
@@ -226,7 +226,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun windowsRegistrationTakesNoSchemeWhoseProgIdCannotBeWritten() {
-    val shell = FakeWindowsShell(failingWrites = setOf("Software\\Classes\\SimpleX.simplexchat"))
+    val shell = FakeWindowsShell(failingWrites = setOf("Software\\Classes\\TrustiatisSecure.simplexchat"))
     registerWindowsSchemes(windowsExe, shell)
     assertTrue(windowsSchemeValues("simplexchat", windowsExe).none { it in shell.writes }, "URLAssociations must not name a missing ProgId")
   }
@@ -332,7 +332,7 @@ class AppLinkSchemeTest {
       """
       |[Desktop Entry]
       |Type=Application
-      |Name=SimpleX Chat
+      |Name=Trustiatis Secure
       |NoDisplay=true
       |Exec="/home/user/My Apps/simplex.AppImage" %u
       |MimeType=x-scheme-handler/simplexchat;x-scheme-handler/simplex;
@@ -643,11 +643,11 @@ class AppLinkSchemeTest {
 
   @Test
   fun linuxPackageCountsAsRegisteredOnlyWhenItsEntryIsTheDefault() {
-    assertTrue(linuxPackageRegistered(FakeXdgMime(default = "simplex-simplex.desktop")::run), "the deb's own entry")
+    assertTrue(linuxPackageRegistered(FakeXdgMime(default = "trustiatis-secure-trustiatis-secure.desktop")::run), "the deb's own entry")
     assertFalse(linuxPackageRegistered(FakeXdgMime(default = "other.desktop")::run), "another handler")
     assertFalse(linuxPackageRegistered(FakeXdgMime(default = null)::run), "no handler")
     assertFalse(
-      linuxPackageRegistered(FakeXdgMime(default = "other.desktop", connectionDefault = "simplex-simplex.desktop")::run),
+      linuxPackageRegistered(FakeXdgMime(default = "other.desktop", connectionDefault = "trustiatis-secure-trustiatis-secure.desktop")::run),
       "only the connection link handler"
     )
   }

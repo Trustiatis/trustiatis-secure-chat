@@ -16,7 +16,7 @@ fun showStartupError(e: Throwable) {
   try {
     // Win32 edit controls only break lines on CRLF; normalize every line ending to one CRLF so the
     // trace does not render as merged lines (the JVM's own separator is CRLF on Windows, LF elsewhere)
-    showWindowsErrorWindow("SimpleX failed to start", e.stackTraceToString().lines().joinToString("\r\n"))
+    showWindowsErrorWindow("Trustiatis Secure failed to start", e.stackTraceToString().lines().joinToString("\r\n"))
   } catch (_: Throwable) {
     return // dialog failed to show; let the caller rethrow so the launcher's own box is the fallback
   }
@@ -25,8 +25,12 @@ fun showStartupError(e: Throwable) {
   exitProcess(0)
 }
 
-private const val ISSUES_URL = "https://github.com/simplex-chat/simplex-chat/issues"
-private const val SUPPORT_EMAIL = "chat@simplex.chat"
+// Où va le signalement d'un plantage au démarrage. Laissés tels quels, ces
+// deux liens enverraient la trace d'exécution du poste d'un client de
+// Trustiatis à l'éditeur amont, qui n'a rien à voir avec ce support et à qui
+// cette trace n'était pas destinée.
+private const val ISSUES_URL = "https://gitlab.com/Trustiatis/trustiatis-secure-chat/-/issues"
+private const val SUPPORT_EMAIL = "support@trustiatis.com"
 
 // Win32 constants not defined in jna-platform
 private const val ES_MULTILINE = 0x0004
@@ -128,7 +132,7 @@ private fun showWindowsErrorWindow(title: String, trace: String) {
     18, 18, 32, 32, window, null, hInstance, null)
   user32.SendMessage(iconView, STM_SETICON, WPARAM(Pointer.nativeValue(hErrorIcon)), LPARAM(0))
 
-  user32.CreateWindowEx(0, "STATIC", "SimpleX could not start. Copy the error below and report it via:",
+  user32.CreateWindowEx(0, "STATIC", "Trustiatis Secure could not start. Copy the error below and report it via:",
     WS_CHILD or WS_VISIBLE, 60, 20, cw - 80, 20, window, null, hInstance, null)
   val urlLink = user32.CreateWindowEx(0, "STATIC", ISSUES_URL, WS_CHILD or WS_VISIBLE or SS_NOTIFY,
     60, 46, cw - 80, 18, window, HMENU(Pointer.createConstant(URL_LINK_ID)), hInstance, null)
