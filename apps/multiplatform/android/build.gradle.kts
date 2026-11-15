@@ -250,7 +250,7 @@ tasks {
 
                 if (project.properties["android.injected.signing.key.alias"] != null && buildType == "release") {
                     val flavor = variant.removeSuffix("Release").lowercase()
-                    mapOf("arm64-v8a" to "simplex.apk", "armeabi-v7a" to "simplex-armv7a.apk").forEach { (abi, name) ->
+                    mapOf("arm64-v8a" to "trustiatis-secure.apk", "armeabi-v7a" to "trustiatis-secure-armv7a.apk").forEach { (abi, name) ->
                         if (!File(outputDir, "android-$flavor-$abi-release.apk").renameTo(File(outputDir, name))) {
                             logger.warn("No $abi apk to rename to $name")
                         }

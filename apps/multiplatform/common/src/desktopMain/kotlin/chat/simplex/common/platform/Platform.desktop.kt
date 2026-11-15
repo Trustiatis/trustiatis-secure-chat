@@ -4,16 +4,28 @@ import java.io.File
 import java.util.*
 
 private val home = System.getProperty("user.home")
-private val unixConfigPath = (System.getenv("XDG_CONFIG_HOME") ?: "$home/.config") + "/simplex"
+// Les dossiers de configuration et de données portent le nom de CE produit.
+//
+// Gardés tels quels, Trustiatis Secure et l'application officielle liraient et
+// écriraient les MÊMES bases SQLCipher, dans ~/.config/simplex et
+// %AppData%\SimpleX : même identité, même historique, et deux applications de
+// versions différentes qui appliquent leurs migrations sur la même base. Le
+// verrou d'instance unique vit dans ce dossier (dataDir/simplex.started), donc
+// chacune refuserait aussi de démarrer en voyant l'autre.
+//
+// Conséquence assumée : une base de l'application officielle n'est plus reprise
+// en silence. Elle s'importe, par Exporter puis Importer, ce qui est de toute
+// façon la seule façon correcte de déplacer un profil entre deux produits.
+private val unixConfigPath = (System.getenv("XDG_CONFIG_HOME") ?: "$home/.config") + "/trustiatis-secure"
 internal val unixDataHome = System.getenv("XDG_DATA_HOME") ?: "$home/.local/share"
-private val unixDataPath = "$unixDataHome/simplex"
+private val unixDataPath = "$unixDataHome/trustiatis-secure"
 // DesktopPlatform's constants read this file's paths, so an eager value is null when the enum initializes first.
 val desktopPlatform by lazy { detectDesktopPlatform() }
 
 enum class DesktopPlatform(val libExtension: String, val configPath: String, val dataPath: String, val githubAssetName: String) {
   LINUX_X86_64("so", unixConfigPath, unixDataPath, "simplex-desktop-x86_64.AppImage"),
   LINUX_AARCH64("so", unixConfigPath, unixDataPath, "simplex-desktop-aarch64.AppImage"),
-  WINDOWS_X86_64("dll", System.getenv("AppData") + File.separator + "SimpleX", System.getenv("AppData") + File.separator + "SimpleX", "simplex-desktop-windows-x86_64.msi"),
+  WINDOWS_X86_64("dll", System.getenv("AppData") + File.separator + "Trustiatis Secure", System.getenv("AppData") + File.separator + "Trustiatis Secure", "simplex-desktop-windows-x86_64.msi"),
   MAC_X86_64("dylib", unixConfigPath, unixDataPath, "simplex-desktop-macos-x86_64.dmg"),
   MAC_AARCH64("dylib", unixConfigPath, unixDataPath, "simplex-desktop-macos-aarch64.dmg");
 

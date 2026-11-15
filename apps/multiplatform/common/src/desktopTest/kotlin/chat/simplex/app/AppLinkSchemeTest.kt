@@ -47,22 +47,22 @@ private const val OWNER_WRITABLE = "rwxr-xr-x"
 private const val GROUP_WRITABLE = "rwxrwxr-x"
 private const val OTHERS_WRITABLE = "rwxr-xrwx"
 private const val WORLD_WRITABLE = "rwxrwxrwx"
-private const val APPIMAGE_FILE_NAME = "SimpleX.AppImage"
+private const val APPIMAGE_FILE_NAME = "TrustiatisSecure.AppImage"
 private const val XDG_MIME = "xdg-mime"
 
 class AppLinkSchemeTest {
-  private val windowsExe = "C:\\Program Files\\SimpleX\\SimpleX.exe"
+  private val windowsExe = "C:\\Program Files\\Trustiatis Secure\\Trustiatis Secure.exe"
   private val appLinkCommandKey = "Software\\Classes\\simplexchat\\shell\\open\\command"
   private val connectionCommandKey = "Software\\Classes\\simplex\\shell\\open\\command"
   private val appLinkCommand = appLinkCommandKey to ""
   private val connectionCommand = connectionCommandKey to ""
-  private val olderWindowsCommand = "\"C:\\Old\\SimpleX.exe\" \"%1\""
+  private val olderWindowsCommand = "\"C:\\Old\\Trustiatis Secure.exe\" \"%1\""
   private val appImagePath = "/home/user/$APPIMAGE_FILE_NAME"
 
   @Test
   fun windowsCommandQuotesTheAppAndTheLink() {
     assertEquals(
-      "\"C:\\Program Files\\SimpleX\\SimpleX.exe\" \"%1\"",
+      "\"C:\\Program Files\\Trustiatis Secure\\Trustiatis Secure.exe\" \"%1\"",
       windowsOpenCommand(windowsExe)
     )
   }
@@ -183,7 +183,7 @@ class AppLinkSchemeTest {
   @Test
   fun windowsRegistrationRepairsItsProgIdWhileAnotherProgramHoldsTheScheme() = withTempDir { dir ->
     val otherCommand = "\"${Files.createFile(dir.resolve("Other.exe"))}\" \"%1\""
-    val staleProgId = windowsProgIdValues("simplexchat", "C:\\Old\\SimpleX.exe").associate { (it.key to it.name) to it.value }
+    val staleProgId = windowsProgIdValues("simplexchat", "C:\\Old\\Trustiatis Secure.exe").associate { (it.key to it.name) to it.value }
     val shell = FakeWindowsShell(user = (staleProgId + (appLinkCommand to otherCommand)).toMutableMap())
     registerWindowsSchemes(windowsExe, shell)
     assertEquals(windowsProgIdValues("simplexchat", windowsExe), shell.writes.take(3), "the ProgId points at this exe again")
@@ -233,7 +233,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun windowsRegistrationKeepsAnotherInstalledCopysProgId() = withTempDir { dir ->
-    val otherCopy = Files.createFile(dir.resolve("SimpleX.exe")).toString()
+    val otherCopy = Files.createFile(dir.resolve("Trustiatis Secure.exe")).toString()
     val otherProgId = windowsProgIdValues("simplexchat", otherCopy).associate { (it.key to it.name) to it.value }
     val shell = FakeWindowsShell(user = otherProgId.toMutableMap())
     registerWindowsSchemes(windowsExe, shell)
@@ -242,7 +242,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun windowsRegistrationTreatsItsOwnProgramAsItsOwnHandler() = withTempDir { dir ->
-    val exe = Files.createFile(dir.resolve("SimpleX.exe")).toString()
+    val exe = Files.createFile(dir.resolve("Trustiatis Secure.exe")).toString()
     val otherExe = Files.createFile(dir.resolve("Other.exe")).toString()
     val shell = FakeWindowsShell(
       user = mutableMapOf(appLinkCommand to "\"$exe\" %1"),
@@ -298,7 +298,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun execArgumentOfAPlainPathIsLeftBare() {
-    assertEquals("/home/user/Downloads/simplex-desktop-x86_64.AppImage", desktopExecArgument("/home/user/Downloads/simplex-desktop-x86_64.AppImage"))
+    assertEquals("/home/user/Downloads/TrustiatisSecure.AppImage", desktopExecArgument("/home/user/Downloads/TrustiatisSecure.AppImage"))
   }
 
   @Test
@@ -360,7 +360,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun packagedMacAndWindowsAreRecognised() {
-    assertEquals(DesktopInstallation.MacBundle, desktopInstallation(DesktopPlatform.MAC_AARCH64, "/Applications/SimpleX.app/Contents/MacOS/SimpleX", mapOf()))
+    assertEquals(DesktopInstallation.MacBundle, desktopInstallation(DesktopPlatform.MAC_AARCH64, "/Applications/Trustiatis Secure.app/Contents/MacOS/Trustiatis Secure", mapOf()))
     assertEquals(DesktopInstallation.WindowsExe(windowsExe), desktopInstallation(DesktopPlatform.WINDOWS_X86_64, windowsExe, mapOf()))
   }
 
@@ -476,7 +476,7 @@ class AppLinkSchemeTest {
   @Test
   fun missingAppImageIsRefused() {
     assumePosix()
-    assertFalse(onlyOwnerCanReplace(Path.of("/nonexistent-simplex-dir/SimpleX.AppImage"), "root"))
+    assertFalse(onlyOwnerCanReplace(Path.of("/nonexistent-trustiatis-dir/TrustiatisSecure.AppImage"), "root"))
   }
 
   // Built under the module's build directory, as the check walks up to the root and the system temp directory is open to everyone.
@@ -587,7 +587,7 @@ class AppLinkSchemeTest {
   @Test
   fun appImageRegistrationRewritesTheEntryOfAMovedAppImage() = withRegistration { appImage, applicationsDir ->
     applicationsDir.mkdirs()
-    File(applicationsDir, APPIMAGE_ENTRY_NAME).writeText(appImageDesktopEntry("/old/SimpleX.AppImage")!!)
+    File(applicationsDir, APPIMAGE_ENTRY_NAME).writeText(appImageDesktopEntry("/old/TrustiatisSecure.AppImage")!!)
     val xdg = FakeXdgMime(default = APPIMAGE_ENTRY_NAME)
     assertTrue(registerAppImageScheme(appImage, applicationsDir, listOf(), xdg::run))
     assertEquals(appImageDesktopEntry(appImage), File(applicationsDir, APPIMAGE_ENTRY_NAME).readText())

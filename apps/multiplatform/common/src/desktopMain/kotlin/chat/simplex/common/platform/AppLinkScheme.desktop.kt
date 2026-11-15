@@ -70,7 +70,7 @@ private var registered = false
 actual fun appLinkSchemeRegistered(): Boolean = registered
 
 fun registerLinkSchemes() {
-  thread(name = "simplex-link-schemes", isDaemon = true) {
+  thread(name = "trustiatis-secure-link-schemes", isDaemon = true) {
     registered = registerForThisInstallation()
   }
 }

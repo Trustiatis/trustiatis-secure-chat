@@ -63,7 +63,7 @@ class SimplexService: Service() {
 
   override fun onCreate() {
     super.onCreate()
-    Log.d(TAG, "Simplex service created")
+    Log.d(TAG, "Trustiatis Secure service created")
     createNotificationIfNeeded()
     ServiceCompat.startForeground(this, SIMPLEX_SERVICE_ID, createNotificationIfNeeded(), foregroundServiceType())
     /**
@@ -85,7 +85,7 @@ class SimplexService: Service() {
   }
 
   override fun onDestroy() {
-    Log.d(TAG, "Simplex service destroyed")
+    Log.d(TAG, "Trustiatis Secure service destroyed")
     try {
       wakeLock?.let {
         while (it.isHeld) it.release() // release all, in case acquired more than once
