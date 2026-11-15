@@ -272,7 +272,7 @@
   <string name="turn_off_battery_optimization_button">Allow</string>
   <string name="turn_off_system_restriction_button">Open app settings</string>
   <string name="disable_notifications_button">Disable notifications</string>
-  <string name="system_restricted_background_desc">SimpleX can\'t run in background. You will receive the notifications only when the app is running.</string>
+  <string name="system_restricted_background_desc">Trustiatis Secure can\'t run in background. You will receive the notifications only when the app is running.</string>
   <string name="system_restricted_background_warn"><![CDATA[To enable notifications, please choose <b>App battery usage</b> / <b>Unrestricted</b> in the app settings.]]></string>
   <string name="system_restricted_background_in_call_title">No background calls</string>
   <string name="system_restricted_background_in_call_desc">The app may be closed after 1 minute in background.</string>
@@ -292,8 +292,8 @@
   <string name="hide_notification">Hide</string>
 
   <!-- Notification channels -->
-  <string name="ntf_channel_messages">SimpleX Chat messages</string>
-  <string name="ntf_channel_calls">SimpleX Chat calls</string>
+  <string name="ntf_channel_messages">Trustiatis Secure messages</string>
+  <string name="ntf_channel_calls">Trustiatis Secure calls</string>
 
   <!-- Notifications -->
   <string name="settings_notifications_mode_title">Notification service</string>
@@ -346,7 +346,7 @@
   <string name="auth_confirm_credential">Confirm your credential</string>
   <string name="auth_unavailable">Authentication unavailable</string>
   <string name="auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled">Device authentication is not enabled. You can turn on Trustiatis Lock via Settings, once you enable device authentication.</string>
-  <string name="auth_device_authentication_is_disabled_turning_off">Device authentication is disabled. Turning off SimpleX Lock.</string>
+  <string name="auth_device_authentication_is_disabled_turning_off">Device authentication is disabled. Turning off Trustiatis Lock.</string>
   <string name="auth_stop_chat">Stop chat</string>
   <string name="auth_open_chat_console">Open chat console</string>
   <string name="auth_open_chat_profiles">Change chat profiles</string>
@@ -831,7 +831,7 @@
   <string name="gallery_video_button">Video</string>
 
   <!-- help - ChatHelpView.kt -->
-  <string name="thank_you_for_installing_simplex">Thank you for installing SimpleX Chat!</string>
+  <string name="thank_you_for_installing_simplex">Thank you for installing Trustiatis Secure!</string>
   <string name="you_can_connect_to_simplex_chat_founder"><![CDATA[You can <font color="#0088ff">connect to SimpleX Chat developers to ask any questions and to receive updates</font>.]]></string>
   <string name="to_start_a_new_chat_help_header">To start a new chat</string>
   <string name="chat_help_tap_button">Tap button</string>
@@ -839,7 +839,7 @@
   <string name="add_contact_button_to_create_link_or_connect_via_link"><![CDATA[<b>Add contact</b>: to create a new invitation link, or connect via a link you received.]]></string>
   <string name="create_group_button_to_create_new_group"><![CDATA[<b>Create group</b>: to create a new group.]]></string>
   <string name="to_connect_via_link_title">To connect via link</string>
-  <string name="if_you_received_simplex_invitation_link_you_can_open_in_browser">If you received SimpleX Chat invitation link, you can open it in your browser:</string>
+  <string name="if_you_received_simplex_invitation_link_you_can_open_in_browser">If you received a SimpleX invitation link, you can open it in your browser:</string>
   <string name="desktop_scan_QR_code_from_app_via_scan_QR_code"><![CDATA[💻 desktop: scan displayed QR code from the app, via <b>Scan QR code</b>.]]></string>
   <string name="mobile_tap_open_in_mobile_app_then_tap_connect_in_app"><![CDATA[📱 mobile: tap <b>Open in mobile app</b>, then tap <b>Connect</b> in the app.]]></string>
 
@@ -917,7 +917,7 @@
   <string name="icon_descr_address">SimpleX Address</string>
   <string name="icon_descr_help">help</string>
   <string name="icon_descr_simplex_team">SimpleX Team</string>
-  <string name="image_descr_simplex_logo">SimpleX Logo</string>
+  <string name="image_descr_simplex_logo">Trustiatis Secure logo</string>
   <string name="icon_descr_email">Email</string>
   <string name="icon_descr_more_button">More</string>
 
@@ -1030,14 +1030,14 @@
   <string name="your_chat_profiles">Your chat profiles</string>
   <string name="create_chat_profile">Create chat profile</string>
   <string name="database_passphrase_and_export">Database passphrase &amp; export</string>
-  <string name="about_simplex_chat">About SimpleX Chat</string>
+  <string name="about_simplex_chat">About Trustiatis Secure</string>
   <string name="how_to_use_simplex_chat">How to use it</string>
   <string name="markdown_help">Markdown help</string>
   <string name="markdown_in_messages">Markdown in messages</string>
   <string name="chat_with_the_founder">Send questions and ideas</string>
   <string name="send_us_an_email">Send us email</string>
   <string name="follow_simplex_network_news">Follow SimpleX Network News</string>
-  <string name="chat_lock">SimpleX Lock</string>
+  <string name="chat_lock">Trustiatis Lock</string>
   <string name="chat_console">Chat console</string>
   <string name="message_servers">Message servers</string>
   <string name="smp_servers_preset_address">Preset server address</string>
@@ -1207,14 +1207,14 @@
   <string name="save_auto_accept_settings">Save SimpleX address settings</string>
   <string name="delete_address">Delete address</string>
   <string name="invite_friends">Invite friends</string>
-  <string name="email_invite_subject">Let\'s talk in SimpleX Chat</string>
-  <string name="email_invite_body">Hi!\nConnect to me via SimpleX Chat: %s</string>
+  <string name="email_invite_subject">Let\'s talk in Trustiatis Secure</string>
+  <string name="email_invite_body">Hi!\nConnect to me via Trustiatis Secure: %s</string>
   <string name="for_social_media">For social media</string>
   <string name="or_to_share_privately">Or to share privately</string>
   <string name="simplex_address_or_1_time_link">SimpleX address or 1-time link?</string>
   <string name="create_1_time_link">Create 1-time link</string>
   <string name="new_1_time_link">New 1-time link</string>
-  <string name="onboarding_send_1_time_link">Send the link via any messenger - it\'s secure. Ask to paste into SimpleX.</string>
+  <string name="onboarding_send_1_time_link">Send the link via any messenger - it\'s secure. Ask to paste into Trustiatis Secure.</string>
   <string name="onboarding_or_show_qr_code">Or show QR in person or via video call.</string>
   <string name="onboarding_post_address">Use this address in your social media profile, website, or email signature.</string>
   <string name="onboarding_or_use_qr_code">Or use this QR - print or show online.</string>
@@ -1276,7 +1276,7 @@
   <string name="create_address_button">Create</string>
   <string name="invalid_name">Invalid name!</string>
   <string name="correct_name_to">Correct name to %s?</string>
-  <string name="about_simplex">About SimpleX</string>
+  <string name="about_simplex">About Trustiatis Secure</string>
 
   <!-- markdown demo - MarkdownHelpView.kt -->
   <string name="how_to_use_markdown">How to use markdown</string>
@@ -1429,7 +1429,7 @@
   <string name="relay_server_if_necessary">Relay server is only used if necessary. Another party can observe your IP address.</string>
 
   <!-- Call Lock Screen -->
-  <string name="open_simplex_chat_to_accept_call">Open SimpleX Chat to accept call</string>
+  <string name="open_simplex_chat_to_accept_call">Open Trustiatis Secure to accept call</string>
   <string name="allow_accepting_calls_from_lock_screen">Enable calls from lock screen via Settings.</string>
   <string name="open_verb">Open</string>
   <string name="open_external_link_title">Open external link?</string>
@@ -2253,7 +2253,7 @@
   <string name="theme_system">System</string>
   <string name="theme_light">Light</string>
   <string name="theme_dark">Dark</string>
-  <string name="theme_simplex">SimpleX</string>
+  <string name="theme_simplex">Trustiatis</string>
   <string name="theme_black">Black</string>
 
   <!-- Languages -->
@@ -3168,10 +3168,10 @@
   <string name="close_behavior_dialog_text">If you choose Close, messages won\'t be received.\nYou can change it later in Appearance settings.</string>
   <string name="close_behavior_dialog_close">Close the app</string>
   <string name="close_behavior_dialog_minimize">Minimize to tray</string>
-  <string name="tray_show">Show SimpleX</string>
-  <string name="tray_quit">Quit SimpleX</string>
-  <string name="tray_tooltip">SimpleX</string>
-  <string name="tray_tooltip_unread">SimpleX — %d unread</string>
+  <string name="tray_show">Show Trustiatis Secure</string>
+  <string name="tray_quit">Quit Trustiatis Secure</string>
+  <string name="tray_tooltip">Trustiatis Secure</string>
+  <string name="tray_tooltip_unread">Trustiatis Secure: %d unread</string>
   <string name="appearance_minimize_to_tray">Close to tray</string>
   <string name="appearance_minimize_to_tray_desc">Runs in background to receive messages</string>
   <string name="badge_supports_simplex">%s supports SimpleX Chat.</string>

@@ -60,6 +60,32 @@ TEXTES: dict[str, dict[str, str]] = {
         "auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled": "Device authentication is not enabled. You can turn on Trustiatis Lock via Settings, once you enable device authentication.",
         "lock_not_enabled": "Trustiatis Lock not enabled!",
         "you_can_turn_on_lock": "You can turn on Trustiatis Lock via Settings.",
+        # Le nom du produit, partout où il désigne l'application et non le
+        # réseau. Un lien, un nom ou une adresse du réseau SimpleX garde son
+        # nom : voir RESEAU_AUTORISE dans tools/verifier-marque.py.
+        "system_restricted_background_desc": "Trustiatis Secure can\\'t run in background. You will receive the notifications only when the app is running.",
+        "ntf_channel_messages": "Trustiatis Secure messages",
+        "ntf_channel_calls": "Trustiatis Secure calls",
+        "auth_device_authentication_is_disabled_turning_off": "Device authentication is disabled. Turning off Trustiatis Lock.",
+        "chat_lock": "Trustiatis Lock",
+        "thank_you_for_installing_simplex": "Thank you for installing Trustiatis Secure!",
+        "if_you_received_simplex_invitation_link_you_can_open_in_browser": "If you received a SimpleX invitation link, you can open it in your browser:",
+        "image_descr_simplex_logo": "Trustiatis Secure logo",
+        "about_simplex_chat": "About Trustiatis Secure",
+        "about_simplex": "About Trustiatis Secure",
+        "open_simplex_chat_to_accept_call": "Open Trustiatis Secure to accept call",
+        "email_invite_subject": "Let\\'s talk in Trustiatis Secure",
+        "email_invite_body": "Hi!\\nConnect to me via Trustiatis Secure: %s",
+        "onboarding_send_1_time_link": "Send the link via any messenger - it\\'s secure. Ask to paste into Trustiatis Secure.",
+        # Le thème livré par défaut. Seule l'étiquette change : la valeur
+        # d'énumération SIMPLEX est persistée dans les préférences et ne se
+        # renomme pas (interdit n° 4 de CONTRIBUTING.md).
+        "theme_simplex": "Trustiatis",
+        # Menu de la zone de notification, sur le bureau.
+        "tray_show": "Show Trustiatis Secure",
+        "tray_quit": "Quit Trustiatis Secure",
+        "tray_tooltip": "Trustiatis Secure",
+        "tray_tooltip_unread": "Trustiatis Secure: %d unread",
     },
     "fr": {
         "app_name": "Trustiatis Secure",
@@ -88,6 +114,25 @@ TEXTES: dict[str, dict[str, str]] = {
         "auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled": "L\\'authentification de l\\'appareil n\\'est pas activée. Vous pouvez activer le Verrouillage Trustiatis dans les Paramètres une fois l\\'authentification de l\\'appareil activée.",
         "lock_not_enabled": "Le Verrouillage Trustiatis n\\'est pas activé !",
         "you_can_turn_on_lock": "Vous pouvez activer le Verrouillage Trustiatis dans les Paramètres.",
+        "system_restricted_background_desc": "Trustiatis Secure ne peut pas fonctionner en arrière-plan. Vous ne recevrez les notifications que lorsque l\\'application sera en cours d\\'exécution.",
+        "ntf_channel_messages": "Messages Trustiatis Secure",
+        "ntf_channel_calls": "Appels Trustiatis Secure",
+        "auth_device_authentication_is_disabled_turning_off": "L\\'authentification de l\\'appareil est désactivée. Désactivation du Verrouillage Trustiatis.",
+        "chat_lock": "Verrouillage Trustiatis",
+        "thank_you_for_installing_simplex": "Merci d\\'avoir installé Trustiatis Secure !",
+        "if_you_received_simplex_invitation_link_you_can_open_in_browser": "Si vous avez reçu un lien d\\'invitation SimpleX, vous pouvez l\\'ouvrir dans votre navigateur :",
+        "image_descr_simplex_logo": "Logo Trustiatis Secure",
+        "about_simplex_chat": "À propos de Trustiatis Secure",
+        "about_simplex": "À propos de Trustiatis Secure",
+        "open_simplex_chat_to_accept_call": "Ouvrez Trustiatis Secure pour accepter l\\'appel",
+        "email_invite_subject": "Discutons sur Trustiatis Secure",
+        "email_invite_body": "Salut !\\nConnectez-vous avec moi via Trustiatis Secure : %s",
+        "onboarding_send_1_time_link": "Envoyez le lien via n\\'importe quelle messagerie : c\\'est sécurisé. Demandez de le coller dans Trustiatis Secure.",
+        "theme_simplex": "Trustiatis",
+        "tray_show": "Afficher Trustiatis Secure",
+        "tray_quit": "Quitter Trustiatis Secure",
+        "tray_tooltip": "Trustiatis Secure",
+        "tray_tooltip_unread": "Trustiatis Secure : %d non lus",
     },
 }
 
