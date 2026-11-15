@@ -191,6 +191,10 @@ travail de la Phase 2. Il devra être vert avant la première version publiée.
 
 ## Étape 6 bis, débloquer l'intégration continue
 
+> **Levé le 2026-11-15.** Le Membre a fait vérifier le compte. Ce qui suit est conservé
+> parce que le même blocage se représentera à chaque nouveau projet GitLab du groupe, et
+> que la cause n'est pas devinable depuis le message affiché.
+
 **Constaté le 2026-11-15 : aucun pipeline ne peut tourner.** Les dix-neuf premiers ont tous
 échoué instantanément, sans démarrer un seul job. Ce n'est pas la configuration : interrogé
 par son API GraphQL, GitLab répond `yamlErrors: false` et donne la raison, mot pour mot :
