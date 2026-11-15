@@ -49,16 +49,25 @@ typographie:
 coeur-intact:
   stage: controles
   image: alpine/git:latest
+  # GitLab ne clone par défaut que la référence testée, et en profondeur réduite : la
+  # branche de référence de l'amont serait absente, le contrôle passerait sans rien
+  # contrôler, et un garde-fou qui passe en silence est pire que pas de garde-fou. On
+  # récupère donc explicitement cette référence depuis le distant.
+  variables:
+    GIT_DEPTH: 0
   script:
     - |
-      ref=$(git for-each-ref --format='%(refname:short)' 'refs/heads/upstream-*' \
-            | sort -V | tail -1)
+      ref=$(git ls-remote --heads origin 'refs/heads/upstream-*' \
+            | awk '{print $2}' | sed 's|refs/heads/||' | sort -V | tail -1)
       if [ -z "$ref" ]; then
-        echo "Aucune branche de référence upstream-* : greffe non faite, contrôle ignoré."
-        exit 0
+        echo "ERREUR : aucune branche upstream-* sur le distant."
+        echo "Elle est la preuve de ce que vaut l'amont. Sans elle, rien n'est vérifiable."
+        exit 1
       fi
       echo "Référence d'amont : $ref"
-      diff=$(git diff --name-only "$ref" HEAD -- src/ scripts/ flake.nix flake.lock cabal.project || true)
+      git fetch --no-tags origin "refs/heads/$ref:refs/heads/$ref" 2>/dev/null \
+        || echo "   (déjà présente localement)"
+      diff=$(git diff --name-only "$ref" HEAD -- src/ scripts/ flake.nix flake.lock cabal.project)
       if [ -n "$diff" ]; then
         echo "ERREUR : le coeur de l'amont a été modifié, ce qu'interdit la décision D-2 :"
         echo "$diff"
@@ -68,6 +77,7 @@ coeur-intact:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
 
 # ---------------------------------------------------------------------------
 # Aucun secret committé.
