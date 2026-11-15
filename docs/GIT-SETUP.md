@@ -191,66 +191,93 @@ travail de la Phase 2. Il devra être vert avant la première version publiée.
 
 ## Étape 6 bis, débloquer l'intégration continue
 
-**Constaté le 2026-11-15 : aucun pipeline ne peut tourner.** Les quinze premiers ont tous
+**Constaté le 2026-11-15 : aucun pipeline ne peut tourner.** Les dix-neuf premiers ont tous
 échoué instantanément, sans démarrer un seul job. Ce n'est pas la configuration : interrogé
-par son API, GitLab répond `yamlErrors: false` et donne la raison, mot pour mot :
+par son API GraphQL, GitLab répond `yamlErrors: false` et donne la raison, mot pour mot :
 
 ```text
 The pipeline failed due to the user not being verified.
 ```
 
-GitLab.com exige depuis plusieurs années que le compte soit **vérifié** avant de laisser
-tourner des pipelines sur ses exécuteurs partagés, y compris en plan gratuit, pour lutter
-contre le minage de cryptomonnaie. La vérification se fait par carte bancaire ou par
-téléphone, dans `Préférences > Compte`, ou à l'adresse
-`https://gitlab.com/-/identity_verification`. **Une carte n'est pas débitée** par cette
-vérification, elle sert de preuve d'identité.
+Vérifié le même jour : ce refus intervient **avant** l'évaluation de la configuration. Après
+l'ajout du bloc `workflow` qui devait supprimer les pipelines sur les branches de travail,
+GitLab en a tout de même créé un par branche, en échec, avec la même raison. Tant que le
+compte n'est pas vérifié, **tout** envoi produit un pipeline en échec, quoi qu'on change au
+fichier de CI.
 
-### Quel compte, exactement
+### La procédure, telle que GitLab la documente
 
-Deux comptes GitLab interviennent ici, et ce sont bien **deux comptes distincts**, pas un
-compte et un groupe.
+Source : `https://docs.gitlab.com/ci/debugging/`, section « Error: Identity verification is
+required in order to run CI jobs ». **Il n'y a pas d'URL directe à ouvrir**, et c'est
+pourquoi `https://gitlab.com/-/identity_verification` ne mène nulle part quand on la saisit
+à la main. Le point d'entrée est une **bannière d'alerte sur la page du pipeline en échec**.
+
+1. Se connecter sur gitlab.com.
+2. Ouvrir un pipeline en échec :
+   `https://gitlab.com/Trustiatis/trustiatis-secure-chat/-/pipelines`, puis cliquer sur l'un
+   d'eux.
+3. Dans la bannière rouge en haut de page, cliquer **« Verify my account »**, en français
+   « Vérifier mon compte ».
+4. Suivre les étapes : numéro de téléphone avec code à usage unique, et éventuellement carte
+   bancaire si GitLab estime le risque plus élevé.
+5. Créer un nouveau commit ou relancer un pipeline à la main.
+
+Sur la carte bancaire, la documentation de GitLab est explicite et vaut d'être citée :
+« GitLab does not store your card details directly or make any charges. This process is not
+connected to any billing information for your groups. » Elle sert de preuve d'identité,
+rien d'autre.
+
+**C'est au Membre de la faire.** L'agent ne saisit jamais de coordonnées bancaires ni de
+pièce d'identité, quelle que soit la demande.
+
+### Sur quel compte, et ce que je ne sais pas
+
+Deux comptes GitLab interviennent, et ce sont bien **deux comptes distincts**, pas un compte
+et un groupe.
 
 | Compte | Rôle | Identifiant |
 |---|---|---|
 | **`Trustiatis`**, affiché « Trustiatis.com » | **propriétaire de l'espace de noms** du projet, donc celui qui porte la consommation de CI. C'est un **compte utilisateur**, pas un groupe : `GET /groups/Trustiatis` répond 404 | id 23182124 |
 | le **compte personnel du Membre** | le compte dont la clé SSH pousse depuis ce poste, et celui qui est enregistré comme déclencheur des pipelines | non nommé ici : ce dépôt est public |
 
-**C'est `Trustiatis` qui doit être vérifié, pas le compte personnel.** La démonstration est
-dans les faits, relevés le 2026-11-15 : dans l'espace personnel du Membre, des pipelines
-déclenchés par lui **réussissent**, le plus récent le 2026-10-27. Le même
-utilisateur, sur `Trustiatis/trustiatis-secure-chat`, se voit répondre que l'utilisateur
-n'est pas vérifié. La seule variable qui change est l'espace de noms qui porte la
-consommation.
+Un fait, relevé le 2026-11-15 : dans l'espace personnel du Membre, des pipelines qu'il a
+déclenchés **réussissent**, le plus récent le 2026-10-27. Le même utilisateur,
+sur `Trustiatis/trustiatis-secure-chat`, se voit répondre que l'utilisateur n'est pas
+vérifié. La seule variable qui change est l'espace de noms.
 
-Donc : **se connecter en tant que `Trustiatis`** et faire la vérification sur ce compte là.
-Il faut prévoir que ce compte n'a probablement jamais servi à faire tourner de CI, et donc
-que rien n'a encore été vérifié dessus.
+J'en avais conclu que `Trustiatis` était le compte à vérifier. **Cette conclusion n'est pas
+sûre**, et la documentation de GitLab explique pourquoi : la vérification d'identité y est
+décrite comme **propre à l'utilisateur** et calculée sur un « score de risque » qui peut
+évoluer dans le temps. Le contraste observé pourrait donc venir de l'espace de noms, mais
+aussi d'un score de risque qui a changé entre octobre et novembre.
 
-Réserve honnête : le message de GitLab dit « the user », et la conclusion ci dessus est une
-déduction par contraste, pas une lecture directe du statut des deux comptes, qui n'est pas
-lisible sans être connecté. La page `https://gitlab.com/-/identity_verification`, ouverte
-une fois connecté en tant que `Trustiatis`, donne la réponse en une seconde.
+**La bannière tranche sans discussion.** Se connecter d'abord en tant que `Trustiatis`,
+propriétaire de l'espace de noms, et ouvrir le pipeline. Si aucune bannière n'apparaît,
+recommencer connecté avec le compte personnel. Celui des deux qui voit la bannière est
+celui qu'il faut vérifier.
 
-**C'est au Membre de la faire.** L'agent ne saisit jamais de coordonnées bancaires ni de
-pièce d'identité, quelle que soit la demande.
+### La voie qu'il faudra prendre de toute façon : notre propre exécuteur
 
-Vérifié le 2026-11-15 : ce refus intervient **avant** l'évaluation de la configuration.
-Après l'ajout du bloc `workflow` qui devait supprimer les pipelines sur les branches de
-travail, GitLab en a tout de même créé un par branche, en échec, avec la même raison et
-`yamlErrors: false`. Autrement dit, tant que le compte n'est pas vérifié, **tout** envoi
-produit un pipeline en échec, quelle que soit la configuration, et l'effet du bloc
-`workflow` ne pourra être constaté qu'après la vérification.
+GitLab liste, parmi les solutions, « Use project or group runners instead of GitLab-hosted
+runners ». Pour ce projet là, ce n'est pas un contournement, c'est la cible.
 
-Deux voies si cette vérification n'est pas souhaitée :
+Trustiatis Secure finira par produire des binaires **signés** : certificat Authenticode
+Windows, notarisation Apple, signature APK. Le chapitre 14 du cahier des charges impose de
+protéger les clés de signature, et le chapitre 6 interdit de les mettre dans le dépôt. Or
+une clé de signature exposée à un exécuteur partagé, mutualisé avec des inconnus, n'est pas
+protégée, quelles que soient les précautions de GitLab. **Les compilations signées devront
+tourner sur une machine du groupe**, et la question ne se pose pas qu'à la mise en
+production : elle se pose dès qu'une variable de CI protégée porte un secret.
 
-| Voie | Ce qu'elle implique |
-|---|---|
-| **Vérifier le compte** | les exécuteurs partagés de GitLab deviennent disponibles, rien d'autre à faire |
-| **Déclarer un exécuteur à nous** | un `gitlab-runner` sur une machine du groupe, par exemple la VM d'exécution de l'agent d'infrastructure. Évite la dépendance et la vérification, mais la machine doit être disponible quand un pipeline tourne. À arbitrer avec le plan de refonte infra |
+Déclarer dès maintenant un `gitlab-runner` sur une machine du groupe règle donc trois choses
+d'un coup : le blocage de vérification, la dépendance aux exécuteurs de GitLab, et la
+trajectoire de sécurité. À arbitrer avec le plan de refonte infra, qui sait déjà quelles
+machines existent.
 
-Tant que l'un ou l'autre n'est pas fait, les quatre contrôles doivent être passés **à la
-main** avant chaque fusion, et la demande de fusion doit en porter la preuve :
+### En attendant, les contrôles se passent à la main
+
+Tant que l'une ou l'autre voie n'est pas prise, les quatre contrôles doivent être passés à
+la main avant chaque fusion, et la demande de fusion doit en porter la preuve :
 
 ```bash
 sh tools/verifier-typographie.sh
