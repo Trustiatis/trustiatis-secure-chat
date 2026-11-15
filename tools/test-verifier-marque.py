@@ -67,7 +67,23 @@ CAS = [
     ('<string name="x">Use SimpleX Chat servers?</string>', False, "opérateur des serveurs proposés"),
     ('<string name="x">SimpleX Chat and Flux made an agreement</string>', False, "opérateurs nommés"),
     ('<string name="x">SimpleX Chat security was audited by Trail of Bits.</string>', False, "fait historique"),
-    # Identifiants. Invisibles d'un utilisateur, et coûteux à renommer.
+    # Identifiants du code. Invisibles d'un utilisateur, et coûteux à renommer.
+    # La frontière est la marque COLLÉE à d'autres caractères d'identifiant.
+    ("class SimplexService : Service() {", False, "nom de classe"),
+    ('const val DATABASE = "simplex_v1_chat.db"', False, "nom de fichier de base"),
+    ("uriHandler.openVerifiedSimplexUri(simplexTeamUri)", False, "noms de fonction et de variable"),
+    ("val SimplexColorPalette = darkColors(", False, "nom de palette"),
+    ('appPrefs.getString("simplex.theme")', False, "clé de préférence"),
+    ("import chat.simplex.res.*", False, "chemin de paquet"),
+    ("  // Skip when Simplex service is currently working", False, "ligne commentée"),
+    ('    val titre = "SimpleX" // vu dans SimplexService', True, "note en fin de ligne : le code reste contrôlé"),
+    # ...et ce que la même règle ne doit PAS laisser passer, parce qu'un espace
+    # ou un guillemet sépare la marque du reste : les formes vues d'un utilisateur.
+    ('val title = "SimpleX"', True, "forme vue, marque isolée"),
+    ('val title = "SimpleX Chat"', True, "forme vue, deux mots"),
+    ('showWindowsErrorWindow("SimpleX failed to start"', True, "forme vue, phrase"),
+    ('const val CHANNEL_NAME = "SimpleX Chat service"', True, "nom de canal, vu dans les réglages"),
+    # Identifiants des catalogues.
     ('<string name="simplex_name_error">Trustiatis Secure</string>', False, "clé de ressource"),
     ("  <!-- API Error Responses - SimpleXAPI.kt -->", False, "commentaire, renvoi vers une source"),
     ("  <!-- Images - chat.simplex.app.views.chat.item.CIImageView.kt -->", False, "commentaire"),
@@ -79,11 +95,9 @@ def main() -> int:
     module = charger()
     rates = 0
     for ligne, attendu, pourquoi in CAS:
-        reste = module.MOTIF_AUTORISE_CASSE.sub("", ligne)
-        reste = module.MOTIF_AUTORISE.sub("", reste)
-        if module.MOTIF_COMMENTAIRE_XML.search(ligne):
-            reste = module.MOTIF_COMMENTAIRE_XML.sub("", reste)
-        signale = bool(module.MOTIF_MARQUE.search(reste))
+        # Le chemin sert à la décision : il dit si « // » ouvre un commentaire.
+        chemin = "x.kt" if not ligne.lstrip().startswith("<") else "strings.xml"
+        signale = module.ligne_signalee(ligne, chemin)
         if signale == attendu:
             continue
         rates += 1
