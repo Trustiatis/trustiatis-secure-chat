@@ -43,7 +43,9 @@ extension AppSettings {
         if let val = privacySaveLastDraft { def.setValue(val, forKey: DEFAULT_PRIVACY_SAVE_LAST_DRAFT) }
         if let val = privacyProtectScreen { def.setValue(val, forKey: DEFAULT_PRIVACY_PROTECT_SCREEN) }
         if let val = privacyMediaBlurRadius { def.setValue(val, forKey: DEFAULT_PRIVACY_MEDIA_BLUR_RADIUS) }
-        if let val = notificationMode { ChatModel.shared.notificationMode = val.toNotificationsMode() }
+        // Trustiatis Secure: an imported file cannot turn push notifications back on,
+        // see docs/DECISIONS.md P-5.
+        if let val = notificationMode, val.toNotificationsMode() == .off { ChatModel.shared.notificationMode = .off }
         if let val = notificationPreviewMode { ntfPreviewModeGroupDefault.set(val) }
         if let val = webrtcPolicyRelay { def.setValue(val, forKey: DEFAULT_WEBRTC_POLICY_RELAY) }
         if let val = webrtcICEServers { def.setValue(val, forKey: DEFAULT_WEBRTC_ICE_SERVERS) }

@@ -1715,7 +1715,11 @@ enum NotificationsMode: String, Decodable, SelectableItem {
 
     var id: String { self.rawValue }
 
-    static var values: [NotificationsMode] = [.instant, .periodic, .off]
+    // Trustiatis Secure: push notifications are not available in this app, see docs/DECISIONS.md P-5.
+    // The cases above are kept: they are sent to and received from the chat core as strings.
+    // Only the list offered to the UI is reduced, so that no view can select a mode that
+    // would send the device token to a notification server that cannot deliver anything.
+    static var values: [NotificationsMode] = [.off]
 }
 
 struct RemoteCtrlInfo: Decodable {

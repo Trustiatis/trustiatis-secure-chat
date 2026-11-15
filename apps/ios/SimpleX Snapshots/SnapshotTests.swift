@@ -294,7 +294,7 @@ private func previewScenes() -> [SnapshotScene] {
         SnapshotScene(NewChatMenuButton_Previews.self),
         SnapshotScene(NewFeaturesView_Previews.self),
         SnapshotScene(NewServerView_Previews.self),
-        SnapshotScene(NotificationsModeView_Previews.self, device: true),
+        SnapshotScene(NotificationsInfoView_Previews.self, device: true),
         SnapshotScene(NotificationsView_Previews.self),
         SnapshotScene(OnboardingConditionsView_Previews.self),
         SnapshotScene(OnboardingStepsView_Previews.self),

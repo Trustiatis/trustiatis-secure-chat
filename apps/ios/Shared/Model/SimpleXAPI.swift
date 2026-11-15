@@ -698,23 +698,20 @@ func apiRegisterToken(token: DeviceToken, notificationMode: NotificationsMode) a
     throw r.unexpected
 }
 
-func registerToken(token: DeviceToken) {
+// Trustiatis Secure: the device token is never registered, see docs/DECISIONS.md P-5.
+// This app has no notification server and no Apple push identity, so registering would hand
+// the token to someone else's server in exchange for a delivery that can never happen.
+// A database imported from another app can still report instant or periodic, which is why
+// the mode is forced back to off here rather than simply skipped.
+func registerToken(token _: DeviceToken) {
     let m = ChatModel.shared
     let mode = m.notificationMode
-    if mode != .off && !m.tokenRegistered {
-        m.tokenRegistered = true
-        logger.debug("registerToken \(mode.rawValue)")
+    if mode != .off {
+        logger.warning("registerToken: mode \(mode.rawValue) forced to off, push notifications are disabled in this app")
         Task {
-            do {
-                let status = try await apiRegisterToken(token: token, notificationMode: mode)
-                await MainActor.run {
-                    m.tokenStatus = status
-                    if !status.workingToken {
-                        m.reRegisterTknStatus = status
-                    }
-                }
-            } catch let error {
-                logger.error("registerToken apiRegisterToken error: \(responseError(error))")
+            await MainActor.run {
+                m.notificationMode = .off
+                m.notificationServer = nil
             }
         }
     }
@@ -728,6 +725,11 @@ func tokenStatusInfo(_ status: NtfTknStatus, register: Bool) -> String {
 func reRegisterToken(token: DeviceToken) {
     let m = ChatModel.shared
     let mode = m.notificationMode
+    // Trustiatis Secure: second guard on the same path, see docs/DECISIONS.md P-5.
+    if mode == .off {
+        logger.warning("reRegisterToken: not sent, push notifications are disabled in this app")
+        return
+    }
     logger.debug("reRegisterToken \(mode.rawValue)")
     Task {
         do {

@@ -10,11 +10,29 @@ sont plus des estimations d'audit : ce sont les lignes que le contrôle signale 
 
 | Où | Signalements | Nature du travail |
 |---|---|---|
-| `strings.xml` des 41 catalogues Moko | **2 423** | chaînes traduites. Décision D-6 : fichier de référence et français d'abord, les autres langues par vagues |
-| Kotlin et Kotlin Script | **303** | code commun Android et Desktop : thèmes, identifiants, libellés en dur |
-| Swift | **203** | couche iOS, au périmètre depuis la décision P-1 |
-| `SimpleX.xcodeproj/project.pbxproj` | **28** | noms de cibles et de produits Xcode |
-| **Total** | **2 957** sur **154 fichiers** | |
+| Catalogues de traduction (`.xml`) | **3 355** | chaînes traduites. Décision D-6 : fichier de référence et français d'abord, les autres langues par vagues |
+| Kotlin et Kotlin Script | **816** | code commun Android et Desktop : thèmes, identifiants, libellés en dur |
+| Swift | **606** | couche iOS, au périmètre depuis la décision P-1 |
+| `SimpleX.xcodeproj/project.pbxproj` | **166** | noms de cibles et de produits Xcode |
+| Divers (scripts, manifestes, droits) | **47** | |
+| **Total** | **4 990** sur **555 fichiers** | |
+
+> **Le relevé du matin, 2 957 sur 154 fichiers, était faux et le contrôle était en cause.**
+> La liste des dérogations contenait `\bSIMPLEX\b`, destinée à la valeur d'énumération de
+> thème, écrite en capitales. Elle était compilée avec `re.IGNORECASE`, donc elle autorisait
+> aussi **« SimpleX » isolé**, c'est à dire la marque elle même partout où elle est un mot
+> et non un identifiant collé. Autrement dit, le contrôle laissait passer la quasi totalité
+> des phrases vues par un utilisateur, qui sont précisément ce que la politique de marque
+> interdit de conserver. Corrigé le 2026-11-15 : les dérogations sensibles à la casse sont
+> appliquées séparément des autres. Deux dérogations ont été ajoutées dans le même temps,
+> parce qu'elles sont obligatoires ou intouchables : la mention de droit d'auteur de l'amont
+> en tête de fichier, exigée par l'AGPL, et les fonctions du pont FFI
+> (`sendSimpleXCmd`, `recvSimpleXMsg`).
+>
+> Reste à trancher en Phase 2, et volontairement laissé signalé : les **213 en-têtes de
+> fichier** de la forme `//  SimpleX`, qui ne sont vus par aucun utilisateur mais portent le
+> nom du projet amont. Les garder relève de la provenance, les réécrire relève du conflit à
+> chaque report.
 
 Ce total n'est pas la quantité de travail : un même mot répété dans 41 traductions se traite
 une fois, par un script. Il est la **mesure de départ**, et il doit tomber à zéro avant la
@@ -75,7 +93,13 @@ entrées du **cercle 3** doivent être argumentées, ce sont elles qui coûtent 
 
 | Cercle | Fichier | Modification | Justification | Commit |
 |---|---|---|---|---|
-| | | | | |
+| **3** | `apps/ios/Shared/Model/AppAPITypes.swift` | `NotificationsMode.values` réduit à `[.off]` | P-5. Les cas `instant` et `periodic` de l'énumération sont **conservés**, ils sont échangés avec le coeur sous forme de chaînes (interdit n° 3 de `CONTRIBUTING.md`). Seule la liste offerte à l'interface change, ce qui neutralise d'un coup tous les sélecteurs, présents et futurs | `feature/ios` |
+| **3** | `apps/ios/Shared/Views/UserSettings/NotificationsView.swift` | sélecteur de mode remplacé par un texte, et retrait de `setNotificationsMode` | P-5. `setNotificationsMode` était le chemin qui appelait `apiRegisterToken` depuis les réglages | `feature/ios` |
+| **3** | `apps/ios/Shared/Views/Onboarding/YourNetwork.swift` | défaut `.instant` passé à `.off`, feuille de sélection remplacée par l'écran d'information, `applyNotificationMode` réduit | P-5, et c'est **le point de fuite principal** : l'amont arme `instant` par défaut et enregistre le jeton dès que l'utilisateur touche « Continue », sans l'avoir demandé | `feature/ios` |
+| **3** | `apps/ios/Shared/Views/Onboarding/SetNotificationsMode.swift` | `SetNotificationsMode` et `NtfModeSelector` retirés, `NotificationsInfoView` conservée et complétée | P-5. L'écran d'information reste, c'est lui qui porte l'explication | `feature/ios` |
+| **3** | `apps/ios/Shared/Model/SimpleXAPI.swift` | `registerToken` ne pose plus de jeton et ramène le mode à `.off`, garde ajoutée dans `reRegisterToken` | P-5. Verrou de dernier recours : une base importée d'une autre application peut annoncer `instant`, et c'est ce chemin qui enverrait alors le jeton | `feature/ios` |
+| **3** | `apps/ios/Shared/Views/UserSettings/AppSettings.swift` | un mode importé autre que `.off` est ignoré | P-5. Un fichier de réglages ne doit pas pouvoir rallumer ce que l'interface a retiré | `feature/ios` |
+| 2 | `apps/ios/SimpleX Snapshots/SnapshotTests.swift` | scène `NotificationsModeView_Previews` remplacée par `NotificationsInfoView_Previews` | conséquence mécanique du retrait ci dessus, sans quoi la cible de test ne compile pas | `feature/ios` |
 
 ## 4. Points de vigilance relevés à l'audit
 
