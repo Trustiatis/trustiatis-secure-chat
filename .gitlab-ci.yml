@@ -1,0 +1,102 @@
+# Intégration continue de Trustiatis Secure.
+#
+# État : squelette de Phase 2. Aucune compilation n'est encore faite ici, parce qu'aucun
+# runner n'est déclaré et qu'aucune chaîne de construction n'a été vérifiée. Les étapes de
+# compilation seront ajoutées en Phase 6, avec les runners décrits au chapitre 14 de
+# docs/INITIAL_AUDIT.md.
+#
+# Règle du projet : ne jamais prétendre qu'une compilation a réussi sans preuve.
+
+stages:
+  - controles
+
+default:
+  interruptible: true
+
+# ---------------------------------------------------------------------------
+# Contrôle de marque : aucune occurrence interdite de la marque de l'amont.
+# Avertissement tant que la Phase 2 n'est pas finie, bloquant ensuite.
+# ---------------------------------------------------------------------------
+marque:
+  stage: controles
+  image: python:3.12-slim
+  allow_failure: true          # à passer à false à la fin de la Phase 2
+  script:
+    - python3 tools/verifier-marque.py
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ---------------------------------------------------------------------------
+# Typographie : la décision du Membre interdit le tiret long et le tiret
+# demi-long dans les documents produits.
+# ---------------------------------------------------------------------------
+typographie:
+  stage: controles
+  image: alpine:3.20
+  script:
+    - |
+      # Les deux motifs sont construits en octal pour que ce fichier ne contienne
+      # lui-meme aucun tiret long, et pour ne pas dependre de `grep -P`.
+      em=$(printf '\342\200\224')
+      en=$(printf '\342\200\223')
+      trouve=$(grep -rn -e "$em" -e "$en" --include='*.md' docs/ ./*.md 2>/dev/null || true)
+      if [ -n "$trouve" ]; then
+        echo "Tirets longs ou demi-longs interdits dans les documents produits :"
+        echo "$trouve"
+        exit 1
+      fi
+      echo "Typographie conforme."
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ---------------------------------------------------------------------------
+# Garde-fou de la décision D-2 : le coeur Haskell n'est pas modifié.
+# Toute différence avec la branche de référence de l'amont fait échouer la CI.
+# ---------------------------------------------------------------------------
+coeur-intact:
+  stage: controles
+  image: alpine/git:latest
+  script:
+    - |
+      ref=$(git for-each-ref --format='%(refname:short)' 'refs/heads/upstream-*' \
+            | sort -V | tail -1)
+      if [ -z "$ref" ]; then
+        echo "Aucune branche de référence upstream-* : greffe non faite, contrôle ignoré."
+        exit 0
+      fi
+      echo "Référence d'amont : $ref"
+      diff=$(git diff --name-only "$ref" HEAD -- src/ scripts/ flake.nix flake.lock cabal.project || true)
+      if [ -n "$diff" ]; then
+        echo "ERREUR : le coeur de l'amont a été modifié, ce qu'interdit la décision D-2 :"
+        echo "$diff"
+        exit 1
+      fi
+      echo "Coeur intact."
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+# ---------------------------------------------------------------------------
+# Aucun secret committé.
+# ---------------------------------------------------------------------------
+secrets:
+  stage: controles
+  image: alpine:3.20
+  script:
+    - |
+      motifs='\.jks$|\.keystore$|\.p12$|\.pfx$|\.p8$|\.mobileprovision$|^local\.properties$|^keystore\.properties$'
+      trouve=$(git ls-files | grep -E "$motifs" || true)
+      if [ -n "$trouve" ]; then
+        echo "ERREUR : fichiers de secret versionnés :"
+        echo "$trouve"
+        exit 1
+      fi
+      echo "Aucun secret versionné."
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_COMMIT_BRANCH == "main"
