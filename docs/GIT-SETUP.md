@@ -50,15 +50,15 @@ et les liens de `INDEX-DOCUMENTATION.md`, pour un gain nul.
 
 Rappels qui restent valables :
 
-- **Le projet a été créé PUBLIC**, constaté le 2026-11-15 : il se consulte sans être
-  connecté. Ce n'est pas la visibilité privée que cette procédure supposait. Ce n'est pas un
-  problème en soi, l'AGPLv3 exigera de toute façon la publication du code avant toute
-  distribution de binaire (voir `NOTICE-AGPL.md`), et c'est donc une étape prise d'avance.
-  Mais deux conséquences sont immédiates et il faut les vouloir : **tout l'historique poussé
-  est déjà lisible par n'importe qui**, adresse de commit comprise, et le fork est public
-  avant d'avoir commencé sa personnalisation, donc visible avec la marque de l'amont encore
-  partout. Si ce n'est pas voulu, repasser le projet en privé maintenant, dans
-  `Settings > General > Visibility`.
+- **Le projet a été créé PUBLIC**, constaté le 2026-11-15 : il se consultait sans être
+  connecté. Deux conséquences immédiates : tout l'historique poussé était lisible par
+  n'importe qui, adresse de commit comprise, et le fork s'affichait avant toute
+  personnalisation, donc avec la marque de l'amont encore partout.
+  **Décision du Membre le 2026-11-15 : repasser le projet en privé.** L'AGPLv3 n'exige la
+  mise à disposition du code qu'au moment où un binaire est **distribué** (voir
+  `NOTICE-AGPL.md`), et rien n'est compilé. Réglage dans
+  `Settings > General > Visibility, project features, permissions`. **À rouvrir en public
+  avant la première distribution**, et cette case figure à l'étape 7.
 - Le projet doit être **vierge**, sans README d'initialisation, sinon le premier envoi sera
   refusé pour divergence.
 
