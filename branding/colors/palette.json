@@ -1,0 +1,53 @@
+{
+  "_source": "id-trustiatis/src/brand.ts (thème sombre, en ligne sur id.trustiatis.com depuis le 2026-11-04) et design-system/trustiatis/charte-graphique.md (relevé du DOM de trustiatis.com le 2026-08-08). Aucune valeur n'est inventée : chacune est reprise de l'une de ces deux sources, et la colonne source le dit.",
+  "_regle": "Ce fichier est la seule source. Les ressources des arbres de code sont générées par tools/propager-branding.py et ne se modifient pas à la main.",
+
+  "marque": {
+    "primaire":        { "hex": "#509482", "nom": "sauge",            "source": "brand.ts colors.primary ; charte --sage" },
+    "primaire_clair":  { "hex": "#6FB3A1", "nom": "sauge clair",      "source": "brand.ts colors.primaryBright" },
+    "primaire_fonce":  { "hex": "#3D7566", "nom": "sauge profond",    "source": "brand.ts colors.primaryDeep" },
+    "accent":          { "hex": "#BE7C7B", "nom": "terracotta",       "source": "brand.ts colors.accent ; charte --terracotta" },
+    "accent_clair":    { "hex": "#D89B9A", "nom": "terracotta clair", "source": "brand.ts colors.accentBright" },
+    "accent_vif":      { "hex": "#FFB07A", "nom": "terracotta vif",   "source": "brand.ts colors.accentFlash" },
+    "alerte":          { "hex": "#EF6B6B", "nom": "rouge",            "source": "brand.ts colors.red" },
+    "alerte_vive":     { "hex": "#FF3B3B", "nom": "rouge vif",        "source": "brand.ts colors.redFlash" }
+  },
+
+  "theme_sombre": {
+    "_source": "brand.ts, le thème de id.trustiatis.com, qui est sombre",
+    "fond":            "#070D18",
+    "fond_secondaire": "#0A1220",
+    "texte":           "#E9EFF7",
+    "texte_attenue":   "#A5D8C9",
+    "texte_attenue_2": "#8AB5A5",
+    "texte_sur_cta":   "#2D5B4F"
+  },
+
+  "theme_clair": {
+    "_source": "charte-graphique.md, relevée sur trustiatis.com, qui est clair",
+    "fond":            "#FFFFFF",
+    "fond_secondaire": "#F4F7F6",
+    "texte":           "#1D1E20",
+    "texte_attenue":   "#3D7566",
+    "texte_attenue_2": "#6B6F72",
+    "texte_sur_cta":   "#FFFFFF"
+  },
+
+  "formes": {
+    "_source": "brand.ts radius et ctaRadius",
+    "rayon":     "22px",
+    "rayon_cta": "14px"
+  },
+
+  "typographie": {
+    "_decision": "Roboto, qui est la police de id.trustiatis.com et la police système d'Android. Rien n'est embarqué dans l'application : la famille est demandée au système, ce qui évite d'ajouter des fichiers de police à chaque report de l'amont.",
+    "famille": "Roboto",
+    "repli": "sans-serif"
+  },
+
+  "fond_icone": {
+    "_decision": "L'amont propose deux icônes, que l'utilisateur choisit dans l'application. On en garde deux, avec le même dessin et deux fonds, tous deux pris aux sources : le fond sombre de id.trustiatis.com, et la plaque blanche de la charte du site, qui est celle du favicon d'origine. Le sauge a été écarté comme second fond : le I du monogramme est sauge, il s'y effacerait.",
+    "sombre": "#070D18",
+    "clair": "#FFFFFF"
+  }
+}
