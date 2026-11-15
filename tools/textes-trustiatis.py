@@ -147,9 +147,11 @@ TEXTES: dict[str, dict[str, str]] = {
 AJOUTS: dict[str, dict[str, str]] = {
     "base": {
         "trustiatis_updates_from_portal": "Updates are published on the Trustiatis portal, downloads.trustiatis.com. The application does not check for them by itself.",
+        "trustiatis_non_affiliation": "Trustiatis Secure is an independent product published by Trustiatis, derived from the free software SimpleX Chat and compatible with the SimpleX network. It is not published, supported or endorsed by SimpleX Chat Ltd. SimpleX is a trademark of SimpleX Chat Ltd.",
     },
     "fr": {
         "trustiatis_updates_from_portal": "Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com. L\\'application ne les cherche pas d\\'elle même.",
+        "trustiatis_non_affiliation": "Trustiatis Secure est un produit indépendant édité par Trustiatis, dérivé du logiciel libre SimpleX Chat et compatible avec le réseau SimpleX. Il n\\'est ni édité, ni soutenu, ni approuvé par SimpleX Chat Ltd. « SimpleX » est une marque de SimpleX Chat Ltd.",
     },
 }
 

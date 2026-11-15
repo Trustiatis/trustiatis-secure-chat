@@ -51,12 +51,17 @@ de chaînes sont donc à distinguer, et `tools/verifier-marque.py` les fait resp
 |---|---|---|
 | **Nom du produit** | remplacé par « Trustiatis Secure » | « SimpleX » comme nom de l'application |
 | **Réseau et protocole** | **conservé**, car le remplacer serait inexact | « adresse SimpleX », « réseau SimpleX », « compatible avec le réseau SimpleX » |
-| **Renvois vers l'éditeur amont** | retirés ou réécrits vers Trustiatis | site, conditions, dons, badges de SimpleX Chat Ltd |
+| **Renvois vers l'éditeur amont** | retirés ou réécrits vers Trustiatis, **sauf le financement** | site et conditions de SimpleX Chat Ltd. Les dons, les badges et la bannière de financement sont **conservés** par la décision P-7 du Membre, et la dérogation est bornée dans `EDITEUR_CONSERVE_P7` de `tools/verifier-marque.py` |
 
 ### Mention à faire figurer
 
 Dans l'écran « À propos », sur le portail de téléchargement et dans les descriptions de
-magasins :
+magasins. **Posée dans l'application le 2026-11-15**, clé `trustiatis_non_affiliation`,
+affichée par `SimpleXInfoLayout` dans la seule branche où `onboardingStage` est nul, c'est à
+dire l'écran ouvert depuis les réglages et non le premier démarrage. C'est la contrepartie de
+P-7 : garder l'appel au soutien de l'amont sans cette mention laisserait croire à une
+affiliation, que sa politique de marque interdit expressément. Reste à la porter sur le
+portail et dans les descriptions de magasins :
 
 > Trustiatis Secure est un produit indépendant édité par Trustiatis, dérivé du logiciel libre
 > SimpleX Chat et compatible avec le réseau SimpleX. Il n'est ni édité, ni soutenu, ni

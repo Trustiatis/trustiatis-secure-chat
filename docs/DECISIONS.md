@@ -108,7 +108,11 @@ se met dans une position difficile à défendre.
    une application nommée Trustiatis Secure peut se lire comme une affiliation, que la
    politique de marque de l'amont interdit expressément. Le texte existe déjà, dans
    `NOTICE-AGPL.md`, et il doit figurer dans l'écran « À propos ». C'est la contrepartie
-   technique de cette décision, pas une formalité.
+   technique de cette décision, pas une formalité. **Faite le 2026-11-15** : clé
+   `trustiatis_non_affiliation` dans les deux catalogues, affichée par `SimpleXInfoLayout`
+   dans la branche où `onboardingStage` est nul, donc dans l'écran ouvert depuis les réglages
+   et pas pendant l'accueil. Il reste à la porter sur le portail de téléchargement et dans les
+   descriptions de magasins, qui ne sont pas du ressort de ce dépôt.
 
 ### 2026-11-15 au soir, P-6 : la greffe revient sur v7.1.2
 

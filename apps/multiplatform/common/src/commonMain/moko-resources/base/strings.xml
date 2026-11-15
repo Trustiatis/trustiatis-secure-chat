@@ -3370,5 +3370,6 @@
   <string name="v7_1_flat_layout">Flat layout and markdown</string>
   <string name="v7_1_flat_layout_descr">Enable in Appearance settings.</string>
   <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->
+  <string name="trustiatis_non_affiliation">Trustiatis Secure is an independent product published by Trustiatis, derived from the free software SimpleX Chat and compatible with the SimpleX network. It is not published, supported or endorsed by SimpleX Chat Ltd. SimpleX is a trademark of SimpleX Chat Ltd.</string>
   <string name="trustiatis_updates_from_portal">Updates are published on the Trustiatis portal, downloads.trustiatis.com. The application does not check for them by itself.</string>
 </resources>
