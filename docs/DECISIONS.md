@@ -82,7 +82,46 @@ Ce que la mise en oeuvre a appris, et qui n'était pas dans l'énoncé de la dé
 4. **Rien de tout cela n'est compilé.** La chaîne iOS exige Xcode, donc un Mac, que le
    groupe n'a pas encore (voir P-1, conséquence 1). Le changement est relu, pas éprouvé.
 
+### 2026-11-15, nuit, P-7 est renversée : l'appel au soutien ne paraît pas
+
+Décidé par le Membre après lecture de la réserve 1 ci dessous : « ne pas faire apparaître le
+don de soutien, ce n'est pas possible ».
+
+| N° | Décision | Portée |
+|---|---|---|
+| **P-7 bis** | **L'appel au soutien de SimpleX Chat n'apparaît pas dans Trustiatis Secure.** La décision P-7, qui le conservait, est annulée | quatre points d'entrée fermés, et un cinquième réécrit |
+
+**Ce qui est fermé, et comment.** La méthode est celle de P-5 et du risque T-02 : on neutralise
+la porte, pas ses appelants, pour qu'un report de l'amont ne conflicte que sur une ligne.
+
+| Point d'entrée | Traitement |
+|---|---|
+| bannière de financement de la liste des conversations, carte des nouveautés, section « Invest » des réglages | `crowdfundingAvailable()` rend faux. Les trois appelants et tout l'écran `GetStakeView` restent en place |
+| entrée des badges dans les réglages | retirée. Sans badge, son intitulé est « Support SimpleX » : c'est l'appel au soutien, à l'endroit le plus vu |
+| section « soutenir le projet » des réglages | retirée : elle menait à la page de contribution de l'amont, à sa fiche Google Play (`chat.simplex.app`, qui n'est pas notre application) et à son dépôt GitHub |
+| canal d'actualités et canal du fondateur de l'amont | retirés : ils adressent un client de Trustiatis à un éditeur qui ne le connaît pas |
+| « nous écrire » | **réécrit** vers `support@trustiatis.com`, ce que `NOTICE-AGPL.md` prescrit pour cette catégorie |
+
+**Ce que la décision coûte, et il faut le savoir.** Le badge était un **achat** qui rendait un
+service réel : des fichiers de 2 à 5 Gio conservés de 7 à 21 jours. Fermer son entrée retire
+cette capacité de l'interface. Le code des badges reste en place, et le badge d'un
+correspondant continue de s'afficher dans son profil : c'est une information sur lui, pas une
+sollicitation adressée à l'utilisateur. Rouvrir la seule entrée des badges, sans rouvrir le
+financement, reste donc possible d'une ligne si le Membre le souhaite.
+
+**Ce qui n'est pas touché.** Les chaînes restent dans les quarante-deux catalogues. Les
+retirer voudrait dire toucher quarante-deux fichiers que l'amont réécrit à chaque version,
+pour un gain nul : une chaîne qu'aucun écran ne lit n'est pas vue. La liste
+`EDITEUR_NEUTRALISE` de `tools/verifier-marque.py` porte désormais ce nom, qui dit la vérité.
+
+**Et la mention de non affiliation reste indispensable**, bien que P-7 soit renversée : elle
+ne dépendait pas de l'appel au soutien. Elle est en place dans l'écran « À propos ».
+
 ### 2026-11-15 au soir, P-7 rendue : l'appel au soutien de l'amont est conservé
+
+> **Annulée la nuit même par P-7 bis, ci dessus.** La section est conservée telle quelle :
+> c'est la réserve 1 qu'elle portait qui a conduit le Membre à décider l'inverse, et effacer
+> le raisonnement effacerait la raison de la décision suivante.
 
 | N° | Décision | Portée |
 |---|---|---|

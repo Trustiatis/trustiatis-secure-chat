@@ -185,24 +185,33 @@ OPERATEUR_AUTORISE = [
     r"Self-host SimpleX servers",
 ]
 
-# Renvois vers l'éditeur amont que le Membre a décidé de CONSERVER.
+# Renvois vers l'éditeur amont dont les ÉCRANS SONT NEUTRALISÉS.
 #
-# Décision P-7, rendue le 2026-11-15 : Trustiatis Secure garde l'appel au
-# soutien de SimpleX Chat. C'est la troisième catégorie de NOTICE-AGPL.md, que
-# ce document dit de retirer ou de réécrire ; la décision du Membre prime, et
-# cette liste est là pour que la dérogation soit nommée, bornée et relisible
-# plutôt que dispersée en commentaires dans quarante catalogues.
+# **P-7 est renversée.** Le Membre l'a décidé le 2026-11-15 au soir, après avoir
+# lu la réserve que j'avais portée au dossier : « Invest in SimpleX Chat » et
+# « Own a part of SimpleX Chat » renvoient à un financement participatif en
+# CAPITAL sur Wefunder, c'est à dire à une offre de titres, et relayer une offre
+# de titres d'un tiers à ses clients n'est pas relayer un lien de don. L'appel au
+# soutien de l'amont ne doit donc pas apparaître.
 #
-# Deux choses différentes y cohabitent, et la distinction compte :
-#   - le badge de soutien est un ACHAT qui rend un service à l'utilisateur
-#     (fichiers de 2 à 5 Gio conservés de 7 à 21 jours) ;
-#   - « Invest in SimpleX Chat » renvoie à un financement participatif en
-#     CAPITAL sur Wefunder, c'est à dire à une offre de titres, ouverte aux
-#     seules juridictions que l'offre couvre. Voir la note de P-7.
+# Les points d'entrée sont fermés dans le code, pas ici : `crowdfundingAvailable()`
+# rend faux, l'entrée des badges et la section « soutenir le projet » des réglages
+# ne sont plus posées. Plus aucun écran ne montre ces chaînes.
 #
-# Toute ligne ajoutée ici doit pouvoir se rattacher à P-7. Ce n'est pas une
-# liste où l'on range ce qui résiste.
-EDITEUR_CONSERVE_P7 = [
+# Pourquoi cette liste survit, alors. Les chaînes, elles, **restent dans les
+# quarante-deux catalogues**, parce que les retirer voudrait dire toucher
+# quarante-deux fichiers que l'amont réécrit à chaque version, pour un gain nul :
+# une chaîne qu'aucun écran ne lit n'est pas vue. Elles sont donc tolérées ici, et
+# le nom de la liste dit désormais la vérité : neutralisées, pas conservées.
+#
+# Ce que la décision coûte, et qui est consigné pour qu'on ne le redécouvre pas :
+# le badge était un ACHAT qui rendait un service réel, des fichiers de 2 à 5 Gio
+# conservés de 7 à 21 jours. Fermer son entrée retire cette capacité de
+# l'interface.
+#
+# Toute ligne ajoutée ici doit correspondre à un écran effectivement neutralisé.
+# Ce n'est pas une liste où l'on range ce qui résiste.
+EDITEUR_NEUTRALISE = [
     r"[Ss]upport(?:s|ed)? SimpleX(?: Chat)?",
     r"[Ss]outen(?:ez|ir|u) SimpleX(?: Chat)?", r"soutient SimpleX(?: Chat)?",
     r"Invest in SimpleX Chat", r"Own a part of SimpleX Chat",
@@ -229,7 +238,7 @@ MOTIF_AUTORISE = re.compile(
         + IDENTIFIANTS_AUTORISES
         + RESEAU_AUTORISE
         + OPERATEUR_AUTORISE
-        + EDITEUR_CONSERVE_P7
+        + EDITEUR_NEUTRALISE
     ),
     re.IGNORECASE,
 )

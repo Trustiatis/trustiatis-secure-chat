@@ -51,7 +51,7 @@ de chaînes sont donc à distinguer, et `tools/verifier-marque.py` les fait resp
 |---|---|---|
 | **Nom du produit** | remplacé par « Trustiatis Secure » | « SimpleX » comme nom de l'application |
 | **Réseau et protocole** | **conservé**, car le remplacer serait inexact | « adresse SimpleX », « réseau SimpleX », « compatible avec le réseau SimpleX » |
-| **Renvois vers l'éditeur amont** | retirés ou réécrits vers Trustiatis, **sauf le financement** | site et conditions de SimpleX Chat Ltd. Les dons, les badges et la bannière de financement sont **conservés** par la décision P-7 du Membre, et la dérogation est bornée dans `EDITEUR_CONSERVE_P7` de `tools/verifier-marque.py` |
+| **Renvois vers l'éditeur amont** | retirés ou réécrits vers Trustiatis | site, conditions, dons, badges et bannière de financement de SimpleX Chat Ltd. **P-7 avait fait exception pour le financement ; P-7 bis l'annule** : les points d'entrée sont fermés dans le code, le courriel de contact est réécrit vers `support@trustiatis.com`. Les chaînes restent dans les catalogues, où aucun écran ne les lit, et `EDITEUR_NEUTRALISE` de `tools/verifier-marque.py` les recense |
 
 ### Mention à faire figurer
 
