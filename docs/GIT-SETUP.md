@@ -209,6 +209,13 @@ vérification, elle sert de preuve d'identité.
 **C'est au Membre de la faire.** L'agent ne saisit jamais de coordonnées bancaires ni de
 pièce d'identité, quelle que soit la demande.
 
+Vérifié le 2026-11-15 : ce refus intervient **avant** l'évaluation de la configuration.
+Après l'ajout du bloc `workflow` qui devait supprimer les pipelines sur les branches de
+travail, GitLab en a tout de même créé un par branche, en échec, avec la même raison et
+`yamlErrors: false`. Autrement dit, tant que le compte n'est pas vérifié, **tout** envoi
+produit un pipeline en échec, quelle que soit la configuration, et l'effet du bloc
+`workflow` ne pourra être constaté qu'après la vérification.
+
 Deux voies si cette vérification n'est pas souhaitée :
 
 | Voie | Ce qu'elle implique |
