@@ -46,6 +46,20 @@ TEXTES: dict[str, dict[str, str]] = {
         "why_built_p6": "This is the channel to prefer with Trustiatis, and for sensitive information and data it is the only one we use. Nobody at Trustiatis will ever ask you for a password, a key or an access code by email, by telephone, or through another messenger. A request that reaches you by another route did not come from us.",
         "why_built_p7": "Some second factors will be delivered here as well. A one time code that arrives in this application has passed neither through your mailbox nor through the mobile network, which are the two places such codes are usually stolen.",
         "why_built_tagline": "Open the application, ask for the card, then speak freely.",
+        # Le verrou de l'application et le service d'arrière plan. Ce sont les
+        # mentions de marque les plus vues : le service d'arrière plan affiche
+        # une notification permanente sur l'appareil.
+        "simplex_service_notification_title": "Trustiatis Secure",
+        "to_preserve_privacy_simplex_has_background_service_instead_of_push_notifications_it_uses_a_few_pc_battery": "<![CDATA[To improve privacy, <b>this application runs in background</b> instead of using push notifications.]]>",
+        "la_notice_title_simplex_lock": "Trustiatis Lock",
+        "la_lock_mode": "Trustiatis Lock mode",
+        "auth_simplex_lock_turned_on": "Trustiatis Lock turned on",
+        "auth_enable_simplex_lock": "Enable Trustiatis Lock",
+        "auth_disable_simplex_lock": "Disable Trustiatis Lock",
+        "la_notice_to_protect_your_information_turn_on_simplex_lock_you_will_be_prompted_to_complete_authentication_before_this_feature_is_enabled": "To protect your information, turn on Trustiatis Lock.\\nYou will be prompted to complete authentication before this feature is enabled.",
+        "auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled": "Device authentication is not enabled. You can turn on Trustiatis Lock via Settings, once you enable device authentication.",
+        "lock_not_enabled": "Trustiatis Lock not enabled!",
+        "you_can_turn_on_lock": "You can turn on Trustiatis Lock via Settings.",
     },
     "fr": {
         "app_name": "Trustiatis Secure",
@@ -63,6 +77,17 @@ TEXTES: dict[str, dict[str, str]] = {
         "why_built_p6": "C\\'est le canal à privilégier avec Trustiatis, et pour les informations et les données sensibles c\\'est le seul que nous employons. Personne chez Trustiatis ne vous demandera jamais un mot de passe, une clé ou un code d\\'accès par courriel, par téléphone ou par une autre messagerie. Une demande qui vous parvient par une autre voie ne vient pas de nous.",
         "why_built_p7": "Certains seconds facteurs seront également remis ici. Un code à usage unique qui arrive dans cette application n\\'est passé ni par votre boîte aux lettres, ni par le réseau mobile, qui sont les deux endroits où ces codes se volent d\\'habitude.",
         "why_built_tagline": "Ouvrez l\\'application, réclamez la carte, puis parlez librement.",
+        "simplex_service_notification_title": "Trustiatis Secure",
+        "to_preserve_privacy_simplex_has_background_service_instead_of_push_notifications_it_uses_a_few_pc_battery": "<![CDATA[Pour protéger votre vie privée, <b>cette application fonctionne en arrière-plan</b> au lieu d\\'utiliser les notifications push.]]>",
+        "la_notice_title_simplex_lock": "Verrouillage Trustiatis",
+        "la_lock_mode": "Mode de Verrouillage Trustiatis",
+        "auth_simplex_lock_turned_on": "Verrouillage Trustiatis activé",
+        "auth_enable_simplex_lock": "Activer le Verrouillage Trustiatis",
+        "auth_disable_simplex_lock": "Désactiver le Verrouillage Trustiatis",
+        "la_notice_to_protect_your_information_turn_on_simplex_lock_you_will_be_prompted_to_complete_authentication_before_this_feature_is_enabled": "Pour protéger vos informations, activez le Verrouillage Trustiatis.\\nUne authentification vous sera demandée avant que cette fonctionnalité ne soit activée.",
+        "auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled": "L\\'authentification de l\\'appareil n\\'est pas activée. Vous pouvez activer le Verrouillage Trustiatis dans les Paramètres une fois l\\'authentification de l\\'appareil activée.",
+        "lock_not_enabled": "Le Verrouillage Trustiatis n\\'est pas activé !",
+        "you_can_turn_on_lock": "Vous pouvez activer le Verrouillage Trustiatis dans les Paramètres.",
     },
 }
 

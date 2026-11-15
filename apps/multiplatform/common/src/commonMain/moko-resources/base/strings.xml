@@ -262,7 +262,7 @@
   <string name="icon_descr_instant_notifications">Instant notifications</string>
   <string name="service_notifications">Instant notifications!</string>
   <string name="service_notifications_disabled">Instant notifications are disabled!</string>
-  <string name="to_preserve_privacy_simplex_has_background_service_instead_of_push_notifications_it_uses_a_few_pc_battery"><![CDATA[To improve privacy, <b>SimpleX runs in background</b> instead of using push notifications.]]></string>
+  <string name="to_preserve_privacy_simplex_has_background_service_instead_of_push_notifications_it_uses_a_few_pc_battery"><![CDATA[To improve privacy, <b>this application runs in background</b> instead of using push notifications.]]></string>
   <string name="it_can_disabled_via_settings_notifications_still_shown"><![CDATA[<b>It can be disabled via settings</b> – notifications will still be shown while the app is running.]]></string>
   <string name="turn_off_battery_optimization"><![CDATA[<b>Allow it</b> in the next dialog to receive notifications instantly.]]></string>
   <string name="turning_off_service_and_periodic">Battery optimization is active, turning off background service and periodic requests for new messages. You can re-enable them via settings.</string>
@@ -284,7 +284,7 @@
   <string name="xiaomi_ignore_battery_optimization"><![CDATA[<b>Xiaomi devices</b>: please enable Autostart in the system settings for notifications to work.]]></string>
 
   <!-- SimpleX Chat foreground Service -->
-  <string name="simplex_service_notification_title">SimpleX Chat service</string>
+  <string name="simplex_service_notification_title">Trustiatis Secure</string>
   <string name="simplex_service_notification_text">Receiving messages…</string>
   <string name="call_service_notification_audio_call">Audio call</string>
   <string name="call_service_notification_video_call">Video call</string>
@@ -318,10 +318,10 @@
   <string name="error_showing_desktop_notification">Error showing notification, contact developers.</string>
 
   <!-- local authentication notice - SimpleXAPI.kt -->
-  <string name="la_notice_title_simplex_lock">SimpleX Lock</string>
-  <string name="la_notice_to_protect_your_information_turn_on_simplex_lock_you_will_be_prompted_to_complete_authentication_before_this_feature_is_enabled">To protect your information, turn on SimpleX Lock.\nYou will be prompted to complete authentication before this feature is enabled.</string>
+  <string name="la_notice_title_simplex_lock">Trustiatis Lock</string>
+  <string name="la_notice_to_protect_your_information_turn_on_simplex_lock_you_will_be_prompted_to_complete_authentication_before_this_feature_is_enabled">To protect your information, turn on Trustiatis Lock.\nYou will be prompted to complete authentication before this feature is enabled.</string>
   <string name="la_notice_turn_on">Turn on</string>
-  <string name="la_lock_mode">SimpleX Lock mode</string>
+  <string name="la_lock_mode">Trustiatis Lock mode</string>
   <string name="la_lock_mode_system">System authentication</string>
   <string name="la_lock_mode_passcode">Passcode entry</string>
   <string name="la_auth_failed">Authentication failed</string>
@@ -337,22 +337,22 @@
   <string name="la_please_remember_to_store_password">Please remember or store it securely - there is no way to recover a lost password!</string>
 
   <!-- LocalAuthentication.kt -->
-  <string name="auth_simplex_lock_turned_on">SimpleX Lock turned on</string>
+  <string name="auth_simplex_lock_turned_on">Trustiatis Lock turned on</string>
   <string name="auth_you_will_be_required_to_authenticate_when_you_start_or_resume">You will be required to authenticate when you start or resume the app after 30 seconds in background.</string>
   <string name="auth_unlock">Unlock</string>
   <string name="auth_log_in_using_credential">Log in using your credential</string>
-  <string name="auth_enable_simplex_lock">Enable SimpleX Lock</string>
-  <string name="auth_disable_simplex_lock">Disable SimpleX Lock</string>
+  <string name="auth_enable_simplex_lock">Enable Trustiatis Lock</string>
+  <string name="auth_disable_simplex_lock">Disable Trustiatis Lock</string>
   <string name="auth_confirm_credential">Confirm your credential</string>
   <string name="auth_unavailable">Authentication unavailable</string>
-  <string name="auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled">Device authentication is not enabled. You can turn on SimpleX Lock via Settings, once you enable device authentication.</string>
+  <string name="auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled">Device authentication is not enabled. You can turn on Trustiatis Lock via Settings, once you enable device authentication.</string>
   <string name="auth_device_authentication_is_disabled_turning_off">Device authentication is disabled. Turning off SimpleX Lock.</string>
   <string name="auth_stop_chat">Stop chat</string>
   <string name="auth_open_chat_console">Open chat console</string>
   <string name="auth_open_chat_profiles">Change chat profiles</string>
   <string name="auth_open_migration_to_another_device">Open migration screen</string>
-  <string name="lock_not_enabled">SimpleX Lock not enabled!</string>
-  <string name="you_can_turn_on_lock">You can turn on SimpleX Lock via Settings.</string>
+  <string name="lock_not_enabled">Trustiatis Lock not enabled!</string>
+  <string name="you_can_turn_on_lock">You can turn on Trustiatis Lock via Settings.</string>
 
   <!-- Chat Alerts - ChatItemView.kt -->
   <string name="message_delivery_error_title">Message delivery error</string>
