@@ -274,16 +274,22 @@ def dans_perimetre(chemin: str) -> bool:
     return os.path.splitext(chemin)[1] in EXTENSIONS
 
 
-def ligne_signalee(ligne: str, chemin: str = "") -> bool:
+def ligne_signalee(ligne: str, chemin: str = "", brute: str | None = None) -> bool:
     """La décision du contrôle, sur une ligne.
 
     Elle est ici, et pas dans la boucle, pour que `test-verifier-marque.py`
     l'appelle au lieu de la réécrire : la version réécrite avait divergé dès la
     première règle ajoutée.
+
+    `brute` est la ligne telle qu'elle est écrite dans le fichier, avant que les
+    commentaires XML ne soient vidés. Sans elle, la dérogation « marque-ok »
+    était inutilisable dans un catalogue, c'est à dire dans les seuls fichiers
+    où une chaîne peut avoir besoin de nommer la marque de l'amont : le
+    commentaire qui la portait avait disparu avant l'examen de la ligne.
     """
     if not MOTIF_MARQUE.search(ligne):
         return False
-    if MOTIF_DEROGATION.search(ligne):
+    if MOTIF_DEROGATION.search(brute if brute is not None else ligne):
         return False
     if chemin.endswith((".kt", ".kts", ".swift")) and MOTIF_LIGNE_COMMENTEE.match(ligne):
         return False
@@ -316,7 +322,7 @@ def signalements(racine: str):
                 contenu = _sans_commentaires_xml(contenu)
             lignes = contenu.splitlines()
             for n, ligne in enumerate(lignes, 1):
-                if ligne_signalee(ligne, relatif):
+                if ligne_signalee(ligne, relatif, affiche[n - 1]):
                     yield {
                         "fichier": relatif,
                         "ligne": n,

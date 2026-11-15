@@ -88,6 +88,26 @@ CAS = [
     ("  <!-- API Error Responses - SimpleXAPI.kt -->", False, "commentaire, renvoi vers une source"),
     ("  <!-- Images - chat.simplex.app.views.chat.item.CIImageView.kt -->", False, "commentaire"),
     ('<string name="x">DefaultTheme.SIMPLEX</string>', False, "énumération persistée"),
+    # Dérogation posée sur la ligne. Le cas vaut d'être épinglé : dans un catalogue, les
+    # commentaires sont vidés avant l'examen de la ligne, donc le contrôle rapportait la
+    # chaîne alors qu'elle portait sa raison. C'est la ligne brute qui décide.
+    (
+        '<string name="trustiatis_non_affiliation">SimpleX is a trademark of SimpleX Chat'
+        " Ltd.</string>",
+        True,
+        "la mention est bien signalée quand rien ne la justifie",
+    ),
+    (
+        '<string name="trustiatis_non_affiliation">SimpleX is a trademark of SimpleX Chat'
+        " Ltd.</string>  <!-- marque-ok: mention obligatoire, NOTICE-AGPL.md -->",
+        False,
+        "dérogation nommée sur la ligne d'un catalogue",
+    ),
+    (
+        '<string name="x">Open SimpleX Chat to accept call</string>  <!-- rien -->',
+        True,
+        "un commentaire sans raison ne déroge pas",
+    ),
 ]
 
 
@@ -97,7 +117,14 @@ def main() -> int:
     for ligne, attendu, pourquoi in CAS:
         # Le chemin sert à la décision : il dit si « // » ouvre un commentaire.
         chemin = "x.kt" if not ligne.lstrip().startswith("<") else "strings.xml"
-        signale = module.ligne_signalee(ligne, chemin)
+        # Reproduire le chemin de production, et pas une version plus facile : sur un
+        # catalogue, le contrôle vide les commentaires avant d'examiner la ligne, et ne
+        # garde la ligne brute que pour y chercher une dérogation. Un test qui sauterait
+        # cette étape laisserait passer le défaut qu'il est censé épingler.
+        examinee = (
+            module._sans_commentaires_xml(ligne) if chemin.endswith(".xml") else ligne
+        )
+        signale = module.ligne_signalee(examinee, chemin, ligne)
         if signale == attendu:
             continue
         rates += 1

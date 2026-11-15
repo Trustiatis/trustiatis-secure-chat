@@ -157,6 +157,13 @@ AJOUTS: dict[str, dict[str, str]] = {
 
 MARQUEUR_AJOUTS = "  <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->"
 
+# Clés dont la valeur nomme légitimement la marque de l'amont, et pourquoi. La raison est
+# posée sur la ligne elle même, à la forme que « verifier-marque.py » reconnaît, pour qu'elle
+# reste lisible dans le catalogue et survive à une regénération.
+DEROGATIONS: dict[str, str] = {
+    "trustiatis_non_affiliation": "mention obligatoire de non affiliation, NOTICE-AGPL.md",
+}
+
 
 def fichier(langue: str) -> Path:
     return CATALOGUES / langue / "strings.xml"
@@ -174,7 +181,10 @@ def ajouter(langue: str, ecrire: bool) -> int:
     if not manquantes:
         return 0
     bloc = "".join(
-        f'  <string name="{cle}">{valeur}</string>\n' for cle, valeur in manquantes.items()
+        f'  <string name="{cle}">{valeur}</string>'
+        + (f"  <!-- marque-ok: {DEROGATIONS[cle]} -->" if cle in DEROGATIONS else "")
+        + "\n"
+        for cle, valeur in manquantes.items()
     )
     if MARQUEUR_AJOUTS in texte:
         texte = texte.replace(MARQUEUR_AJOUTS + "\n", MARQUEUR_AJOUTS + "\n" + bloc, 1)
