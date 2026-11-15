@@ -19,13 +19,13 @@ extraite de la charte, son dossier reste vide et la ressource de l'amont reste e
 
 | Dossier | Contenu | État |
 |---|---|---|
-| `colors/` | palette, au format source et en fichiers de thème générés | vide |
-| `typography/` | fichiers de police et leur licence de redistribution | vide |
-| `logo/` | logo, en SVG source et en déclinaisons | vide |
-| `icons/` | icônes d'application par plateforme (voir le tableau ci dessous) | vide |
-| `splash/` | écran de lancement Android | vide |
-| `screenshots/` | captures pour les fiches de distribution | vide |
-| `store-assets/` | bannières, descriptions, visuels de boutique | vide |
+| `colors/` | `palette.json`, source unique ; les constantes Kotlin des quatre thèmes sont générées | **fait** |
+| `typography/` | fichiers de police et leur licence de redistribution | **sans objet** : la décision de `palette.json` est Roboto, police de `id.trustiatis.com` et police système d'Android, donc demandée au système. Rien à embarquer, rien à redistribuer, et un report de l'amont n'a aucun fichier de police à retrouver |
+| `logo/` | monogramme et logo au mot, en PNG détramés | **fait**, en PNG et non en SVG : la charte ne fournit pas de source vectorielle, et `design-system/detramer.py` reconstruit un fond propre au lieu de découper |
+| `icons/` | icônes d'application par plateforme (voir le tableau ci dessous) | **fait** pour Android, Windows, macOS et Linux ; iOS hors périmètre tant que D-1 n'est pas prise |
+| `splash/` | écran de lancement Android | **sans objet** : l'amont n'en a pas. Le thème de lancement (`values/themes.xml`) ne porte qu'une couleur de barre d'état, aucun dessin, et le premier écran dessiné est déjà celui que nous avons repris |
+| `screenshots/` | captures pour les fiches de distribution | **à faire**, et pas avant que l'application tourne avec sa palette : une capture faite avant ne servirait qu'une fois |
+| `store-assets/` | bannières, descriptions, visuels de boutique | **à faire**, et suspendu à la décision D-1 pour l'App Store |
 
 ## Formats d'icône par plateforme
 

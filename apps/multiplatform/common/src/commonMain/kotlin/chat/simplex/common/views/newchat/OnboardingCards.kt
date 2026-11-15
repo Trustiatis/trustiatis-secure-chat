@@ -111,20 +111,26 @@ internal fun gradientPoints(aspectRatio: Float, scale: Float): GradientEndpoints
   )
 }
 
+// Dégradé de l'écran d'accueil. L'amont l'a écrit en OkLCh, avec l'angle de teinte en
+// clair : c'est donc la seule valeur qui change ici, et la clarté et la saturation qu'il
+// a réglées sont conservées à la virgule près. Les arrêts froids prennent l'angle du
+// sauge (174,6), les deux arrêts chauds celui du terracotta (20,5) : la palette de
+// Trustiatis porte exactement ces deux rôles, et aucune couleur n'est inventée.
+// Source des angles : branding/colors/palette.json, marque.primaire et marque.accent.
 internal val lightStops = arrayOf(
-  0.0f to oklch(0.9219f, 0.0431f, 249.4f),
-  0.5f to oklch(0.9198f, 0.0471f, 240.7f),
-  0.9f to oklch(0.9772f, 0.0358f, 196.6f),
-  0.95f to oklch(0.9829f, 0.0104f, 70.0f),
-  1.0f to oklch(0.9886f, 0.0272f, 99.1f)
+  0.0f to oklch(0.9219f, 0.0431f, 174.6f),
+  0.5f to oklch(0.9198f, 0.0471f, 174.6f),
+  0.9f to oklch(0.9772f, 0.0358f, 174.6f),
+  0.95f to oklch(0.9829f, 0.0104f, 20.5f),
+  1.0f to oklch(0.9886f, 0.0272f, 20.5f)
 )
 
 internal val darkStops = arrayOf(
-  0.4f to oklch(0.1578f, 0.0609f, 267.3f),
-  0.72f to oklch(0.4729f, 0.1574f, 267.3f),
-  0.9f to oklch(0.9024f, 0.0760f, 202.8f),
-  0.95f to oklch(0.9384f, 0.0354f, 65.0f),
-  1.0f to oklch(0.9744f, 0.0370f, 88.4f)
+  0.4f to oklch(0.1578f, 0.0609f, 174.6f),
+  0.72f to oklch(0.4729f, 0.1574f, 174.6f),
+  0.9f to oklch(0.9024f, 0.0760f, 174.6f),
+  0.95f to oklch(0.9384f, 0.0354f, 20.5f),
+  1.0f to oklch(0.9744f, 0.0370f, 20.5f)
 )
 
 private fun Modifier.maxHeightByWidthRatio(ratio: Float) = layout { measurable, constraints ->

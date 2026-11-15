@@ -99,6 +99,192 @@ def _icns(images: dict[str, Image.Image]) -> bytes:
     return b"icns" + struct.pack(">I", len(blocs) + 8) + blocs
 
 
+# ---------------------------------------------------------------------------
+# Couleurs de thème
+# ---------------------------------------------------------------------------
+# Le problème : l'amont ne définit pas seulement une couleur de marque, il
+# définit aussi une dizaine de teintes dérivées (bulles de message, citations,
+# variantes) dont la clarté et la saturation ont été choisies pour rester
+# lisibles sur chaque fond. Les remplacer par des valeurs choisies au jugé
+# casserait ce travail, et inventer des couleurs est interdit par le chapitre 4
+# du cahier des charges.
+#
+# La règle appliquée ici ne choisit donc rien : chaque teinte dérivée **garde la
+# clarté et la saturation de l'amont** et ne reçoit que la **teinte** de la
+# couleur de marque de Trustiatis. Le contraste dessiné par l'amont est
+# conservé au chiffre près, seule la couleur change. C'est mesurable, et c'est
+# pour cela que la conversion OkLCh est faite ici plutôt qu'à l'oeil.
+
+
+def _vers_lineaire(c: float) -> float:
+    return c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4
+
+
+def _vers_srgb(c: float) -> float:
+    return c * 12.92 if c <= 0.0031308 else 1.055 * c ** (1 / 2.4) - 0.055
+
+
+def _oklab(hexa: str) -> tuple[float, float, float]:
+    r, v, b = (_vers_lineaire(int(hexa[i : i + 2], 16) / 255) for i in (0, 2, 4))
+    l = (0.4122214708 * r + 0.5363325363 * v + 0.0514459929 * b) ** (1 / 3)
+    m = (0.2119034982 * r + 0.6806995451 * v + 0.1073969566 * b) ** (1 / 3)
+    s = (0.0883024619 * r + 0.2817188376 * v + 0.6299787005 * b) ** (1 / 3)
+    return (
+        0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+        1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+        0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s,
+    )
+
+
+def _canaux(L: float, a: float, b: float) -> tuple[float, float, float]:
+    l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3
+    m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3
+    s = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3
+    canaux = (
+        4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+        -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+        -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s,
+    )
+    return canaux
+
+
+def _vers_hexa(L: float, a: float, b: float) -> str:
+    """Rend la couleur, après avoir ramené sa saturation dans le gamut sRGB.
+
+    Précaution, et non correctif d'un défaut observé : avec la palette actuelle
+    aucune des teintes produites ne sort du gamut, la clarté et la saturation de
+    l'amont sont restituées à 0,001 près. Mais une marque plus saturée les en
+    sortirait, et l'écrêtage canal par canal rendrait alors une couleur qui n'a
+    plus ni la clarté ni la saturation demandées, sans que rien ne le signale.
+    On réduit donc la saturation, et elle seule, jusqu'à ce que les trois canaux
+    tiennent : la clarté, qui porte le contraste, est préservée.
+    """
+    facteur = 1.0
+    if any(c < -1e-4 or c > 1 + 1e-4 for c in _canaux(L, a, b)):
+        bas, haut = 0.0, 1.0
+        for _ in range(40):
+            facteur = (bas + haut) / 2
+            if any(c < -1e-4 or c > 1 + 1e-4 for c in _canaux(L, a * facteur, b * facteur)):
+                haut = facteur
+            else:
+                bas = facteur
+        facteur = bas
+    return "".join(
+        f"{max(0, min(255, round(_vers_srgb(max(0.0, min(1.0, c))) * 255))):02X}"
+        for c in _canaux(L, a * facteur, b * facteur)
+    )
+
+
+def teinte_de(source_hexa: str, marque_hexa: str) -> str:
+    """La couleur de l'amont, avec la teinte de la marque et son propre contraste.
+
+    Un gris reste gris : sans chroma, il n'y a pas de teinte à remplacer, et en
+    donner une colorerait une couleur que l'amont a voulue neutre.
+    """
+    from math import atan2, cos, hypot, sin
+
+    L, a, b = _oklab(source_hexa.lstrip("#").upper()[:6])
+    chroma = hypot(a, b)
+    if chroma < 0.002:
+        return source_hexa.lstrip("#").upper()[:6]
+    _, ma, mb = _oklab(marque_hexa.lstrip("#").upper()[:6])
+    angle = atan2(mb, ma)
+    return _vers_hexa(L, chroma * cos(angle), chroma * sin(angle))
+
+
+# Les quatre thèmes de l'amont, et le rôle de chaque couleur de marque qu'ils
+# portent. Les couleurs vives et de titre sont prises **telles quelles** dans la
+# palette : ce sont les couleurs de la marque, elles ne se dérivent pas. Le
+# choix de la variante par thème est celui que la palette nomme elle même, et
+# celui que fait id.trustiatis.com, qui est sombre : la variante claire sur un
+# fond sombre, la variante pleine sur un fond clair.
+#
+# Tout le reste, les bulles et les citations, passe par `teinte_de` : la clarté
+# et la saturation restent celles de l'amont, seule la teinte devient la nôtre.
+THEMES_AMONT = {
+    "Dark": {
+        "primary": ("palette", "primaire_clair"),
+        "primaryVariant": ("palette", "primaire"),
+        "title": ("palette", "primaire_clair"),
+        "primaryVariant2": ("derive", "#18262E"),
+        "sentMessage": ("derive", "#18262E"),
+        "sentQuote": ("derive", "#1D3847"),
+    },
+    "Light": {
+        "primary": ("palette", "primaire"),
+        "primaryVariant": ("palette", "primaire_fonce"),
+        "title": ("palette", "primaire"),
+        "primaryVariant2": ("derive", "#E9F7FF"),
+        "sentMessage": ("derive", "#E9F7FF"),
+        "sentQuote": ("derive", "#D6F0FF"),
+    },
+    # Le thème que l'amont nomme « SimpleX » et qui est sa signature visuelle.
+    # Son étiquette est déjà celle de Trustiatis ; son fond vient donc du thème
+    # sombre de la palette, qui est celui de id.trustiatis.com.
+    "Signature": {
+        "primary": ("palette", "primaire_clair"),
+        "primaryVariant": ("palette", "primaire"),
+        "secondaryVariant": ("derive", "#2C464D"),
+        "background": ("sombre", "fond"),
+        "surface": ("sombre", "fond_secondaire"),
+        "title": ("palette", "primaire_clair"),
+        "primaryVariant2": ("derive", "#172941"),
+        "sentMessage": ("derive", "#172941"),
+        "sentQuote": ("derive", "#1C3A57"),
+    },
+    "Black": {
+        "primary": ("palette", "primaire_clair"),
+        "primaryVariant": ("palette", "primaire"),
+        "title": ("palette", "primaire_clair"),
+        "primaryVariant2": ("derive", "#243747"),
+        "sentMessage": ("derive", "#18262E"),
+        "sentQuote": ("derive", "#1D3847"),
+    },
+}
+
+CHEMIN_COULEURS = (
+    MULTI / "common/src/commonMain/kotlin/chat/simplex/common/ui/theme/ColorTrustiatis.kt"
+)
+
+
+def couleurs_kotlin() -> bytes:
+    p = palette()
+    marque = p["marque"]["primaire"]["hex"]
+    lignes = [
+        "package chat.simplex.common.ui.theme",
+        "",
+        "import androidx.compose.ui.graphics.Color",
+        "",
+        "// Fichier GÉNÉRÉ par tools/propager-branding.py depuis branding/colors/palette.json.",
+        "// Ne pas modifier à la main : la prochaine propagation écraserait la correction.",
+        "//",
+        "// Les couleurs de marque sont reprises telles quelles dans la palette. Les teintes",
+        "// dérivées gardent la clarté et la saturation de l'amont et ne reçoivent que notre",
+        "// teinte, pour que le contraste qu'il a dessiné soit conservé au chiffre près.",
+        "//",
+        "// La paire sentinelle reste intacte : le #0088ff des catalogues n'est pas une couleur",
+        "// affichée, c'est la marque que ReadableTextWithLink cherche pour la remplacer par",
+        "// MaterialTheme.colors.primary. Changer l'une sans l'autre éteindrait les liens.",
+        "",
+    ]
+    for theme, roles in THEMES_AMONT.items():
+        lignes.append(f"// Thème {theme}")
+        for role, (origine, cle) in roles.items():
+            if origine == "palette":
+                hexa = p["marque"][cle]["hex"].lstrip("#").upper()
+                venue = f"palette, marque.{cle}"
+            elif origine == "sombre":
+                hexa = p["theme_sombre"][cle].lstrip("#").upper()
+                venue = f"palette, theme_sombre.{cle}"
+            else:
+                hexa = teinte_de(cle, marque)
+                venue = f"amont {cle.upper()}, teinte de la marque"
+            nom = f"Trustiatis{theme}{role[0].upper()}{role[1:]}"
+            lignes.append(f"val {nom} = Color(0xFF{hexa})  // {venue}")
+        lignes.append("")
+    return ("\n".join(lignes)).encode()
+
+
 def cibles() -> dict[Path, bytes]:
     """Le contenu attendu de chaque fichier généré, sans rien écrire."""
     p = palette()
@@ -142,7 +328,12 @@ def cibles() -> dict[Path, bytes]:
             "</resources>\n"
         ).encode()
 
-    # 3. Le monogramme utilisé dans l'application elle même : notification de
+    # 3. Couleurs de thème, le seul fichier Kotlin que cet outil produit. Il est
+    #    à nous, donc il ne conflicte avec aucun report de l'amont : seules les
+    #    affectations de Theme.kt le référencent.
+    sortie[CHEMIN_COULEURS] = couleurs_kotlin()
+
+    # 4. Le monogramme utilisé dans l'application elle même : notification de
     #    bureau, fenêtre, écran d'accueil.
     commun = _pose(dessin, 432, ZONE_SURE)
     png(MULTI / "common/src/commonMain/moko-resources/images/icon_foreground_common@4x.png", commun)
