@@ -3,6 +3,31 @@
 **Document de travail de la Phase 2. Il se remplit au fur et à mesure et sert de preuve de
 l'intention derrière chaque modification.**
 
+## 0. La charge réelle, mesurée après la greffe
+
+Relevé le 2026-11-15, une fois l'amont greffé, par `python3 tools/verifier-marque.py`. Ce ne
+sont plus des estimations d'audit : ce sont les lignes que le contrôle signale aujourd'hui.
+
+| Où | Signalements | Nature du travail |
+|---|---|---|
+| `strings.xml` des 41 catalogues Moko | **2 423** | chaînes traduites. Décision D-6 : fichier de référence et français d'abord, les autres langues par vagues |
+| Kotlin et Kotlin Script | **303** | code commun Android et Desktop : thèmes, identifiants, libellés en dur |
+| Swift | **203** | couche iOS, au périmètre depuis la décision P-1 |
+| `SimpleX.xcodeproj/project.pbxproj` | **28** | noms de cibles et de produits Xcode |
+| **Total** | **2 957** sur **154 fichiers** | |
+
+Ce total n'est pas la quantité de travail : un même mot répété dans 41 traductions se traite
+une fois, par un script. Il est la **mesure de départ**, et il doit tomber à zéro avant la
+première version publiée. Le contrôle est en avertissement dans la CI jusque là, puis
+bloquant (`allow_failure: false` dans `.gitlab-ci.yml`).
+
+Ce que le contrôle **ne** signale pas, volontairement : le coeur Haskell (`src/`), les tests,
+la documentation et le site de l'amont, ses robots, son client en ligne de commande, et son
+intégration continue GitHub. Et il laisse passer les identifiants techniques et les mentions
+du **réseau**, qui restent permis par la politique de marque et nécessaires à l'exactitude.
+La liste exacte des exclusions et des dérogations est en tête de `tools/verifier-marque.py`,
+qui est la seule source sur ce point.
+
 ## 1. Source de l'identité
 
 Décision du Membre : la charte de référence est celle de **`id.trustiatis.com`**, l'application

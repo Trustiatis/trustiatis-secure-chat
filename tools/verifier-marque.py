@@ -44,6 +44,9 @@ EXCLUS_PREFIXES = (
     "apps/simplex-chat/",    # client en ligne de commande, hors produit
     "apps/ios/SimpleX Localizations/",
     "scripts/",
+    ".github/",              # intégration continue de l'amont, remplacée par la nôtre : n'y figurent que
+                             # des identifiants de construction et des noms de secrets GitHub, jamais
+                             # de texte vu par un utilisateur
     "plans/",
     "eth/",
     "fastlane/",

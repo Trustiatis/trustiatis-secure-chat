@@ -66,7 +66,5 @@ produits. Incises en virgules ou parenthèses, plages en « de ... à ... ». Co
 rendre :
 
 ```bash
-# Motifs construits en octal pour que ce fichier ne contienne pas lui-meme de tiret long.
-em=$(printf '\342\200\224'); en=$(printf '\342\200\223')
-grep -rn -e "$em" -e "$en" docs/*.md *.md
+sh tools/verifier-typographie.sh
 ```

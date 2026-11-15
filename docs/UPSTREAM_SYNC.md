@@ -54,6 +54,8 @@ liste de référence est celle de l'audit de Phase 1, chapitre 7. En pratique :
 | `AndroidManifest.xml` | fusionner : structure de l'amont, nos schémas et nos hôtes |
 | `AppUpdater.kt` | fusionner, et **revérifier que l'URL de mise à jour reste celle de Trustiatis** |
 | `src/`, `scripts/`, `flake.nix` | **prendre l'amont sans discussion** : nous ne les modifions pas (décision D-2) |
+| `README.md` | **garder la version Trustiatis.** C'est le seul fichier de l'amont que la greffe écrase entièrement, et il conflictera donc à chaque report |
+| `docs/README-AMONT.md` | **remplacer par le README du nouveau tag** : `git show upstream-vX.Y.Z:README.md >> docs/README-AMONT.md` après l'en tête. Il n'existe que pour garder trace de ce que la greffe a écarté |
 
 ### Contrôles obligatoires avant de fusionner un report
 

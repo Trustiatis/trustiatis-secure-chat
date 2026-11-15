@@ -163,8 +163,7 @@ Et `Settings > Repository > Protected tags` : motif `v*`, création réservée a
 git log --oneline -3 main
 git diff --stat upstream-v7.1.3 main      # ne doit montrer que la couche Trustiatis
 python3 tools/verifier-marque.py          # signalements attendus : la marque de l'amont est encore partout
-em=$(printf '\342\200\224'); en=$(printf '\342\200\223')
-grep -rn -e "$em" -e "$en" docs/*.md *.md  # doit être vide
+sh tools/verifier-typographie.sh
 ```
 
 Le contrôle de marque **doit** signaler beaucoup de lignes à ce stade : c'est précisément le

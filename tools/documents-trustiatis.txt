@@ -1,0 +1,25 @@
+# Liste des documents rédigés par Trustiatis, et d'eux seuls.
+#
+# Elle existe parce que l'amont apporte son propre docs/, en anglais, rempli de tirets
+# longs. La règle typographique du groupe porte sur ce que NOUS produisons, pas sur ce que
+# nous conservons de l'amont. Une liste blanche est donc la bonne forme : une liste noire
+# laisserait passer tout nouveau document.
+#
+# Un chemin par ligne, motifs de glob acceptés. Tout document ajouté à ce dépôt doit être
+# ajouté ici, sans quoi il échappe au contrôle.
+#
+# docs/README-AMONT.md est volontairement absent : c'est le README de l'amont, mot pour mot.
+
+README.md
+CONTRIBUTING.md
+NOTICE-AGPL.md
+branding/README.md
+docs/INITIAL_AUDIT.md
+docs/SIMPLEXMQ_AUDIT.md
+docs/DECISIONS.md
+docs/GIT-SETUP.md
+docs/UPSTREAM_SYNC.md
+docs/BRANDING.md
+docs/DISTRIBUTION.md
+.gitlab/merge_request_templates/Default.md
+.gitlab/issue_templates/Default.md

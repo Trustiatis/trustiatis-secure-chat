@@ -36,18 +36,7 @@ typographie:
   stage: controles
   image: alpine:3.20
   script:
-    - |
-      # Les deux motifs sont construits en octal pour que ce fichier ne contienne
-      # lui-meme aucun tiret long, et pour ne pas dependre de `grep -P`.
-      em=$(printf '\342\200\224')
-      en=$(printf '\342\200\223')
-      trouve=$(grep -rn -e "$em" -e "$en" --include='*.md' docs/ ./*.md 2>/dev/null || true)
-      if [ -n "$trouve" ]; then
-        echo "Tirets longs ou demi-longs interdits dans les documents produits :"
-        echo "$trouve"
-        exit 1
-      fi
-      echo "Typographie conforme."
+    - sh tools/verifier-typographie.sh
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "develop"
