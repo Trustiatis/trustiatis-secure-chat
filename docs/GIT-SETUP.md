@@ -191,9 +191,26 @@ travail de la Phase 2. Il devra être vert avant la première version publiée.
 
 ## Étape 6 bis, débloquer l'intégration continue
 
-> **Levé le 2026-11-15.** Le Membre a fait vérifier le compte. Ce qui suit est conservé
-> parce que le même blocage se représentera à chaque nouveau projet GitLab du groupe, et
-> que la cause n'est pas devinable depuis le message affiché.
+> **Levé le 2026-11-15.** Le Membre a fait vérifier le compte, et la chaîne tourne.
+> Premier pipeline complet, commit `253afdb4` sur `develop` :
+>
+> | Job | Résultat | Durée |
+> |---|---|---|
+> | `typographie` | réussi | 34 s |
+> | `coeur-intact` | réussi | 43 s |
+> | `secrets` | réussi | 31 s |
+> | `marque` | **échec autorisé**, par construction | 40 s |
+>
+> L'échec de `marque` est l'état attendu : il signale les 2 957 occurrences de la marque de
+> l'amont, et il restera rouge jusqu'à la fin de la Phase 2. Il passera en bloquant
+> (`allow_failure: false`) quand le compte devra être à zéro.
+>
+> `coeur-intact` réussi veut bien dire quelque chose : le job échoue de lui même si la
+> branche `upstream-*` est introuvable, donc sa réussite prouve qu'il a trouvé la référence
+> d'amont et que le diff du coeur est réellement vide.
+>
+> Ce qui suit est conservé parce que le même blocage se représentera à chaque nouveau projet
+> GitLab du groupe, et que la cause n'est pas devinable depuis le message affiché.
 
 **Constaté le 2026-11-15 : aucun pipeline ne peut tourner.** Les dix-neuf premiers ont tous
 échoué instantanément, sans démarrer un seul job. Ce n'est pas la configuration : interrogé
