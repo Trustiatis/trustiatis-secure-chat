@@ -24,6 +24,15 @@ modifications et leur date.
 
 ## Procédure de report d'une version
 
+> **À lire avant de pousser `upstream-vX.Y.Z`.** Le motif `upstream-*` est une branche
+> protégée dont la poussée est fermée à **personne**, mainteneurs compris, et GitLab compte la
+> **création** d'une branche comme une poussée. La nouvelle référence d'amont pur ne pourra
+> donc pas partir telle quelle. La marche à suivre, dans
+> `Settings > Repository > Protected branches` : retirer la protection `upstream-*`, pousser
+> la branche, puis la reposer à l'identique (fusion : Maintainers, poussée : No one, envoi
+> forcé interdit). C'est volontairement pénible : cette référence est la preuve que le coeur
+> de l'amont n'a pas été touché, et le job `coeur-intact` s'appuie sur elle.
+
 ```bash
 cd ~/Documents/claude/trustiatis-secure
 
