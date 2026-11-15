@@ -13,9 +13,13 @@ sont plus des estimations d'audit : ce sont les lignes que le contrôle signale 
 | Catalogues de traduction (`.xml`) | **3 355** | chaînes traduites. Décision D-6 : fichier de référence et français d'abord, les autres langues par vagues |
 | Kotlin et Kotlin Script | **816** | code commun Android et Desktop : thèmes, identifiants, libellés en dur |
 | Swift | **606** | couche iOS, au périmètre depuis la décision P-1 |
-| `SimpleX.xcodeproj/project.pbxproj` | **166** | noms de cibles et de produits Xcode |
-| Divers (scripts, manifestes, droits) | **47** | |
-| **Total** | **4 990** sur **555 fichiers** | |
+| `SimpleX.xcodeproj/project.pbxproj` | **168** | noms de cibles et de produits Xcode |
+| Divers (scripts, manifestes, droits) | **65** | |
+| **Total** | **5 010** sur **567 fichiers** | |
+
+Relevé sur l'amont **v7.1.2**, base de la greffe depuis le 2026-11-15 au soir. Sur v7.1.3,
+le même contrôle donnait 4 990 sur 555 fichiers : l'écart de vingt signalements n'est pas une
+régression, c'est la différence entre deux versions de l'amont.
 
 > **Le relevé du matin, 2 957 sur 154 fichiers, était faux et le contrôle était en cause.**
 > La liste des dérogations contenait `\bSIMPLEX\b`, destinée à la valeur d'énumération de
