@@ -82,6 +82,17 @@ if [ "$obtenu" != "$attendu" ]; then
 fi
 echo "sha256  : vérifiée"
 
+# Chemin à la forme Windows, pour les outils natifs appelés depuis MSYS2.
+en_windows() {
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$1"
+  else
+    local brut
+    brut="$(cd "$(dirname "$1")" && pwd -W)/$(basename "$1")"
+    printf '%s' "${brut//\//\\}"
+  fi
+}
+
 travail="$cache/extraction-$cible"
 rm -rf "$travail"
 mkdir -p "$travail"
@@ -107,29 +118,24 @@ case "$cible" in
     # barres obliques inverses. Le « C:/... » que rend « pwd -W » lui arrache « This
     # installation package could not be opened » et le code 1619, vu par le shell comme 83.
     # C'est ce qui a mis en échec la première construction Windows, le 2026-11-16.
-    en_windows() {
-      if command -v cygpath >/dev/null 2>&1; then
-        cygpath -w "$1"
-      else
-        local brut
-        brut="$(cd "$(dirname "$1")" && pwd -W)/$(basename "$1")"
-        printf '%s' "${brut//\//\\}"
-      fi
-    }
     paquet_win="$(en_windows "$paquet")"
     cible_win="$(en_windows "$travail")"
-    journal="$cache/msiexec-$cible.log"
-    rm -f "$journal"
-    # Le journal verbeux n'est pas du confort : une installation administrative en échec
-    # n'affiche qu'une phrase, et la cause est dans le journal. Il est en UTF-16.
-    if ! msiexec //a "$paquet_win" //qn "//l*v" "$(en_windows "$journal")" TARGETDIR="$cible_win"; then
-      echo "ERREUR : msiexec n'a pas ouvert $actif." >&2
+    # Pas d'option de journalisation ici, et c'est une leçon payée : « //l*v » a fait
+    # rester msiexec en vie sans fin sur la machine hébergée, sans une ligne de sortie,
+    # jusqu'à ce qu'on interrompe la construction. Devant une ligne de commande qu'il
+    # n'analyse pas, msiexec ouvre une fenêtre d'aide, que « /qn » ne supprime pas et que
+    # personne n'ira fermer sur une machine sans écran. On lui donne donc la ligne la plus
+    # courte qui fasse le travail.
+    #
+    # Le délai n'est pas là pour la beauté du geste : sans lui, un msiexec qui attend
+    # occupe la machine jusqu'au plafond de six heures de GitHub.
+    code=0
+    timeout 900 msiexec //a "$paquet_win" //qn TARGETDIR="$cible_win" || code=$?
+    if [ "$code" -ne 0 ]; then
+      echo "ERREUR : msiexec n'a pas ouvert $actif (code $code)." >&2
       echo "  paquet : $paquet_win" >&2
       echo "  cible  : $cible_win" >&2
-      if [ -f "$journal" ]; then
-        echo "--- fin du journal msiexec ---" >&2
-        { iconv -f UTF-16LE -t UTF-8 "$journal" 2>/dev/null || cat "$journal"; } | tail -40 >&2
-      fi
+      [ "$code" = "124" ] && echo "  Le code 124 est celui du délai : msiexec n'a pas rendu la main." >&2
       exit 1
     fi
     arbre="$travail"
@@ -184,13 +190,24 @@ chmod -R u+w "$destination"
 liens="$racine/apps/multiplatform/build/links"
 mkdir -p "$liens"
 rm -rf "${liens:?}/$lien"
-if ln -s "../../common/src/commonMain/cpp/desktop/libs/$dossier" "$liens/$lien" 2>/dev/null; then
-  :
-else
-  # Windows sans droit de création de lien symbolique : on recopie, c'est équivalent pour
-  # la compilation, simplement plus lourd sur le disque.
-  cp -R "$destination" "$liens/$lien"
-fi
+case "$cible" in
+  windows-*)
+    # Sous Windows on ne pose pas un lien symbolique de MSYS2 : c'en est un pour les outils
+    # de MSYS2 et pas pour Windows, et c'est la JVM qui lira ce chemin. Une jonction de
+    # répertoire en est un pour tout le monde et ne demande aucun droit particulier.
+    #
+    # Une copie ferait un paquet sans VLC : prepare-vlc-windows.sh remplit le répertoire
+    # d'origine après ce script, et une copie ne verrait pas cet ajout.
+    if ! cmd //c mklink //J "$(en_windows "$liens/$lien")" "$(en_windows "$destination")" >/dev/null 2>&1; then
+      echo "AVERTISSEMENT : jonction impossible, repli sur une copie. VLC devra être posé" >&2
+      echo "avant ce script, ou la copie refaite après, sans quoi le paquet sortira muet." >&2
+      cp -R "$destination" "$liens/$lien"
+    fi
+    ;;
+  *)
+    ln -s "../../common/src/commonMain/cpp/desktop/libs/$dossier" "$liens/$lien"
+    ;;
+esac
 
 nettoyer
 trap - EXIT
