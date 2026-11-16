@@ -1,0 +1,182 @@
+# Paquets de bureau pour Windows et macOS.
+#
+# Pourquoi ce fichier existe : le poste qui construit Trustiatis Secure est une machine
+# Linux. Les paquets .msi, .exe et .dmg ne se fabriquent que sur leur propre système, et il
+# n'y a ni machine Windows ni Mac. Ces travaux s'exécutent donc sur les machines hébergées
+# par GitHub, gratuites et sans plafond pour un dépôt public.
+#
+# Ce que ce fichier ne fait pas, et ce n'est pas un oubli :
+#  - il ne recompile pas le coeur Haskell (décision D-2). Les bibliothèques viennent des
+#    paquets publiés par l'amont, par scripts/desktop/libs-depuis-amont.sh ;
+#  - il ne signe rien. La signature de code Windows et Apple suppose des certificats que le
+#    groupe n'a pas encore, et la décision appartient au Membre ;
+#  - il ne publie rien. Les paquets sortent en artefacts de la compilation. C'est l'outil
+#    de publication du portail de téléchargement, lancé à la main, qui en fait une version.
+#
+# Il ne se déclenche que sur demande : aucun événement automatique.
+
+name: Paquets de bureau
+
+on:
+  workflow_dispatch:
+    inputs:
+      windows:
+        description: Construire le paquet Windows (.msi et .exe)
+        type: boolean
+        default: true
+      macos_arm:
+        description: Construire le paquet macOS pour Apple Silicon (.dmg)
+        type: boolean
+        default: true
+      macos_intel:
+        description: Construire le paquet macOS pour Intel (.dmg)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    name: Windows x86_64
+    if: inputs.windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      # UCRT64 et non MINGW64 : build-lib-windows.sh le dit, l'autre produit des threads
+      # non posix et l'application se termine au démarrage. CMake et gcc doivent venir de
+      # MSYS2, pas d'une installation Windows séparée.
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: ucrt64
+          update: true
+          install: >-
+            make
+            perl
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-gcc
+
+      - name: Bibliothèques du coeur, depuis le paquet d'amont
+        shell: msys2 {0}
+        run: scripts/desktop/libs-depuis-amont.sh windows-x86_64
+
+      - name: VLC
+        shell: msys2 {0}
+        run: scripts/desktop/prepare-vlc-windows.sh
+
+      - name: Construire le .msi et le .exe
+        shell: msys2 {0}
+        run: |
+          cd apps/multiplatform
+          ./gradlew --no-daemon --console=plain packageMsi packageExe
+
+      - name: Empreintes
+        shell: msys2 {0}
+        run: |
+          cd apps/multiplatform/release/main
+          find . -type f \( -name '*.msi' -o -name '*.exe' \) -print0 \
+            | xargs -0 sha256sum | tee "$GITHUB_WORKSPACE/empreintes-windows-x86_64.txt"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paquets-windows-x86_64
+          path: |
+            apps/multiplatform/release/main/msi/*.msi
+            apps/multiplatform/release/main/exe/*.exe
+            empreintes-windows-x86_64.txt
+          if-no-files-found: error
+
+  # Deux travaux plutôt qu'une matrice : les deux machines ne se déclenchent pas ensemble,
+  # et une condition par entrée de matrice compare un booléen à une chaîne, ce qui ne donne
+  # pas ce qu'on croit. Les étiquettes des machines sont celles de la matrice build-macos
+  # de l'amont : macos-latest est Apple Silicon, macos-15-intel est la machine Intel.
+  macos-aarch64:
+    name: macOS aarch64
+    if: inputs.macos_arm
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Bibliothèques du coeur, depuis le paquet d'amont
+        run: scripts/desktop/libs-depuis-amont.sh macos-aarch64
+
+      - name: VLC
+        run: scripts/desktop/prepare-vlc-mac.sh
+
+      # Sans identité de signature dans local.properties, le bloc signing de
+      # desktop/build.gradle.kts ne s'active pas : le .dmg sort non signé, et c'est voulu
+      # tant que la décision sur les certificats n'est pas prise.
+      - name: Construire le .dmg
+        run: |
+          cd apps/multiplatform
+          ./gradlew --no-daemon --console=plain packageDmg
+
+      - name: Empreintes
+        run: |
+          cd apps/multiplatform/release/main/dmg
+          shasum -a 256 *.dmg | tee "$GITHUB_WORKSPACE/empreintes-macos-aarch64.txt"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paquets-macos-aarch64
+          path: |
+            apps/multiplatform/release/main/dmg/*.dmg
+            empreintes-macos-aarch64.txt
+          if-no-files-found: error
+
+  macos-x86_64:
+    name: macOS x86_64
+    if: inputs.macos_intel
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Bibliothèques du coeur, depuis le paquet d'amont
+        run: scripts/desktop/libs-depuis-amont.sh macos-x86_64
+
+      - name: VLC
+        run: scripts/desktop/prepare-vlc-mac.sh
+
+      - name: Construire le .dmg
+        run: |
+          cd apps/multiplatform
+          ./gradlew --no-daemon --console=plain packageDmg
+
+      - name: Empreintes
+        run: |
+          cd apps/multiplatform/release/main/dmg
+          shasum -a 256 *.dmg | tee "$GITHUB_WORKSPACE/empreintes-macos-x86_64.txt"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paquets-macos-x86_64
+          path: |
+            apps/multiplatform/release/main/dmg/*.dmg
+            empreintes-macos-x86_64.txt
+          if-no-files-found: error

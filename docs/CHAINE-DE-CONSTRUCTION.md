@@ -348,3 +348,121 @@ sur l'espace. Vider `/tmp` avant d'empaqueter, et décompresser ailleurs.
 l'état des sources au moment où il a été empaqueté, et les deux plateformes ne se
 construisent pas ensemble sur cette VM : comparer la date du paquet à celle des sources avant
 de livrer. C'est ainsi qu'un paquet Debian antérieur aux retraits de P-7 bis a été écarté.
+
+## 10. Windows et macOS, sans machine Windows ni Mac
+
+Le poste de construction est une machine Linux, et il n'y en a pas d'autre. Or un `.msi`, un
+`.exe` et un `.dmg` ne se fabriquent que sur leur propre système : `jpackage` appelle
+`candle`/`light` sur Windows et `hdiutil` sur macOS. La solution retenue est un miroir
+public du dépôt sur GitHub, et un seul fichier de compilation continue qui nous appartient,
+`.github/workflows/paquets-bureau.yml`, qui construit sur les machines hébergées. Elles sont
+gratuites et sans plafond pour un dépôt public, ce qui n'est vrai ni des machines Windows de
+GitLab (bêta de l'offre gratuite) ni de ses machines macOS (offre Premium).
+
+### Le coeur ne se recompile pas, il se prend où il est déjà compilé
+
+`scripts/desktop/build-lib-windows.sh` et `build-lib-mac.sh` lancent `cabal build
+lib:simplex-chat`. Les suivre reviendrait à recompiler le coeur Haskell, que D-2 interdit, et
+supposerait une chaîne GHC complète plus un MinGW très précis sur Windows.
+
+À la place, `scripts/desktop/libs-depuis-amont.sh <cible>` télécharge le paquet de bureau que
+l'amont a publié pour la base de `tools/amont-courant.txt`, vérifie son empreinte SHA-256
+contre `tools/paquets-amont.txt`, l'ouvre selon le système (`dpkg-deb -x`, `msiexec /a`,
+`hdiutil attach`), **cherche** le répertoire `resources` qui contient `libsimplex` au lieu de
+supposer un chemin, et remplit `cpp/desktop/libs/<dossier>/` puis
+`apps/multiplatform/build/links/<lien>`. C'est la méthode déjà employée pour Linux et pour
+Android, étendue aux deux autres systèmes.
+
+| Cible | Dossier | Lien | Ce que le paquet d'amont apporte |
+|---|---|---|---|
+| `linux-x86_64` | `linux-x86_64` | `linux-x64` | 166 fichiers, dont `libsimplex.so` et 165 bibliothèques GHC |
+| `windows-x86_64` | `windows-x86_64` | `windows-x64` | `libsimplex.dll` et `libcrypto-3-x64.dll`, les deux seuls que `build-lib-windows.sh` dépose |
+| `macos-aarch64` | `mac-aarch64` | `macos-arm64` | `libsimplex.dylib` et ses dépendances, **avec les `install_name` déjà corrigés** par l'amont |
+| `macos-x86_64` | `mac-x86_64` | `macos-x64` | idem pour Intel |
+
+Le gain sur macOS n'est pas mince : tout le travail d'`install_name_tool` de
+`build-lib-mac.sh`, une centaine de lignes, est déjà fait dans le paquet publié.
+
+### Deux exclusions à la copie, et pourquoi
+
+`libapp-lib.*` n'est pas repris du paquet : c'est la pièce que CMake compile sur place, et
+`cmakeBuildAndCopy` la dépose dans ce même répertoire. Y laisser celle de l'amont ferait
+croire qu'on distribue un binaire qu'on n'a pas construit.
+
+`vlc/` n'est pas repris non plus. Sa source n'est pas le paquet mais
+`scripts/desktop/prepare-vlc-{linux,mac,windows}.sh`, qui le remplissent depuis la
+publication `vlc` de l'amont et réécrivent les chemins de chargement. Le reprendre du paquet
+ajoute 230 Mo dont rien n'aurait l'usage.
+
+### Ce que la vérification de ce script a révélé sur la chaîne Linux
+
+Le script a été éprouvé de bout en bout sur sa cible Linux, en comparant son résultat au
+contenu qui avait servi à la compilation déjà livrée. **Les 166 bibliothèques du coeur sont
+identiques octet pour octet.** Trois écarts sont apparus, et aucun n'était connu :
+
+| Écart | Ce que c'était |
+|---|---|
+| Le paquet d'amont pris était celui d'**Ubuntu 24.04** | La compilation livrée s'appuyait sur celui de **22.04**. Mêmes versions de paquets Haskell, mais **aucun fichier commun**. `tools/paquets-amont.txt` épingle désormais le 22.04, empreinte `4db7f96c…`, qui vise aussi la plus ancienne glibc des deux |
+| `libffi.so.8` | Présent dans le paquet d'amont, absent du répertoire précédent. L'extraction d'alors ne gardait que les bibliothèques GHC et comptait sur celle du système. Celle de l'amont est maintenant livrée, ce qui vaut mieux pour un paquet distribuable |
+| L'arborescence `vlc/` | En comptait 389 fichiers réels, d'origine non consignée, dont 4 au premier niveau portant des noms résolus (`libvlc.so` et non `libvlc.so.5`) et deux bibliothèques du système hôte (`libdb-5.3.so`, `libpulsecommon-16.1.so`). Elle vient d'être refaite par `prepare-vlc-linux.sh`, la voie prévue, qui en pose 1 035 |
+
+Conséquence à ne pas taire : **un paquet Debian reconstruit maintenant ne sera pas identique
+à `trustiatis-secure-7.1.2-ts1-amd64.deb` déjà empaqueté**, puisqu'il emportera `libffi.so.8`
+et l'arborescence VLC complète. Le coeur, lui, est le même. Le contrôle `patchelf` que la
+section 7 annonçait nécessaire pour VLC ne l'est pas sur Linux : dans
+`prepare-vlc-linux.sh`, les appels à `patchelf` sont tous situés après un `exit 0` et ne
+s'exécutent jamais.
+
+### Le fichier de compilation continue
+
+`.github/workflows/paquets-bureau.yml` ne se déclenche **que sur demande**, avec trois cases
+à cocher (Windows, macOS Apple Silicon, macOS Intel). Chaque travail pose le JDK 17, appelle
+`libs-depuis-amont.sh`, puis `prepare-vlc-*.sh`, puis Gradle :
+
+| Système | Machine | Préparation | Cible Gradle |
+|---|---|---|---|
+| Windows | `windows-latest` | MSYS2 **UCRT64** avec `make`, `perl`, `cmake` et `gcc` de MSYS2 | `packageMsi packageExe` |
+| macOS Apple Silicon | `macos-latest` | rien de plus | `packageDmg` |
+| macOS Intel | `macos-15-intel` | rien de plus | `packageDmg` |
+
+UCRT64 et non MINGW64 : `build-lib-windows.sh` prévient que l'autre produit des threads non
+posix et que l'application se termine au démarrage. CMake doit venir de MSYS2 et non d'une
+installation Windows séparée, pour la même raison.
+
+Le paramètre `-Psimplex.assets.dir` que l'amont passe à Gradle n'est **pas** repris : il
+recopie les images de marque de l'amont, ce que le chapitre 4 écarte, et la compilation Linux
+livrée ne l'utilisait pas davantage.
+
+Rien n'est signé. La signature de code Windows suppose depuis juin 2023 une clé sur support
+matériel, et Microsoft a confirmé qu'un certificat EV ne contourne plus SmartScreen ; côté
+Apple, il faut un identifiant de développeur et la notarisation. Les deux sont une décision
+du Membre, pas une difficulté technique. Sans identité dans `local.properties`, le bloc
+`signing` de `desktop/build.gradle.kts` reste inactif et le `.dmg` sort non signé, sans
+échec.
+
+### Avant d'ouvrir le miroir : neutraliser les huit fichiers de l'amont
+
+Le dépôt porte huit fichiers de compilation continue hérités de l'amont. Sur un dépôt public,
+trois se déclenchent tout seuls :
+
+| Fichier | Déclencheur | Risque sur le miroir |
+|---|---|---|
+| `reproduce-schedule.yml` | `schedule`, tous les jours à 2 h | **S'exécute depuis la branche par défaut**, donc tous les jours |
+| `cla.yml` | `issue_comment`, `pull_request_target` | S'exécute au premier commentaire venu |
+| `build.yml` | `push` sur `master`/`stable` et **étiquettes `v*`**, `pull_request` | Pousser les étiquettes de l'amont le déclenche |
+| `packages.yml` | `pull_request` | S'exécute à la première proposition de modification |
+| `web.yml` | `push` sur `master` | Sans branche `master`, inerte |
+| `android-emu.yml`, `desktop-linux.yml`, `ios-sim.yml` | `workflow_dispatch` seul | Inertes tant que personne ne les lance |
+
+La neutralisation ne passe **pas** par une modification de ces fichiers : les éditer créerait
+un conflit à chaque report depuis l'amont. Elle passe par le réglage du dépôt, qui n'est pas
+dans Git. Ordre à respecter, faute de quoi la première poussée les déclenche :
+
+1. créer le dépôt avec les actions désactivées
+   (`PATCH /repos/<compte>/<dépôt>/actions/permissions`, `{"enabled": false}`) ;
+2. pousser les branches, **sans les étiquettes de l'amont** ;
+3. désactiver les huit fichiers un par un
+   (`PUT /repos/<compte>/<dépôt>/actions/workflows/<id>/disable`) ;
+4. réactiver les actions du dépôt, puis vérifier que seul « Paquets de bureau » est actif.
+
+À refaire pour tout fichier que l'amont ajouterait lors d'un report.
