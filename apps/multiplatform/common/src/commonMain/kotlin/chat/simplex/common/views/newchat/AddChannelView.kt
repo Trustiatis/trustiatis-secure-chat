@@ -640,6 +640,10 @@ fun RelayProgressIndicator(active: Int, total: Int) {
     )
   } else {
     val progress = active.toFloat() / total.coerceAtLeast(1).toFloat()
+    // L'accent du thème plutôt qu'un bleu écrit en dur : la couleur suit alors le thème
+    // choisi par l'utilisateur, ce que la valeur littérale ne faisait pas. Elle est lue
+    // ici parce que le corps de Canvas n'est pas composable.
+    val accent = MaterialTheme.colors.primary
     Box(Modifier.size(20.dp)) {
       Canvas(Modifier.fillMaxSize()) {
         // Background circle
@@ -649,7 +653,7 @@ fun RelayProgressIndicator(active: Int, total: Int) {
         )
         // Progress arc
         drawArc(
-          color = Color(0xFF2196F3), // accent blue
+          color = accent,
           startAngle = -90f,
           sweepAngle = 360f * progress,
           useCenter = false,

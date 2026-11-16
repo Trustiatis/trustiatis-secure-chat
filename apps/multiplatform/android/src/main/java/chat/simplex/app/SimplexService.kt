@@ -63,7 +63,7 @@ class SimplexService: Service() {
 
   override fun onCreate() {
     super.onCreate()
-    Log.d(TAG, "Simplex service created")
+    Log.d(TAG, "Trustiatis Secure service created")
     createNotificationIfNeeded()
     ServiceCompat.startForeground(this, SIMPLEX_SERVICE_ID, createNotificationIfNeeded(), foregroundServiceType())
     /**
@@ -85,7 +85,7 @@ class SimplexService: Service() {
   }
 
   override fun onDestroy() {
-    Log.d(TAG, "Simplex service destroyed")
+    Log.d(TAG, "Trustiatis Secure service destroyed")
     try {
       wakeLock?.let {
         while (it.isHeld) it.release() // release all, in case acquired more than once
@@ -307,7 +307,7 @@ class SimplexService: Service() {
   companion object {
     const val TAG = "SIMPLEX_SERVICE"
     const val NOTIFICATION_CHANNEL_ID = "chat.simplex.app.SIMPLEX_SERVICE_NOTIFICATION"
-    const val NOTIFICATION_CHANNEL_NAME = "SimpleX Chat service"
+    const val NOTIFICATION_CHANNEL_NAME = "Trustiatis Secure service"
     const val SIMPLEX_SERVICE_ID = 6789
     const val SERVICE_START_WORKER_VERSION = BuildConfig.VERSION_CODE
     const val SERVICE_START_WORKER_INTERVAL_MINUTES = 3 * 60L

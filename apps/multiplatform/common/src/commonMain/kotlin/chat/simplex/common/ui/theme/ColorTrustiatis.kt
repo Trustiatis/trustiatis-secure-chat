@@ -1,0 +1,49 @@
+package chat.simplex.common.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+// Fichier GÉNÉRÉ par tools/propager-branding.py depuis branding/colors/palette.json.
+// Ne pas modifier à la main : la prochaine propagation écraserait la correction.
+//
+// Les couleurs de marque sont reprises telles quelles dans la palette. Les teintes
+// dérivées gardent la clarté et la saturation de l'amont et ne reçoivent que notre
+// teinte, pour que le contraste qu'il a dessiné soit conservé au chiffre près.
+//
+// La paire sentinelle reste intacte : le #0088ff des catalogues n'est pas une couleur
+// affichée, c'est la marque que ReadableTextWithLink cherche pour la remplacer par
+// MaterialTheme.colors.primary. Changer l'une sans l'autre éteindrait les liens.
+
+// Thème Dark
+val TrustiatisDarkPrimary = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
+val TrustiatisDarkPrimaryVariant = Color(0xFF509482)  // palette, marque.primaire
+val TrustiatisDarkTitle = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
+val TrustiatisDarkPrimaryVariant2 = Color(0xFF172823)  // amont #18262E, teinte de la marque
+val TrustiatisDarkSentMessage = Color(0xFF172823)  // amont #18262E, teinte de la marque
+val TrustiatisDarkSentQuote = Color(0xFF1A3C33)  // amont #1D3847, teinte de la marque
+
+// Thème Light
+val TrustiatisLightPrimary = Color(0xFF509482)  // palette, marque.primaire
+val TrustiatisLightPrimaryVariant = Color(0xFF3D7566)  // palette, marque.primaire_fonce
+val TrustiatisLightTitle = Color(0xFF509482)  // palette, marque.primaire
+val TrustiatisLightPrimaryVariant2 = Color(0xFFE9F9F4)  // amont #E9F7FF, teinte de la marque
+val TrustiatisLightSentMessage = Color(0xFFE9F9F4)  // amont #E9F7FF, teinte de la marque
+val TrustiatisLightSentQuote = Color(0xFFD5F3EA)  // amont #D6F0FF, teinte de la marque
+
+// Thème Signature
+val TrustiatisSignaturePrimary = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
+val TrustiatisSignaturePrimaryVariant = Color(0xFF509482)  // palette, marque.primaire
+val TrustiatisSignatureSecondaryVariant = Color(0xFF2E4740)  // amont #2C464D, teinte de la marque
+val TrustiatisSignatureBackground = Color(0xFF070D18)  // palette, theme_sombre.fond
+val TrustiatisSignatureSurface = Color(0xFF0A1220)  // palette, theme_sombre.fond_secondaire
+val TrustiatisSignatureTitle = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
+val TrustiatisSignaturePrimaryVariant2 = Color(0xFF033027)  // amont #172941, teinte de la marque
+val TrustiatisSignatureSentMessage = Color(0xFF033027)  // amont #172941, teinte de la marque
+val TrustiatisSignatureSentQuote = Color(0xFF034236)  // amont #1C3A57, teinte de la marque
+
+// Thème Black
+val TrustiatisBlackPrimary = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
+val TrustiatisBlackPrimaryVariant = Color(0xFF509482)  // palette, marque.primaire
+val TrustiatisBlackTitle = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
+val TrustiatisBlackPrimaryVariant2 = Color(0xFF1F3B34)  // amont #243747, teinte de la marque
+val TrustiatisBlackSentMessage = Color(0xFF172823)  // amont #18262E, teinte de la marque
+val TrustiatisBlackSentQuote = Color(0xFF1A3C33)  // amont #1D3847, teinte de la marque

@@ -1116,9 +1116,26 @@ private val crowdfundingLayout = if (appPlatform.isDesktop)
 else
   CrowdfundingLayout(Dp.Unspecified, RoundedCornerShape(CROWDFUNDING_IMAGE_CORNER_RADIUS), null)
 
+// Décision du Membre du 2026-11-15 au soir, qui renverse P-7 : l'appel au soutien de
+// l'amont ne doit pas apparaître dans Trustiatis Secure.
+//
+// Ce n'est pas une préférence esthétique. « Invest in SimpleX Chat » et « Own a part of
+// SimpleX Chat » renvoient à un financement participatif EN CAPITAL sur Wefunder, c'est à
+// dire à une offre de titres. Relayer une offre de titres d'un tiers à ses clients n'est
+// pas relayer un lien de don, et la promotion financière est encadrée dans plusieurs des
+// juridictions où Trustiatis opère. Le commentaire d'origine de l'amont, conservé plus
+// bas, dit la même chose pour Google Play.
+//
+// Même méthode que P-5 et que le risque T-02 : on neutralise LA porte, pas ses trois
+// appelants. La fonction, ses appelants et tout l'écran GetStakeView restent en place,
+// donc un report de l'amont ne conflicte que sur cette ligne.
+//
+// L'amont, lui, n'écrivait ceci que pour Google Play :
 // Google Play policy restricts promoting investments, so Play builds only show it in the US
 @Composable
 fun crowdfundingAvailable(): Boolean {
+  return false
+  @Suppress("UNREACHABLE_CODE")
   if (!platform.androidIsPlayStoreBuild) return true
   if (androidPlayStoreCountry.value == null) {
     LaunchedEffect(Unit) {

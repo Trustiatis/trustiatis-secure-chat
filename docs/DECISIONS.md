@@ -82,6 +82,87 @@ Ce que la mise en oeuvre a appris, et qui n'était pas dans l'énoncé de la dé
 4. **Rien de tout cela n'est compilé.** La chaîne iOS exige Xcode, donc un Mac, que le
    groupe n'a pas encore (voir P-1, conséquence 1). Le changement est relu, pas éprouvé.
 
+### 2026-11-15, nuit, P-7 est renversée : l'appel au soutien ne paraît pas
+
+Décidé par le Membre après lecture de la réserve 1 ci dessous : « ne pas faire apparaître le
+don de soutien, ce n'est pas possible ».
+
+| N° | Décision | Portée |
+|---|---|---|
+| **P-7 bis** | **L'appel au soutien de SimpleX Chat n'apparaît pas dans Trustiatis Secure.** La décision P-7, qui le conservait, est annulée | cinq points d'entrée fermés, et un sixième réécrit |
+
+**Ce qui est fermé, et comment.** La méthode est celle de P-5 et du risque T-02 : on neutralise
+la porte, pas ses appelants, pour qu'un report de l'amont ne conflicte que sur une ligne.
+
+| Point d'entrée | Traitement |
+|---|---|
+| bannière de financement de la liste des conversations, carte des nouveautés, section « Invest » des réglages | `crowdfundingAvailable()` rend faux. Les trois appelants et tout l'écran `GetStakeView` restent en place |
+| entrée des badges dans les réglages | retirée. Sans badge, son intitulé est « Support SimpleX » : c'est l'appel au soutien, à l'endroit le plus vu |
+| section « soutenir le projet » des réglages | retirée : elle menait à la page de contribution de l'amont, à sa fiche Google Play (`chat.simplex.app`, qui n'est pas notre application) et à son dépôt GitHub |
+| canal d'actualités et canal du fondateur de l'amont | retirés : ils adressent un client de Trustiatis à un éditeur qui ne le connaît pas |
+| lien vers le client en ligne de commande de l'amont, dans les réglages développeur | retiré. **Oubli de la première mise en oeuvre**, relevé en ouvrant le paquet construit : les cinq autres portes étaient fermées, celle ci s'affichait encore et menait au dépôt GitHub de l'amont |
+| « nous écrire » | **réécrit** vers `support@trustiatis.com`, ce que `NOTICE-AGPL.md` prescrit pour cette catégorie |
+
+**Ce que la décision coûte, et il faut le savoir.** Le badge était un **achat** qui rendait un
+service réel : des fichiers de 2 à 5 Gio conservés de 7 à 21 jours. Fermer son entrée retire
+cette capacité de l'interface. Le code des badges reste en place, et le badge d'un
+correspondant continue de s'afficher dans son profil : c'est une information sur lui, pas une
+sollicitation adressée à l'utilisateur. Rouvrir la seule entrée des badges, sans rouvrir le
+financement, reste donc possible d'une ligne si le Membre le souhaite.
+
+**Ce qui reste, et pourquoi.** Trois composables de l'amont ne sont plus appelés par personne
+et restent dans le fichier : `ContributeItem`, `StarOnGithubItem`, `RateAppItem`,
+`InstallTerminalAppItem`. Un écran qu'aucun appelant n'atteint ne s'affiche pas, et les
+laisser en place évite un conflit de report à chaque version de l'amont. **En revanche, les
+liens de `OperatorView` et de `NetworkAndServers` vers le dépôt de l'amont ne sont pas
+touchés** : ils pointent les conditions d'utilisation du réseau et leurs commits, qui sont
+réellement publiés là. Les réécrire serait faux, et la décision D-4 retient les serveurs de
+la communauté.
+
+**Ce qui n'est pas touché.** Les chaînes restent dans les quarante-deux catalogues. Les
+retirer voudrait dire toucher quarante-deux fichiers que l'amont réécrit à chaque version,
+pour un gain nul : une chaîne qu'aucun écran ne lit n'est pas vue. La liste
+`EDITEUR_NEUTRALISE` de `tools/verifier-marque.py` porte désormais ce nom, qui dit la vérité.
+
+**Et la mention de non affiliation reste indispensable**, bien que P-7 soit renversée : elle
+ne dépendait pas de l'appel au soutien. Elle est en place dans l'écran « À propos ».
+
+### 2026-11-15 au soir, P-7 rendue : l'appel au soutien de l'amont est conservé
+
+> **Annulée la nuit même par P-7 bis, ci dessus.** La section est conservée telle quelle :
+> c'est la réserve 1 qu'elle portait qui a conduit le Membre à décider l'inverse, et effacer
+> le raisonnement effacerait la raison de la décision suivante.
+
+| N° | Décision | Portée |
+|---|---|---|
+| **P-7** | **Trustiatis Secure garde l'appel au soutien de SimpleX Chat.** Badges, bannière de financement, section « Support SimpleX Chat » des réglages, contact des développeurs, lien vers le client en ligne de commande, pictogramme de l'équipe : rien n'est retiré ni réécrit. Ma recommandation de masquer ces écrans n'est pas retenue | les six points d'entrée restent en place. La dérogation est nommée et bornée dans `EDITEUR_CONSERVE_P7` de `tools/verifier-marque.py`, et testée, plutôt que dispersée en commentaires dans quarante catalogues |
+
+**Ce que la décision gagne.** Le badge de soutien est un achat qui rend un service à
+l'utilisateur, des fichiers de 2 à 5 Gio conservés de 7 à 21 jours : le retirer aurait coûté
+une capacité réelle. Et un fork qui vit du travail de l'amont et en masque l'appel au soutien
+se met dans une position difficile à défendre.
+
+**Deux réserves à porter au dossier, non bloquantes.**
+
+1. **Une partie de cet appel n'est pas un don.** « Invest in SimpleX Chat » et « Own a part of
+   SimpleX Chat » renvoient à un financement participatif **en capital** sur Wefunder, c'est à
+   dire à une offre de titres, réservée aux juridictions que l'offre couvre. Relayer une offre
+   de titres d'un tiers à ses clients n'est pas le même acte que relayer un lien de don, et la
+   promotion financière est encadrée dans plusieurs des juridictions où Trustiatis opère. À
+   soumettre à la fonction GRC avant la première version publiée. Si la réponse est de ne
+   garder que le don et le badge, la modification se borne au bloc
+   `if (crowdfundingAvailable())` de `views/usersettings/SettingsView.desktop.kt` et aux deux
+   appels à `GetStakeBanner`.
+2. **La mention de non affiliation devient indispensable.** Garder « Soutenez SimpleX » dans
+   une application nommée Trustiatis Secure peut se lire comme une affiliation, que la
+   politique de marque de l'amont interdit expressément. Le texte existe déjà, dans
+   `NOTICE-AGPL.md`, et il doit figurer dans l'écran « À propos ». C'est la contrepartie
+   technique de cette décision, pas une formalité. **Faite le 2026-11-15** : clé
+   `trustiatis_non_affiliation` dans les deux catalogues, affichée par `SimpleXInfoLayout`
+   dans la branche où `onboardingStage` est nul, donc dans l'écran ouvert depuis les réglages
+   et pas pendant l'accueil. Il reste à la porter sur le portail de téléchargement et dans les
+   descriptions de magasins, qui ne sont pas du ressort de ce dépôt.
+
 ### 2026-11-15 au soir, P-6 : la greffe revient sur v7.1.2
 
 Décidé par le Membre, en réponse au constat fait pendant la première compilation : « Passe la

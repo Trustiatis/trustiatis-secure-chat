@@ -160,11 +160,17 @@ fun showAppUpdateNotice() {
 private var updateCheckerJob: Job = Job()
 fun setupUpdateChecker() = withLongRunningApi {
   updateCheckerJob.cancel()
-  if (appPrefs.appUpdateChannel.get() == AppUpdatesChannel.DISABLED) {
-    return@withLongRunningApi
+  // Verrou de dernier recours du risque T-02. L'interface n'offre plus le choix
+  // du canal, mais la préférence est lue dans un fichier qui peut venir
+  // d'ailleurs : une installation antérieure de l'application officielle, ou une
+  // archive de réglages importée. Ce chemin est le seul par lequel la
+  // vérification démarre, donc c'est ici qu'on la refuse, et on remet la
+  // préférence au cas désactivé pour que l'écran de réglages dise la vérité.
+  if (appPrefs.appUpdateChannel.get() != AppUpdatesChannel.DISABLED) {
+    Log.i(TAG, "Update channel forced back to DISABLED: upstream checker points at the official GitHub releases")
+    appPrefs.appUpdateChannel.set(AppUpdatesChannel.DISABLED)
   }
-  checkForUpdate()
-  createUpdateJob()
+  return@withLongRunningApi
 }
 
 private fun createUpdateJob() {

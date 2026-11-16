@@ -47,7 +47,7 @@
       android:extractNativeLibs="${extract_native_libs}"
       android:supportsRtl="true"
       android:enableOnBackInvokedCallback="false"
-      android:theme="@style/Theme.SimpleX"
+      android:theme="@style/Theme.TrustiatisSecure"
       tools:ignore="UnusedAttribute">
     <!--      android:localeConfig="@xml/locales_config"-->
 
@@ -60,7 +60,7 @@
         android:label="${app_name}"
         android:windowSoftInputMode="adjustResize"
         android:configChanges="uiMode"
-        android:theme="@style/Theme.SimpleX">
+        android:theme="@style/Theme.TrustiatisSecure">
       <intent-filter>
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>

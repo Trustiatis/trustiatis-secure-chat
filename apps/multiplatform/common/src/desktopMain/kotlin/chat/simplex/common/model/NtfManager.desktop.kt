@@ -182,8 +182,8 @@ object NtfManager {
   private fun windowsDisplayNotification(title: String, text: String, icon: ImageBitmap?) {
     if (SystemTray.isSupported()) {
       val tray = SystemTray.getSystemTray()
-      tray.remove(tray.trayIcons.firstOrNull { it.toolTip == "SimpleX" })
-      val trayIcon = TrayIcon(icon?.toAwtImage(), "SimpleX")
+      tray.remove(tray.trayIcons.firstOrNull { it.toolTip == "Trustiatis Secure" })
+      val trayIcon = TrayIcon(icon?.toAwtImage(), "Trustiatis Secure")
       trayIcon.isImageAutoSize = true
       tray.add(trayIcon)
       trayIcon.displayMessage(title, text, MessageType.INFO)

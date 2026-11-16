@@ -47,22 +47,22 @@ private const val OWNER_WRITABLE = "rwxr-xr-x"
 private const val GROUP_WRITABLE = "rwxrwxr-x"
 private const val OTHERS_WRITABLE = "rwxr-xrwx"
 private const val WORLD_WRITABLE = "rwxrwxrwx"
-private const val APPIMAGE_FILE_NAME = "SimpleX.AppImage"
+private const val APPIMAGE_FILE_NAME = "TrustiatisSecure.AppImage"
 private const val XDG_MIME = "xdg-mime"
 
 class AppLinkSchemeTest {
-  private val windowsExe = "C:\\Program Files\\SimpleX\\SimpleX.exe"
+  private val windowsExe = "C:\\Program Files\\Trustiatis Secure\\Trustiatis Secure.exe"
   private val appLinkCommandKey = "Software\\Classes\\simplexchat\\shell\\open\\command"
   private val connectionCommandKey = "Software\\Classes\\simplex\\shell\\open\\command"
   private val appLinkCommand = appLinkCommandKey to ""
   private val connectionCommand = connectionCommandKey to ""
-  private val olderWindowsCommand = "\"C:\\Old\\SimpleX.exe\" \"%1\""
+  private val olderWindowsCommand = "\"C:\\Old\\Trustiatis Secure.exe\" \"%1\""
   private val appImagePath = "/home/user/$APPIMAGE_FILE_NAME"
 
   @Test
   fun windowsCommandQuotesTheAppAndTheLink() {
     assertEquals(
-      "\"C:\\Program Files\\SimpleX\\SimpleX.exe\" \"%1\"",
+      "\"C:\\Program Files\\Trustiatis Secure\\Trustiatis Secure.exe\" \"%1\"",
       windowsOpenCommand(windowsExe)
     )
   }
@@ -71,22 +71,22 @@ class AppLinkSchemeTest {
   fun windowsSchemeIsAUrlProtocolNamingItsProgId() {
     assertEquals(
       listOf(
-        RegistryValue(key = "Software\\Classes\\simplexchat", name = "", value = "URL:SimpleX Chat"),
+        RegistryValue(key = "Software\\Classes\\simplexchat", name = "", value = "URL:Trustiatis Secure"),
         RegistryValue(key = "Software\\Classes\\simplexchat", name = "URL Protocol", value = ""),
         RegistryValue(key = "Software\\Classes\\simplexchat\\DefaultIcon", name = "", value = "\"$windowsExe\",0"),
         RegistryValue(key = appLinkCommandKey, name = "", value = "\"$windowsExe\" \"%1\""),
-        RegistryValue(key = "Software\\chat.simplex.app\\Capabilities\\URLAssociations", name = "simplexchat", value = "SimpleX.simplexchat"),
+        RegistryValue(key = "Software\\com.trustiatis.secure\\Capabilities\\URLAssociations", name = "simplexchat", value = "TrustiatisSecure.simplexchat"),
       ),
       windowsSchemeValues("simplexchat", windowsExe),
       "app link scheme"
     )
     assertEquals(
       listOf(
-        RegistryValue(key = "Software\\Classes\\simplex", name = "", value = "URL:SimpleX Chat"),
+        RegistryValue(key = "Software\\Classes\\simplex", name = "", value = "URL:Trustiatis Secure"),
         RegistryValue(key = "Software\\Classes\\simplex", name = "URL Protocol", value = ""),
         RegistryValue(key = "Software\\Classes\\simplex\\DefaultIcon", name = "", value = "\"$windowsExe\",0"),
         RegistryValue(key = connectionCommandKey, name = "", value = "\"$windowsExe\" \"%1\""),
-        RegistryValue(key = "Software\\chat.simplex.app\\Capabilities\\URLAssociations", name = "simplex", value = "SimpleX.simplex"),
+        RegistryValue(key = "Software\\com.trustiatis.secure\\Capabilities\\URLAssociations", name = "simplex", value = "TrustiatisSecure.simplex"),
       ),
       windowsSchemeValues("simplex", windowsExe),
       "connection link scheme"
@@ -97,9 +97,9 @@ class AppLinkSchemeTest {
   fun windowsProgIdOpensTheExe() {
     assertEquals(
       listOf(
-        RegistryValue(key = "Software\\Classes\\SimpleX.simplexchat", name = "", value = "URL:SimpleX Chat"),
-        RegistryValue(key = "Software\\Classes\\SimpleX.simplexchat\\DefaultIcon", name = "", value = "\"$windowsExe\",0"),
-        RegistryValue(key = "Software\\Classes\\SimpleX.simplexchat\\shell\\open\\command", name = "", value = "\"$windowsExe\" \"%1\""),
+        RegistryValue(key = "Software\\Classes\\TrustiatisSecure.simplexchat", name = "", value = "URL:Trustiatis Secure"),
+        RegistryValue(key = "Software\\Classes\\TrustiatisSecure.simplexchat\\DefaultIcon", name = "", value = "\"$windowsExe\",0"),
+        RegistryValue(key = "Software\\Classes\\TrustiatisSecure.simplexchat\\shell\\open\\command", name = "", value = "\"$windowsExe\" \"%1\""),
       ),
       windowsProgIdValues("simplexchat", windowsExe)
     )
@@ -109,13 +109,13 @@ class AppLinkSchemeTest {
   fun windowsApplicationIsListedInDefaultAppsAfterItsCapabilities() {
     assertEquals(
       listOf(
-        RegistryValue(key = "Software\\chat.simplex.app\\Capabilities", name = "ApplicationName", value = "SimpleX Chat"),
+        RegistryValue(key = "Software\\com.trustiatis.secure\\Capabilities", name = "ApplicationName", value = "Trustiatis Secure"),
         RegistryValue(
-          key = "Software\\chat.simplex.app\\Capabilities",
+          key = "Software\\com.trustiatis.secure\\Capabilities",
           name = "ApplicationDescription",
-          value = "Private and secure open-source messenger - no user IDs (not even random numbers)"
+          value = "Confidential channel, encrypted end to end, with no account"
         ),
-        RegistryValue(key = "Software\\RegisteredApplications", name = "SimpleX Chat", value = "Software\\chat.simplex.app\\Capabilities"),
+        RegistryValue(key = "Software\\RegisteredApplications", name = "Trustiatis Secure", value = "Software\\com.trustiatis.secure\\Capabilities"),
       ),
       windowsApplicationValues
     )
@@ -153,7 +153,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun windowsRegistrationAnnouncesARepairedApplicationListing() {
-    val shell = FakeWindowsShell(user = registered().apply { remove("Software\\RegisteredApplications" to "SimpleX Chat") })
+    val shell = FakeWindowsShell(user = registered().apply { remove("Software\\RegisteredApplications" to "Trustiatis Secure") })
     registerWindowsSchemes(windowsExe, shell)
     assertEquals(windowsApplicationValues, shell.writes, "only the application listing is rewritten")
     assertTrue(shell.notified, "Windows is told that associations changed")
@@ -183,7 +183,7 @@ class AppLinkSchemeTest {
   @Test
   fun windowsRegistrationRepairsItsProgIdWhileAnotherProgramHoldsTheScheme() = withTempDir { dir ->
     val otherCommand = "\"${Files.createFile(dir.resolve("Other.exe"))}\" \"%1\""
-    val staleProgId = windowsProgIdValues("simplexchat", "C:\\Old\\SimpleX.exe").associate { (it.key to it.name) to it.value }
+    val staleProgId = windowsProgIdValues("simplexchat", "C:\\Old\\Trustiatis Secure.exe").associate { (it.key to it.name) to it.value }
     val shell = FakeWindowsShell(user = (staleProgId + (appLinkCommand to otherCommand)).toMutableMap())
     registerWindowsSchemes(windowsExe, shell)
     assertEquals(windowsProgIdValues("simplexchat", windowsExe), shell.writes.take(3), "the ProgId points at this exe again")
@@ -226,14 +226,14 @@ class AppLinkSchemeTest {
 
   @Test
   fun windowsRegistrationTakesNoSchemeWhoseProgIdCannotBeWritten() {
-    val shell = FakeWindowsShell(failingWrites = setOf("Software\\Classes\\SimpleX.simplexchat"))
+    val shell = FakeWindowsShell(failingWrites = setOf("Software\\Classes\\TrustiatisSecure.simplexchat"))
     registerWindowsSchemes(windowsExe, shell)
     assertTrue(windowsSchemeValues("simplexchat", windowsExe).none { it in shell.writes }, "URLAssociations must not name a missing ProgId")
   }
 
   @Test
   fun windowsRegistrationKeepsAnotherInstalledCopysProgId() = withTempDir { dir ->
-    val otherCopy = Files.createFile(dir.resolve("SimpleX.exe")).toString()
+    val otherCopy = Files.createFile(dir.resolve("Trustiatis Secure.exe")).toString()
     val otherProgId = windowsProgIdValues("simplexchat", otherCopy).associate { (it.key to it.name) to it.value }
     val shell = FakeWindowsShell(user = otherProgId.toMutableMap())
     registerWindowsSchemes(windowsExe, shell)
@@ -242,7 +242,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun windowsRegistrationTreatsItsOwnProgramAsItsOwnHandler() = withTempDir { dir ->
-    val exe = Files.createFile(dir.resolve("SimpleX.exe")).toString()
+    val exe = Files.createFile(dir.resolve("Trustiatis Secure.exe")).toString()
     val otherExe = Files.createFile(dir.resolve("Other.exe")).toString()
     val shell = FakeWindowsShell(
       user = mutableMapOf(appLinkCommand to "\"$exe\" %1"),
@@ -298,7 +298,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun execArgumentOfAPlainPathIsLeftBare() {
-    assertEquals("/home/user/Downloads/simplex-desktop-x86_64.AppImage", desktopExecArgument("/home/user/Downloads/simplex-desktop-x86_64.AppImage"))
+    assertEquals("/home/user/Downloads/TrustiatisSecure.AppImage", desktopExecArgument("/home/user/Downloads/TrustiatisSecure.AppImage"))
   }
 
   @Test
@@ -332,7 +332,7 @@ class AppLinkSchemeTest {
       """
       |[Desktop Entry]
       |Type=Application
-      |Name=SimpleX Chat
+      |Name=Trustiatis Secure
       |NoDisplay=true
       |Exec="/home/user/My Apps/simplex.AppImage" %u
       |MimeType=x-scheme-handler/simplexchat;x-scheme-handler/simplex;
@@ -360,7 +360,7 @@ class AppLinkSchemeTest {
 
   @Test
   fun packagedMacAndWindowsAreRecognised() {
-    assertEquals(DesktopInstallation.MacBundle, desktopInstallation(DesktopPlatform.MAC_AARCH64, "/Applications/SimpleX.app/Contents/MacOS/SimpleX", mapOf()))
+    assertEquals(DesktopInstallation.MacBundle, desktopInstallation(DesktopPlatform.MAC_AARCH64, "/Applications/Trustiatis Secure.app/Contents/MacOS/Trustiatis Secure", mapOf()))
     assertEquals(DesktopInstallation.WindowsExe(windowsExe), desktopInstallation(DesktopPlatform.WINDOWS_X86_64, windowsExe, mapOf()))
   }
 
@@ -476,7 +476,7 @@ class AppLinkSchemeTest {
   @Test
   fun missingAppImageIsRefused() {
     assumePosix()
-    assertFalse(onlyOwnerCanReplace(Path.of("/nonexistent-simplex-dir/SimpleX.AppImage"), "root"))
+    assertFalse(onlyOwnerCanReplace(Path.of("/nonexistent-trustiatis-dir/TrustiatisSecure.AppImage"), "root"))
   }
 
   // Built under the module's build directory, as the check walks up to the root and the system temp directory is open to everyone.
@@ -587,7 +587,7 @@ class AppLinkSchemeTest {
   @Test
   fun appImageRegistrationRewritesTheEntryOfAMovedAppImage() = withRegistration { appImage, applicationsDir ->
     applicationsDir.mkdirs()
-    File(applicationsDir, APPIMAGE_ENTRY_NAME).writeText(appImageDesktopEntry("/old/SimpleX.AppImage")!!)
+    File(applicationsDir, APPIMAGE_ENTRY_NAME).writeText(appImageDesktopEntry("/old/TrustiatisSecure.AppImage")!!)
     val xdg = FakeXdgMime(default = APPIMAGE_ENTRY_NAME)
     assertTrue(registerAppImageScheme(appImage, applicationsDir, listOf(), xdg::run))
     assertEquals(appImageDesktopEntry(appImage), File(applicationsDir, APPIMAGE_ENTRY_NAME).readText())
@@ -643,11 +643,11 @@ class AppLinkSchemeTest {
 
   @Test
   fun linuxPackageCountsAsRegisteredOnlyWhenItsEntryIsTheDefault() {
-    assertTrue(linuxPackageRegistered(FakeXdgMime(default = "simplex-simplex.desktop")::run), "the deb's own entry")
+    assertTrue(linuxPackageRegistered(FakeXdgMime(default = "trustiatis-secure-trustiatis-secure.desktop")::run), "the deb's own entry")
     assertFalse(linuxPackageRegistered(FakeXdgMime(default = "other.desktop")::run), "another handler")
     assertFalse(linuxPackageRegistered(FakeXdgMime(default = null)::run), "no handler")
     assertFalse(
-      linuxPackageRegistered(FakeXdgMime(default = "other.desktop", connectionDefault = "simplex-simplex.desktop")::run),
+      linuxPackageRegistered(FakeXdgMime(default = "other.desktop", connectionDefault = "trustiatis-secure-trustiatis-secure.desktop")::run),
       "only the connection link handler"
     )
   }

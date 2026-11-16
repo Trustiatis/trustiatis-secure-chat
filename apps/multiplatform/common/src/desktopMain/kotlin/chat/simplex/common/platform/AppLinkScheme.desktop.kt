@@ -22,10 +22,15 @@ import kotlin.concurrent.thread
 internal const val APP_LINK_MIME_TYPE = "x-scheme-handler/$appLinkScheme"
 internal const val CONNECTION_LINK_MIME_TYPE = "x-scheme-handler/$connectionLinkScheme"
 private const val WINDOWS_CLASSES_KEY = "Software\\Classes"
-private const val WINDOWS_PROG_ID_PREFIX = "SimpleX."
-private const val WINDOWS_CAPABILITIES_KEY = "Software\\chat.simplex.app\\Capabilities"
+// Préfixe des ProgID du registre. Il doit être propre à Trustiatis Secure :
+// gardé tel quel, notre installation et celle de l'application officielle
+// écriraient les mêmes clés et se voleraient l'association de protocole.
+private const val WINDOWS_PROG_ID_PREFIX = "TrustiatisSecure."
+// Même raison : la clé porte l'identifiant de distribution, qui est le nôtre.
+private const val WINDOWS_CAPABILITIES_KEY = "Software\\com.trustiatis.secure\\Capabilities"
 private const val WINDOWS_REGISTERED_APPLICATIONS_KEY = "Software\\RegisteredApplications"
-private const val APP_DESCRIPTION = "Private and secure open-source messenger - no user IDs (not even random numbers)"
+// Vue de l'utilisateur, dans les applications par défaut de Windows.
+private const val APP_DESCRIPTION = "Confidential channel, encrypted end to end, with no account"
 private const val WINDOWS_FIRST_ICON_INDEX = 0
 // values from shlwapi.h and shlobj_core.h
 private const val ASSOCF_IS_PROTOCOL = 0x1000
@@ -36,14 +41,14 @@ private const val SHCNE_ASSOCCHANGED = 0x08000000
 private const val SHCNF_IDLIST = 0
 // the Win32 name of a key's default value
 private const val REGISTRY_DEFAULT_VALUE = ""
-internal const val APPIMAGE_ENTRY_NAME = "chat.simplex.app-links.desktop"
+internal const val APPIMAGE_ENTRY_NAME = "com.trustiatis.secure-links.desktop"
 private const val APPLICATIONS_DIR = "applications"
 // the XDG Base Directory default when XDG_DATA_DIRS is unset
 private const val DEFAULT_XDG_DATA_DIRS = "/usr/local/share:/usr/share"
-private const val APP_DISPLAY_NAME = "SimpleX Chat"
+private const val APP_DISPLAY_NAME = "Trustiatis Secure"
 private const val XDG_MIME = "xdg-mime"
 // jpackage names the deb's desktop entry <package>-<app>.desktop
-private const val DEB_ENTRY_NAME = "simplex-simplex.desktop"
+private const val DEB_ENTRY_NAME = "trustiatis-secure-trustiatis-secure.desktop"
 private const val PROCESS_TIMEOUT_SECONDS = 5L
 private const val ROOT_USER = "root"
 // the characters the desktop entry spec requires an Exec argument to quote
@@ -65,7 +70,7 @@ private var registered = false
 actual fun appLinkSchemeRegistered(): Boolean = registered
 
 fun registerLinkSchemes() {
-  thread(name = "simplex-link-schemes", isDaemon = true) {
+  thread(name = "trustiatis-secure-link-schemes", isDaemon = true) {
     registered = registerForThisInstallation()
   }
 }

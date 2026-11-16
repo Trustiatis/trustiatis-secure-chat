@@ -109,23 +109,17 @@ fun SettingsLayout(
     }
     SectionDividerSpaced()
 
-    val (badgeLabel, badgeBenefits) = when (currentShownBadge()?.badgeType) {
-      null -> MR.strings.badges_support_simplex_title to MR.strings.v7_1_supporter_badge_descr
-      is BadgeType.Legend -> MR.strings.badges_your_legend_badge to MR.strings.badges_legend_benefits
-      is BadgeType.Supporter, is BadgeType.Investor, is BadgeType.Unknown -> MR.strings.badges_your_badge to MR.strings.badges_supporter_benefits
-    }
-    SectionView {
-      // Direct showModal (no settings / cardScreen flags) — settings-style card chrome would render
-      // a gray top bar / back button that badges views don't want (they have their own inline titles).
-      SectionItemView(click = { ModalManager.start.showCustomModal(id = ModalViewId.BADGES) { close -> BadgesView(ModalManager.start, close) } }) {
-        val badgeType = chatModel.currentUser.value?.profile?.localBadge?.badge?.badgeType ?: BadgeType.Supporter
-        Image(painterResource(badgeImage(badgeType)), stringResource(badgeLabel), Modifier.size(24.dp))
-        TextIconSpaced()
-        Text(stringResource(badgeLabel))
-      }
-    }
-    SectionTextFooter(stringResource(badgeBenefits))
-    SectionDividerSpaced()
+    // Entrée des badges retirée par la décision du Membre qui renverse P-7. Tant que
+    // l'utilisateur n'a pas de badge, son intitulé est « Support SimpleX » : c'est donc
+    // l'appel au soutien de l'amont, posé à l'endroit le plus vu de l'application.
+    //
+    // Ce que la décision coûte, et il faut le savoir : le badge est un achat qui rend un
+    // service réel, des fichiers de 2 à 5 Gio conservés de 7 à 21 jours. Le retrait de
+    // l'entrée retire cette capacité de l'interface.
+    //
+    // Seul le point d'entrée disparaît. BadgesView et tout le dossier views/badges restent
+    // en place, et le badge d'un correspondant continue de s'afficher dans son profil :
+    // c'est une information sur lui, pas une sollicitation adressée à l'utilisateur.
 
     SectionView(stringResource(MR.strings.advanced_settings)) {
       SettingsActionItem(painterResource(MR.images.ic_wifi_tethering), stringResource(MR.strings.network_and_servers), showCustomModal { _, close -> NetworkAndServersView(close) }, disabled = stopped)
@@ -171,23 +165,18 @@ fun HelpAndSupportView(
     SectionDividerSpaced()
 
     SectionView(stringResource(MR.strings.settings_section_title_contact)) {
-      if (!chatModel.desktopNoUserNoRemote) {
-        SettingsActionItem(painterResource(MR.images.ic_bigtop_updates), stringResource(MR.strings.follow_simplex_network_news), { uriHandler.openVerifiedSimplexUri(simplexNewsUri) }, textColor = MaterialTheme.colors.primary, disabled = stopped)
-        SettingsActionItem(painterResource(MR.images.ic_tag), stringResource(MR.strings.chat_with_the_founder), { uriHandler.openVerifiedSimplexUri(simplexTeamUri) }, textColor = MaterialTheme.colors.primary, disabled = stopped)
-      }
-      SettingsActionItem(painterResource(MR.images.ic_mail), stringResource(MR.strings.send_us_an_email), { uriHandler.openUriCatching("mailto:chat@simplex.chat") }, textColor = MaterialTheme.colors.primary)
+      // Les deux entrées qui ouvraient le canal d'actualités et le canal du fondateur de
+      // l'amont sont retirées : elles adressent un client de Trustiatis à l'éditeur amont,
+      // qui ne le connaît pas et n'a pas à le prendre en charge. Le courriel, lui, est
+      // réécrit vers notre support, ce que NOTICE-AGPL prescrit pour cette catégorie.
+      SettingsActionItem(painterResource(MR.images.ic_mail), stringResource(MR.strings.send_us_an_email), { uriHandler.openUriCatching("mailto:support@trustiatis.com") }, textColor = MaterialTheme.colors.primary)
     }
     SectionDividerSpaced()
 
-    SectionView(stringResource(MR.strings.settings_section_title_support_project)) {
-      if (!platform.androidIsPlayStoreBuild) {
-        ContributeItem(uriHandler)
-      }
-      if (appPlatform.isAndroid) {
-        RateAppItem(uriHandler)
-      }
-      StarOnGithubItem(uriHandler)
-    }
+    // Section « soutenir le projet » retirée par la même décision. Les trois entrées
+    // menaient à l'amont : sa page de contribution, sa fiche Google Play (« chat.simplex.app »,
+    // qui n'est pas notre application) et son dépôt GitHub. Les trois composables sont
+    // conservés plus bas, ils ne sont plus appelés.
     SectionBottomSpacer()
   }
 }
