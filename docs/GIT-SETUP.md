@@ -77,15 +77,33 @@ df -h .                     # il faut au moins 2 Go libres
 
 Deux points relevés le 2026-11-15 sur ce poste, à traiter avant l'envoi.
 
-**L'adresse de commit sera publique.** L'identité locale a été alignée sur celle du dépôt de
-l'espace de travail, soit `Mathieu URBITSCH <23182124-Trustiatis@users.noreply.gitlab.com>`. Ce dépôt
-devant devenir public (obligation AGPL, voir l'étape 7), cette adresse apparaîtra dans
-l'historique, de façon permanente et moissonnable. Si ce n'est pas voulu, le changer
-**maintenant**, avant le premier envoi :
+**L'adresse de commit a été camouflée le 2026-11-16, avant la mise en public.** L'identité
+locale avait d'abord été alignée sur celle du dépôt de l'espace de travail, une adresse
+personnelle. Le dépôt devant devenir public (obligation AGPL, voir l'étape 7), elle serait
+apparue dans l'historique de façon permanente et moissonnable. Décision du Membre : la
+remplacer, nom compris, par l'adresse de redirection que GitLab attribue au compte
+Trustiatis, qui ne reçoit rien et ne désigne aucune personne.
+
+Trente-huit commits sur neuf branches ont été réécrits, et le document que vous lisez avec
+eux, puisqu'il citait l'adresse en toutes lettres. Ce qu'il faut retenir si le cas se
+represente :
+
+- **la réécriture a été bornée à nos commits**, par `^origin/upstream-v7.1.3`. Les 6 972
+  commits de l'amont gardent leurs empreintes, donc `upstream-v7.1.3` et l'étiquette
+  `v7.1.3` ne bougent pas et les reports futurs restent possibles ;
+- **les métadonnées ne suffisent pas**. L'adresse vivait aussi dans le contenu de ce
+  document, dans chacune de ses versions. Toujours chercher dans les fichiers, pas seulement
+  dans `%ae` et `%ce` ;
+- **les arbres ont été comparés avant et après** sur les neuf branches : contenu identique,
+  seules les identités ont changé ;
+- **`main` et `develop` refusent l'envoi forcé**, c'est la protection posée à l'étape 6. Il
+  faut l'autoriser le temps de l'envoi, puis la rétablir.
+
+L'identité à utiliser désormais sur ce dépôt :
 
 ```bash
-git config --local user.email "<adresse de redirection GitLab>"
-git commit --amend --reset-author --no-edit     # à répéter sur chaque commit existant
+git config --local user.name  "Trustiatis.com"
+git config --local user.email "23182124-Trustiatis@users.noreply.gitlab.com"
 ```
 
 **L'espace disque est juste.** Le poste avait 5 927 Mo libres, soit 85 % du disque occupé.
