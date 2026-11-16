@@ -321,10 +321,10 @@ et un groupe.
 | **`Trustiatis`**, affiché « Trustiatis.com » | **propriétaire de l'espace de noms** du projet, donc celui qui porte la consommation de CI. C'est un **compte utilisateur**, pas un groupe : `GET /groups/Trustiatis` répond 404 | id 23182124 |
 | le **compte personnel du Membre** | le compte dont la clé SSH pousse depuis ce poste, et celui qui est enregistré comme déclencheur des pipelines | non nommé ici : ce dépôt est public |
 
-Un fait, relevé le 2026-11-15 : dans l'espace personnel du Membre, des pipelines qu'il a
-déclenchés **réussissent**, le plus récent le 2026-10-27. Le même utilisateur,
-sur `Trustiatis/trustiatis-secure-chat`, se voit répondre que l'utilisateur n'est pas
-vérifié. La seule variable qui change est l'espace de noms.
+Un fait, relevé le 2026-11-15 : dans l'espace de noms personnel du Membre, des pipelines
+qu'il a déclenchés **réussissent**, le plus récent le 2026-10-27. Le même utilisateur, sur
+`Trustiatis/trustiatis-secure-chat`, se voit répondre que l'utilisateur n'est pas vérifié.
+La seule variable qui change est l'espace de noms.
 
 J'en avais conclu que `Trustiatis` était le compte à vérifier. **Cette conclusion n'est pas
 sûre**, et la documentation de GitLab explique pourquoi : la vérification d'identité y est
@@ -334,8 +334,8 @@ aussi d'un score de risque qui a changé entre octobre et novembre.
 
 **La bannière tranche sans discussion.** Se connecter d'abord en tant que `Trustiatis`,
 propriétaire de l'espace de noms, et ouvrir le pipeline. Si aucune bannière n'apparaît,
-recommencer connecté avec le compte personnel. Celui des deux qui voit la bannière est
-celui qu'il faut vérifier.
+recommencer connecté avec le compte personnel. Celui des deux qui voit la bannière est celui
+qu'il faut vérifier.
 
 ### La voie qu'il faudra prendre de toute façon : notre propre exécuteur
 
