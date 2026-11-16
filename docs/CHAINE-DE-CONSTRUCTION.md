@@ -466,3 +466,69 @@ dans Git. Ordre à respecter, faute de quoi la première poussée les déclenche
 4. réactiver les actions du dépôt, puis vérifier que seul « Paquets de bureau » est actif.
 
 À refaire pour tout fichier que l'amont ajouterait lors d'un report.
+
+### Ce que les trois premières constructions ont appris, le 2026-11-16
+
+Les paquets Windows et macOS de 7.1.2-ts1 sont sortis ce jour là, et il a fallu trois
+constructions. Ce qu'elles ont révélé est consigné ici parce que rien n'en était connu.
+
+| Construction | Branche | Résultat |
+|---|---|---|
+| #1 | `main` | macOS Apple Silicon et macOS Intel **réussies** en 16 min ; Windows en échec au bout de 1 min 56 |
+| #2 | `feature/branding` | Windows **bloquée** 27 min sans une ligne de sortie, interrompue |
+| #3 | `feature/branding` | Windows **réussie** en 11 min 14 |
+
+**Les deux systèmes macOS n'ont rien demandé.** `libs-depuis-amont.sh` a ouvert les `.dmg`
+de l'amont, posé les bibliothèques et rendu la main ; `prepare-vlc-mac.sh` a suivi ; Gradle
+a produit le `.dmg`. Aucun `install_name_tool` n'a été nécessaire, comme prévu : les
+bibliothèques du paquet d'amont portent déjà leurs chemins corrigés.
+
+**Windows a coûté deux échecs, de deux natures différentes.**
+
+Le premier : `msiexec` répond « This installation package could not be opened » et sort en
+1619, que le shell voit comme 83. L'empreinte du paquet venait d'être vérifiée, donc le
+fichier était intact : seul son chemin était en cause. `pwd -W` rend `C:/a/...` et `msiexec`
+n'ouvre un paquet qu'à la forme `C:\a\...`. Les deux chemins passent désormais par
+`cygpath -w`.
+
+Le second, et c'est le plus coûteux : l'option de journalisation `//l*v` ajoutée pour
+diagnostiquer le premier a fait **rester `msiexec` en vie sans fin**, sans une ligne de
+sortie. Devant une ligne de commande qu'il n'analyse pas, `msiexec` ouvre une fenêtre
+d'aide, que `/qn` ne supprime pas et que personne ne fermera sur une machine sans écran.
+L'option est retirée et l'appel est borné par `timeout 900`, sans quoi un `msiexec` qui
+attend occupe la machine jusqu'au plafond de six heures de GitHub.
+
+**Le lien vers les bibliothèques n'en est pas un sous Windows.** `ln -s` sous MSYS2 produit
+un lien que seuls les outils de MSYS2 savent suivre, et c'est la JVM qui lit ce chemin. Le
+script pose donc une **jonction de répertoire** (`cmd /c mklink /J`), qui en est un pour
+tout le monde et ne demande aucun droit particulier. Une copie ne conviendrait pas :
+`prepare-vlc-windows.sh` remplit le répertoire d'origine **après** ce script, et une copie
+ne verrait pas cet ajout, donc le paquet sortirait sans VLC.
+
+### Ce que contiennent les paquets, vérifié sans les installer
+
+| Paquet | Taille | SHA-256 |
+|---|---|---|
+| `trustiatis-secure-7.1.2-ts1-windows-x86_64.msi` | 257 089 536 o | `56857e6a138b84b560358312e3ebfe2bf8516c3c7e2dbf2c372697112d6746fb` |
+| `trustiatis-secure-7.1.2-ts1-windows-x86_64.exe` | 257 662 976 o | `b16775f8ff6e3c0ab844e996b4709319b7798b25c19056cb862aa15e6dae6ea0` |
+| `trustiatis-secure-7.1.2-ts1-macos-aarch64.dmg` | 269 843 829 o | `7eb852261f6454bbfeb687453f9354de38592d7dbb8817de26d31a55e5a39ece` |
+| `trustiatis-secure-7.1.2-ts1-macos-x86_64.dmg` | 283 114 289 o | `c5e969bc8a5533d4fb4bce10179574916bf5fb85184d33fdc6a8cc14d50be014` |
+
+Chaque empreinte a été recalculée sur le fichier reçu et comparée à celle que la machine de
+construction avait inscrite dans son artefact : les quatre correspondent.
+
+Le `.msi` a été inspecté depuis le poste Linux, sans l'installer : il porte `libsimplex.dll`,
+`libapp-lib.dll` et **363 greffons VLC** nommés, ce qui prouve que la jonction a tenu et que
+VLC est bien embarqué. Le nom de l'amont n'y apparaît **pas une fois**, le nôtre deux. Aucune
+bibliothèque `libHS*.dll` n'y figure, et c'est normal : sous Windows le runtime Haskell est
+lié dans `libsimplex.dll`, là où la chaîne Linux pose 166 bibliothèques séparées.
+
+Le contenu des deux `.dmg` n'a **pas** été inspecté : il n'y a pas de machine macOS ici, et
+une image disque HFS+ ne s'ouvre pas honnêtement autrement. Le nom que jpackage leur a donné,
+`Trustiatis Secure-7.1.2.dmg`, atteste au moins que la configuration de marque s'est
+appliquée.
+
+**Aucun de ces quatre paquets n'est signé.** Le groupe n'a de certificat de signature de code
+ni chez Apple ni pour Windows, et la décision appartient au Membre. Conséquence pour qui
+télécharge : macOS refuse le premier lancement, SmartScreen avertit. Le portail de
+téléchargement l'explique et donne la manoeuvre pour les deux systèmes.

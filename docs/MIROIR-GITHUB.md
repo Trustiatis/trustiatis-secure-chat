@@ -77,6 +77,34 @@ quatre autres dépôts du compte, et elle est sans phrase de passe sur une VM. �
 Settings puis Deploy keys de ce seul dépôt, avec « Allow write access », puis à retirer des
 clés du compte. Même clé, même empreinte, portée réduite à ce qui est nécessaire.
 
+## Fait le 2026-11-16 : les quatre paquets de bureau sont sortis
+
+Les actions ont été réactivées après neutralisation des huit fichiers hérités, et le dépôt
+rendu public. Relevé avant la première construction : les huit sont marqués **Disabled**,
+« Paquets de bureau » est le seul actif, et le dépôt comptait **zéro exécution**.
+
+| Construction | Branche | Ce qu'elle a produit |
+|---|---|---|
+| #1 | `main` | les deux `.dmg` ; Windows en échec |
+| #2 | `feature/branding` | rien, Windows bloquée puis interrompue |
+| #3 | `feature/branding` | le `.msi` et le `.exe` |
+
+Le détail des deux échecs Windows et de ce que contiennent les paquets est dans
+`docs/CHAINE-DE-CONSTRUCTION.md`, section 10. Les quatre paquets sont publiés sur
+`downloads.trustiatis.com`.
+
+Deux points de méthode qui ont servi et qui resserviront :
+
+- le `concurrency` du fichier est indexé sur la référence, donc une construction lancée sur
+  une autre branche ne touche pas celle qui tourne, et une seconde sur **la même** branche
+  interrompt la première. C'est ainsi que la construction bloquée a été arrêtée ;
+- `workflow_dispatch` n'exige la présence du fichier que sur la branche par défaut. Les
+  essais se font donc sur une branche de travail, sans rien verser dans `main` à chaque
+  correction.
+
+**La clé est toujours une clé du compte.** Le point relevé plus haut n'est pas réglé : elle
+donne l'écriture sur les quatre autres dépôts du compte, et elle est sans phrase de passe.
+
 ## 4. Neutraliser les huit fichiers hérités
 
 Cette neutralisation ne passe **pas** par une modification des fichiers : les éditer créerait
