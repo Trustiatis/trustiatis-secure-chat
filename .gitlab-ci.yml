@@ -124,13 +124,49 @@ coeur-intact:
       echo "Référence d'amont : $ref"
       git fetch --no-tags origin "refs/heads/$ref:refs/heads/$ref" 2>/dev/null \
         || echo "   (déjà présente localement)"
-      diff=$(git diff --name-only "$ref" HEAD -- src/ scripts/ flake.nix flake.lock cabal.project)
-      if [ -n "$diff" ]; then
+      # Le coeur et sa recette : aucune différence, jamais.
+      coeur=$(git diff --name-only "$ref" HEAD -- src/ flake.nix flake.lock cabal.project)
+      if [ -n "$coeur" ]; then
         echo "ERREUR : le coeur de l'amont a été modifié, ce qu'interdit la décision D-2 :"
-        echo "$diff"
+        echo "$coeur"
         exit 1
       fi
-      echo "Coeur intact."
+      # scripts/ se juge autrement, et c'est le 2026-11-16 qui l'a montré : comparer ce
+      # répertoire en bloc faisait échouer le contrôle sur des scripts qui sont de nous.
+      # Ajouter un fichier à côté de ceux de l'amont n'est pas modifier l'amont. Une
+      # modification d'un fichier de l'amont, elle, doit être nommée dans
+      # tools/amont-modifies.txt, et ce fichier renvoie à docs/BRANDING.md.
+      liste=tools/amont-modifies.txt
+      [ -f "$liste" ] || { echo "ERREUR : $liste est absent."; exit 1; }
+      git diff --name-status "$ref" HEAD -- scripts/ > etat-scripts.txt
+      : > fautes-scripts.txt
+      while read -r statut chemin reste; do
+        [ -n "$statut" ] || continue
+        case "$statut" in
+          A) continue ;;
+        esac
+        if grep -v '^[[:space:]]*#' "$liste" | grep -qxF "$chemin"; then
+          continue
+        fi
+        echo "  $statut $chemin $reste" >> fautes-scripts.txt
+      done < etat-scripts.txt
+      if [ -s fautes-scripts.txt ]; then
+        echo "ERREUR : des fichiers de l'amont sous scripts/ sont modifiés sans être"
+        echo "nommés dans $liste :"
+        cat fautes-scripts.txt
+        echo "Soit la modification n'a pas lieu d'être, soit elle est délibérée et doit"
+        echo "être consignée dans docs/BRANDING.md puis ajoutée à cette liste."
+        exit 1
+      fi
+      # Une entrée qui ne correspond plus à rien autorise en silence une modification
+      # future du même fichier. On ne fait pas échouer le job pour autant : après un
+      # report, un fichier peut légitimement redevenir identique à l'amont.
+      grep -v '^[[:space:]]*#' "$liste" | grep -v '^[[:space:]]*$' | while read -r voulu; do
+        if ! awk '{print $2}' etat-scripts.txt | grep -qxF "$voulu"; then
+          echo "AVERTISSEMENT : $voulu est dans $liste mais n'est plus modifié. Entrée à retirer."
+        fi
+      done
+      echo "Coeur intact, et les écarts sous scripts/ sont tous déclarés."
 
 # ---------------------------------------------------------------------------
 # Aucun secret committé.
