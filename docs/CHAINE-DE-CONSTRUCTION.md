@@ -293,3 +293,58 @@ Les deux derniers arguments ne sont pas décoratifs : le poste a 6,6 Gio de mém
 environ 2 disponibles. Les réglages par défaut du dépôt demandent 2 Gio pour Gradle **plus**
 4 Gio pour le démon Kotlin, soit davantage que la machine. La compilation en processus unique
 évite la seconde machine virtuelle Java.
+
+## 9. Construire la version signée d'Android
+
+Le chemin de l'amont, `scripts/android/compress-and-sign-apk.sh`, ne signe pas sur ce poste :
+il exige la commande `zip`, absente, et ne s'exécute que si `compression.level` n'est pas nul.
+La signature est donc faite par le greffon Android, configuré dans
+`apps/multiplatform/android/build.gradle.kts`.
+
+**Aucun secret n'est dans le dépôt.** Quatre variables d'environnement, et rien d'autre :
+
+| Variable | Rôle | Défaut |
+|---|---|---|
+| `TRUSTIATIS_KEYSTORE` | chemin du magasin de clés | aucun : sans elle, pas de signature |
+| `TRUSTIATIS_KEYSTORE_PASSWORD` | mot de passe du magasin | aucun |
+| `TRUSTIATIS_KEY_ALIAS` | alias de la clé | `trustiatis` |
+| `TRUSTIATIS_KEY_PASSWORD` | mot de passe de la clé | celui du magasin |
+
+**Seul le Membre peut lancer cette construction**, parce que lui seul connaît le mot de passe
+du magasin. L'agent ne le demande pas et ne le lit pas, voir le chapitre 6 du cadrage. La
+commande ne l'écrit nulle part, `read -rsp` ne l'affiche pas :
+
+```bash
+cd ~/Documents/claude/trustiatis-secure/apps/multiplatform
+. ~/outils/env-build.sh
+export PATH="$ANDROID_HOME/cmake/3.22.1/bin:$PATH"
+export TRUSTIATIS_KEYSTORE="$HOME/trustiatis-secure.jks"
+export TRUSTIATIS_KEY_ALIAS=trustiatis
+read -rsp "Mot de passe du magasin : " TRUSTIATIS_KEYSTORE_PASSWORD && echo
+export TRUSTIATIS_KEYSTORE_PASSWORD
+./gradlew assembleFossRelease --no-daemon --console=plain \
+  -Dorg.gradle.jvmargs="-Xmx2200m -Dfile.encoding=UTF-8" \
+  -Pkotlin.compiler.execution.strategy=in-process
+```
+
+Contrôle d'après construction, qui ne demande aucun secret :
+
+```bash
+$ANDROID_HOME/build-tools/36.0.0/apksigner verify -v --print-certs \
+  android/build/outputs/apk/foss/release/android-foss-arm64-v8a-release.apk
+```
+
+Attendu : `Signer #1 certificate SHA-256 digest:`
+`502cbc06654a134d536bf496ac44f1013a50c3dcfcd5beba5d61dd70f7c9c82f`, v2 et v3 vraies.
+**v1 fausse est normal** à `minSdk 26`, ce n'est pas un défaut à corriger.
+
+**Piège de `/tmp` sur cette VM.** `jpackage` assemble l'image du paquet dans
+`/tmp/jdk.jpackage*`, or `/tmp` est un **tmpfs de 3,4 Gio** pris sur la mémoire. Un dossier
+de travail volumineux laissé là, par exemple un `.deb` de 600 Mo décompressé pour vérifier
+son contenu, fait échouer `packageDeb` sur `dpkg-deb ... exited with 2 code`, sans message
+sur l'espace. Vider `/tmp` avant d'empaqueter, et décompresser ailleurs.
+
+**Reconstruire après chaque modification de l'interface.** Un APK signé ne vaut que pour
+l'état des sources au moment où il a été empaqueté, et les deux plateformes ne se
+construisent pas ensemble sur cette VM : comparer la date du paquet à celle des sources avant
+de livrer. C'est ainsi qu'un paquet Debian antérieur aux retraits de P-7 bis a été écarté.

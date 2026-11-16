@@ -89,7 +89,7 @@ don de soutien, ce n'est pas possible ».
 
 | N° | Décision | Portée |
 |---|---|---|
-| **P-7 bis** | **L'appel au soutien de SimpleX Chat n'apparaît pas dans Trustiatis Secure.** La décision P-7, qui le conservait, est annulée | quatre points d'entrée fermés, et un cinquième réécrit |
+| **P-7 bis** | **L'appel au soutien de SimpleX Chat n'apparaît pas dans Trustiatis Secure.** La décision P-7, qui le conservait, est annulée | cinq points d'entrée fermés, et un sixième réécrit |
 
 **Ce qui est fermé, et comment.** La méthode est celle de P-5 et du risque T-02 : on neutralise
 la porte, pas ses appelants, pour qu'un report de l'amont ne conflicte que sur une ligne.
@@ -100,6 +100,7 @@ la porte, pas ses appelants, pour qu'un report de l'amont ne conflicte que sur u
 | entrée des badges dans les réglages | retirée. Sans badge, son intitulé est « Support SimpleX » : c'est l'appel au soutien, à l'endroit le plus vu |
 | section « soutenir le projet » des réglages | retirée : elle menait à la page de contribution de l'amont, à sa fiche Google Play (`chat.simplex.app`, qui n'est pas notre application) et à son dépôt GitHub |
 | canal d'actualités et canal du fondateur de l'amont | retirés : ils adressent un client de Trustiatis à un éditeur qui ne le connaît pas |
+| lien vers le client en ligne de commande de l'amont, dans les réglages développeur | retiré. **Oubli de la première mise en oeuvre**, relevé en ouvrant le paquet construit : les cinq autres portes étaient fermées, celle ci s'affichait encore et menait au dépôt GitHub de l'amont |
 | « nous écrire » | **réécrit** vers `support@trustiatis.com`, ce que `NOTICE-AGPL.md` prescrit pour cette catégorie |
 
 **Ce que la décision coûte, et il faut le savoir.** Le badge était un **achat** qui rendait un
@@ -108,6 +109,15 @@ cette capacité de l'interface. Le code des badges reste en place, et le badge d
 correspondant continue de s'afficher dans son profil : c'est une information sur lui, pas une
 sollicitation adressée à l'utilisateur. Rouvrir la seule entrée des badges, sans rouvrir le
 financement, reste donc possible d'une ligne si le Membre le souhaite.
+
+**Ce qui reste, et pourquoi.** Trois composables de l'amont ne sont plus appelés par personne
+et restent dans le fichier : `ContributeItem`, `StarOnGithubItem`, `RateAppItem`,
+`InstallTerminalAppItem`. Un écran qu'aucun appelant n'atteint ne s'affiche pas, et les
+laisser en place évite un conflit de report à chaque version de l'amont. **En revanche, les
+liens de `OperatorView` et de `NetworkAndServers` vers le dépôt de l'amont ne sont pas
+touchés** : ils pointent les conditions d'utilisation du réseau et leurs commits, qui sont
+réellement publiés là. Les réécrire serait faux, et la décision D-4 retient les serveurs de
+la communauté.
 
 **Ce qui n'est pas touché.** Les chaînes restent dans les quarante-deux catalogues. Les
 retirer voudrait dire toucher quarante-deux fichiers que l'amont réécrit à chaque version,

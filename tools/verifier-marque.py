@@ -73,7 +73,12 @@ EXTENSIONS = {
 # la décision D-4 garde les serveurs de la communauté, donc les conditions
 # d'utilisation de l'opérateur (son PRIVACY.md) doivent rester lisibles ;
 # l'historique des nouveautés décrit les versions de l'AMONT, donc renvoyer à
-# ses billets est exact ; et la décision P-7 conserve les liens de contribution.
+# ses billets est exact ; et les conditions d'utilisation du réseau, avec le commit
+# qui les date, sont réellement publiées dans le dépôt de l'amont (décision D-4).
+# ATTENTION : cette tolérance ne dit rien des renvois vers l'ÉDITEUR. P-7 bis les
+# ferme, et comme ces URL ne sont pas signalées, le contrôle ne les trouvera pas :
+# vérifier les appelants à la main, c'est ainsi que l'entrée du client en ligne de
+# commande a été retrouvée, après la première mise en oeuvre de P-7 bis.
 #
 # Cette liste passe EN PREMIER dans l'alternance, et ce n'est pas un détail de
 # présentation : une alternance Python essaie ses branches dans l'ordre, et la
