@@ -1,0 +1,22 @@
+# Fichiers de l'amont que nous modifions volontairement, sous scripts/.
+#
+# Pourquoi cette liste existe. La décision D-2 dit que le coeur de l'amont n'est pas
+# modifié, et le job « coeur-intact » de la CI le vérifie. Sa première écriture comparait
+# scripts/ en bloc et exigeait zéro différence. C'était trop large de deux façons :
+#
+#   - ajouter un script à nous à côté de ceux de l'amont n'est pas modifier l'amont, et
+#     pourtant le contrôle échouait. C'est ainsi qu'il a bloqué la première demande de
+#     fusion, le 2026-11-16, pour scripts/desktop/libs-depuis-amont.sh et
+#     scripts/desktop/installer-sans-root.sh, qui sont tous deux de nous ;
+#   - et il ne distinguait pas une modification délibérée et consignée d'une modification
+#     subie. Or il y en a une, et elle est dans docs/BRANDING.md depuis le début.
+#
+# Le contrôle est donc devenu : aucune différence sur src/, flake.nix, flake.lock et
+# cabal.project, jamais ; sous scripts/, nos ajouts sont permis, et une modification d'un
+# fichier de l'amont n'est permise que si son chemin figure ici.
+#
+# Un chemin par ligne, exactement tel que « git diff --name-status » l'imprime. Toute
+# entrée ajoutée ici doit avoir son entrée correspondante dans docs/BRANDING.md : cette
+# liste dit ce qui est toléré, le tableau de BRANDING.md dit pourquoi.
+
+scripts/desktop/make-appimage-linux.sh

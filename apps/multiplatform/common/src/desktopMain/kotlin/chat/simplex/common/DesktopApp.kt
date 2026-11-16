@@ -127,13 +127,13 @@ private fun ApplicationScope.AppWindow(closedByError: MutableState<Boolean>) {
       } else {
         false
       }
-    }, title = "SimpleX") {
+    }, title = "Trustiatis Secure") {
 //      val hardwareAccelerationDisabled = remember { listOf(GraphicsApi.SOFTWARE_FAST, GraphicsApi.SOFTWARE_COMPAT, GraphicsApi.UNKNOWN).contains(window.renderApi) }
       simplexWindowState.window = window
       AppScreen()
       if (simplexWindowState.openDialog.isAwaiting) {
         FileDialogChooser(
-          title = "SimpleX",
+          title = "Trustiatis Secure",
           isLoad = true,
           params = simplexWindowState.openDialog.params,
           onResult = {
@@ -144,7 +144,7 @@ private fun ApplicationScope.AppWindow(closedByError: MutableState<Boolean>) {
 
       if (simplexWindowState.openMultipleDialog.isAwaiting) {
         FileDialogChooser(
-          title = "SimpleX",
+          title = "Trustiatis Secure",
           isLoad = true,
           params = simplexWindowState.openMultipleDialog.params,
           onResult = {
@@ -155,7 +155,7 @@ private fun ApplicationScope.AppWindow(closedByError: MutableState<Boolean>) {
 
       if (simplexWindowState.saveDialog.isAwaiting) {
         FileDialogChooser(
-          title = "SimpleX",
+          title = "Trustiatis Secure",
           isLoad = false,
           params = simplexWindowState.saveDialog.params,
           onResult = { simplexWindowState.saveDialog.onResult(it.firstOrNull()) }

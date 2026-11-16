@@ -72,8 +72,40 @@ par mois pour 20 Go.
 
 Le client Desktop de l'amont interroge **en dur** l'API GitHub de SimpleX
 (`AppUpdater.kt`, ligne 188). Non corrigé, Trustiatis Secure proposerait d'installer le paquet
-SimpleX par dessus lui même : c'est le **risque T-02** de l'audit de Phase 1, et sa correction
-est inscrite en Phase 2.
+SimpleX par dessus lui même : c'est le **risque T-02** de l'audit de Phase 1.
+
+**Le chemin est neutralisé depuis le 2026-11-15**, en deux endroits, selon la méthode déjà
+employée pour P-5 sur iOS :
+
+| Endroit | Ce qui change |
+|---|---|
+| `SettingsView.desktop.kt` | le sélecteur de canal est remplacé par un texte qui renvoie au portail |
+| `AppUpdater.kt`, `setupUpdateChecker()` | verrou de dernier recours : la préférence est ramenée au cas désactivé, et la fonction sort |
+
+Le verrou n'est pas une précaution de principe. La préférence est lue dans un fichier de
+réglages qui peut venir d'ailleurs, d'une installation antérieure de l'application officielle
+ou d'une archive importée, et `setupUpdateChecker()` est le **seul** chemin par lequel la
+vérification démarre. Les trois cas de `AppUpdatesChannel` sont **conservés** : la préférence
+est persistée par le nom de la valeur.
+
+Ce qu'il restait de l'identité de l'amont dans la même zone a été corrigé en même temps, parce
+que ces constantes décident de vraies associations sur le poste de l'utilisateur :
+
+| Constante | Pourquoi elle ne pouvait pas rester |
+|---|---|
+| `WINDOWS_PROG_ID_PREFIX`, `WINDOWS_CAPABILITIES_KEY` | notre installation et celle de l'application officielle écrivaient **les mêmes clés de registre**, et se volaient donc l'association de protocole |
+| `DEB_ENTRY_NAME` | il nommait `simplex-simplex.desktop` alors que notre paquet installe `trustiatis-secure-trustiatis-secure.desktop`, donc le contrôle d'enregistrement répondait **toujours non** |
+| `APPIMAGE_ENTRY_NAME`, `APP_DISPLAY_NAME`, `APP_DESCRIPTION` | vus de l'utilisateur, dans les applications par défaut de Windows |
+| `ISSUES_URL`, `SUPPORT_EMAIL` de `StartupError.kt` | la fenêtre d'erreur au démarrage envoyait la **trace d'exécution du poste d'un client** à l'éditeur amont |
+
+Les sept tests de `AppLinkSchemeTest` qui affirment ces valeurs ont été mis à jour, et ce sont
+eux qui prouvent la cohérence entre le code et le paquet.
+
+**Ce que le paquet Debian ne sait toujours pas faire.** L'entrée de bureau que jpackage écrit
+porte `MimeType=` vide, et Compose Desktop n'expose pas le moyen de la remplir. Installé par
+`.deb`, le client **n'enregistre donc pas** `x-scheme-handler/simplex`, et un lien d'invitation
+cliqué dans un navigateur ne lui parviendra pas. L'AppImage, elle, écrit sa propre entrée et
+n'a pas ce défaut. À traiter par un post-traitement du paquet.
 
 Le portail publie déjà l'index de remplacement, à l'adresse
 `https://downloads.trustiatis.com/maj/stable.json`, servi comme ressource statique, donc
@@ -116,6 +148,8 @@ trustiatis-secure-<version>-desktop-linux-x86_64.AppImage
 
 - [ ] activer R2 sur le compte Cloudflare Trustiatis et créer le bucket
 - [ ] déployer le Worker et attacher `downloads.trustiatis.com`
-- [ ] corriger l'URL de mise à jour dans `AppUpdater.kt` (Phase 2)
+- [x] neutraliser le vérificateur de mises à jour de l'amont (risque T-02), fait le 2026-11-15
+- [ ] faire lire l'index du portail par le client Desktop, en remplacement
+- [ ] remplir le `MimeType` de l'entrée de bureau du paquet Debian, par post-traitement
 - [ ] ajouter la vérification du SHA-256 avant installation dans le client Desktop
 - [ ] construire, signer et publier la première version

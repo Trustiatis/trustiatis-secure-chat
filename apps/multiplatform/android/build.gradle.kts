@@ -12,7 +12,13 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "chat.simplex.app"
+        // L'identifiant de distribution est celui de Trustiatis : une version
+        // dérivée ne peut pas porter celui de l'amont, ni sur un magasin, ni sur
+        // un appareil où les deux doivent pouvoir cohabiter.
+        applicationId = "com.trustiatis.secure"
+        // Le namespace reste celui de l'amont : il ne nomme que les classes R et
+        // BuildConfig, il n'est pas vu de l'utilisateur, et le changer obligerait
+        // à déplacer les sources Kotlin, donc à rendre chaque report conflictuel.
         namespace = "chat.simplex.app"
         minSdk = 26
         targetSdk = 36
@@ -31,7 +37,7 @@ android {
             }
         }
         manifestPlaceholders["app_name"] = "@string/app_name"
-        manifestPlaceholders["provider_authorities"] = "chat.simplex.app.provider"
+        manifestPlaceholders["provider_authorities"] = "com.trustiatis.secure.provider"
         manifestPlaceholders["extract_native_libs"] = rootProject.extra["compression.level"] as Int != 0
     }
 
@@ -50,17 +56,49 @@ android {
         }
     }
 
+    // Signature de version. Le chemin de l'amont ne sert pas ici : il passe par
+    // scripts/android/compress-and-sign-apk.sh, qui exige la commande `zip`, et il ne
+    // s'exécute que si compression.level n'est pas nul, ce qui n'est pas le cas sur un
+    // poste sans `zip`. Cette configuration ci signe par le greffon Android lui même.
+    //
+    // **Aucun secret n'entre dans le dépôt**, ce qu'interdit le chapitre 6 du cahier des
+    // charges et CONTRIBUTING.md : ni chemin de magasin, ni mot de passe, ni alias en dur.
+    // Tout est lu dans l'environnement, que l'opérateur pose dans son shell et que la CI
+    // injecte par variables, depuis KeePassXC puis Vault.
+    //
+    // Sans TRUSTIATIS_KEYSTORE, aucune configuration n'est créée et la compilation de
+    // débogage continue de fonctionner comme avant : la signature de version est alors
+    // simplement absente, et le greffon le dira.
+    signingConfigs {
+        val magasin = System.getenv("TRUSTIATIS_KEYSTORE")
+        if (!magasin.isNullOrBlank()) {
+            create("trustiatis") {
+                storeFile = File(magasin)
+                storePassword = System.getenv("TRUSTIATIS_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("TRUSTIATIS_KEY_ALIAS") ?: "trustiatis"
+                // Un magasin créé par keytool sans mot de passe de clé distinct reprend
+                // celui du magasin : c'est le cas courant, et le défaut le reflète.
+                keyPassword = System.getenv("TRUSTIATIS_KEY_PASSWORD")
+                    ?: System.getenv("TRUSTIATIS_KEYSTORE_PASSWORD")
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
+            }
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = rootProject.extra["application_id.suffix"] as String
             isDebuggable = rootProject.extra["enable_debuggable"] as Boolean
             manifestPlaceholders["app_name"] = rootProject.extra["app.name"] as String
             // Provider can"t be the same for different apps on the same device
-            manifestPlaceholders["provider_authorities"] = "chat.simplex.app${rootProject.extra["application_id.suffix"]}.provider"
+            manifestPlaceholders["provider_authorities"] = "com.trustiatis.secure${rootProject.extra["application_id.suffix"]}.provider"
         }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfigs.findByName("trustiatis")?.let { signingConfig = it }
         }
     }
     kotlinOptions {
@@ -244,7 +282,7 @@ tasks {
 
                 if (project.properties["android.injected.signing.key.alias"] != null && buildType == "release") {
                     val flavor = variant.removeSuffix("Release").lowercase()
-                    mapOf("arm64-v8a" to "simplex.apk", "armeabi-v7a" to "simplex-armv7a.apk").forEach { (abi, name) ->
+                    mapOf("arm64-v8a" to "trustiatis-secure.apk", "armeabi-v7a" to "trustiatis-secure-armv7a.apk").forEach { (abi, name) ->
                         if (!File(outputDir, "android-$flavor-$abi-release.apk").renameTo(File(outputDir, name))) {
                             logger.warn("No $abi apk to rename to $name")
                         }

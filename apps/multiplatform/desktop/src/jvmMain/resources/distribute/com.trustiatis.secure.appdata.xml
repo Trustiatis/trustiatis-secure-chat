@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.trustiatis.secure</id>
+  <launchable type="desktop-id">com.trustiatis.secure.desktop</launchable>
+  <metadata_license>FSFAP</metadata_license>
+  <project_license>AGPL-3.0</project_license>
+  <name>Trustiatis Secure</name>
+  <summary>Canal confidentiel de Trustiatis, chiffré de bout en bout, sans compte</summary>
+
+  <description>
+    <p>Trustiatis Secure est la messagerie que Trustiatis emploie avec ses clients pour tout ce qui est sensible : identifiants d'accès, constats d'audit, schémas de réseau, clés de récupération. Elle sert aussi aux échanges internes de ces mêmes clients, sans licence à acheter ni compte à créer.</p>
+    <p>Ce qu'elle apporte :</p>
+    <ul>
+      <li>messages chiffrés de bout en bout, avec modification, réponse et suppression.</li>
+      <li>images, fichiers, appels audio et vidéo, chiffrés de la même façon.</li>
+      <li>aucun compte, aucun identifiant, aucun numéro de téléphone : on se connecte par un lien ou un code QR à usage unique.</li>
+      <li>base de données et fichiers chiffrés sur l'appareil.</li>
+      <li>groupes dont l'existence et la composition ne sont connues que de leurs membres.</li>
+      <li>profil transportable d'un appareil à l'autre.</li>
+    </ul>
+    <p>Trustiatis n'exploite aucun serveur relais de ce réseau et ne peut donc pas lire les messages qui y circulent. Chaque interlocuteur présente sa carte d'identité issue de id.trustiatis.com à l'ouverture d'une conversation : c'est ainsi que l'identité se prouve, puisque le réseau lui même n'en détient aucune.</p>
+    <p>L'application est une version Trustiatis d'une messagerie libre qui fonctionne sur le réseau SimpleX. La cryptographie et le protocole ne sont pas modifiés, et l'intégralité du code source est publiée.</p>
+  </description>
+
+  <url type="homepage">https://downloads.trustiatis.com</url>
+  <url type="contact">https://trustiatis.com</url>
+
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="7.1.2" date="2026-11-15">
+      <description>
+        <p>Première version compilée de Trustiatis Secure, non publiée.</p>
+      </description>
+    </release>
+  </releases>
+</component>

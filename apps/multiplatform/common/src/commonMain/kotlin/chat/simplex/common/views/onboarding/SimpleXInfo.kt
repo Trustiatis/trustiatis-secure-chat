@@ -159,7 +159,20 @@ fun SimpleXInfoLayout(
           })
         }
       } else {
-        Spacer(Modifier)
+        // Contrepartie technique de la décision P-7 : garder l'appel au soutien de
+        // l'amont dans une application nommée autrement peut se lire comme une
+        // affiliation, que sa politique de marque interdit. Le texte est celui de
+        // NOTICE-AGPL.md, et cette branche est exactement l'écran « À propos »
+        // ouvert depuis les réglages : pendant l'accueil, onboardingStage n'est
+        // jamais nul, donc la mention n'encombre pas le premier démarrage.
+        Text(
+          stringResource(MR.strings.trustiatis_non_affiliation),
+          style = MaterialTheme.typography.body2,
+          color = MaterialTheme.colors.secondary,
+          textAlign = TextAlign.Center,
+          lineHeight = 20.sp,
+          modifier = Modifier.widthIn(max = 600.dp).padding(vertical = DEFAULT_PADDING)
+        )
       }
     }
   )

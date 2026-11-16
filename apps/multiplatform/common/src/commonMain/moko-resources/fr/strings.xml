@@ -2,7 +2,7 @@
 <resources>
     <string name="thousand_abbreviation">k</string>
     <string name="connect_via_contact_link">Se connecter via l\'adresse du contact ?</string>
-    <string name="app_name" translatable="false">SimpleX</string>
+    <string name="app_name" translatable="false">Trustiatis Secure</string>
     <string name="profile_will_be_sent_to_contact_sending_link">Votre profil va être envoyé au contact qui vous a envoyé ce lien.</string>
     <string name="you_will_join_group">Vous vous connecterez à tous les membres du groupe.</string>
     <string name="connect_via_group_link">Rejoindre le groupe ?</string>
@@ -83,7 +83,7 @@
     <string name="turn_off_battery_optimization"><![CDATA[<b>Autoriser le</b> dans la boîte de dialogue suivante pour recevoir des notifications instantanément.]]></string>
     <string name="error_smp_test_server_auth">Le serveur requiert une autorisation pour créer des files d\'attente, vérifiez le mot de passe.</string>
     <string name="periodic_notifications_desc">L\'application récupère périodiquement les nouveaux messages - elle utilise un peu votre batterie chaque jour. L\'application n\'utilise pas les notifications push - les données de votre appareil ne sont pas envoyées aux serveurs.</string>
-    <string name="to_preserve_privacy_simplex_has_background_service_instead_of_push_notifications_it_uses_a_few_pc_battery"><![CDATA[Pour protéger votre vie privée, <b>SimpleX fonctionne en arrière-plan</b> au lieu d\'utiliser les notifications push.]]></string>
+    <string name="to_preserve_privacy_simplex_has_background_service_instead_of_push_notifications_it_uses_a_few_pc_battery"><![CDATA[Pour protéger votre vie privée, <b>cette application fonctionne en arrière-plan</b> au lieu d\'utiliser les notifications push.]]></string>
     <string name="hide_notification">Cacher</string>
     <string name="settings_notification_preview_mode_title">Aperçu affiché</string>
     <string name="notification_preview_mode_contact">Nom du contact</string>
@@ -91,15 +91,15 @@
     <string name="notification_preview_new_message">nouveau message</string>
     <string name="notification_new_contact_request">Nouvelle demande de contact</string>
     <string name="notification_contact_connected">Connecté</string>
-    <string name="la_notice_title_simplex_lock">Verrouillage SimpleX</string>
+    <string name="la_notice_title_simplex_lock">Verrouillage Trustiatis</string>
     <string name="la_notice_turn_on">Activer</string>
-    <string name="auth_simplex_lock_turned_on">Verrouillage SimpleX activé</string>
+    <string name="auth_simplex_lock_turned_on">Verrouillage Trustiatis activé</string>
     <string name="auth_you_will_be_required_to_authenticate_when_you_start_or_resume">Il vous sera demandé de vous authentifier lorsque vous démarrez ou reprenez l\'application après 30 secondes en arrière-plan.</string>
     <string name="auth_unlock">Déverrouiller</string>
-    <string name="auth_enable_simplex_lock">Activer le Verrouillage SimpleX</string>
-    <string name="auth_disable_simplex_lock">Désactiver le Verrouillage SimpleX</string>
+    <string name="auth_enable_simplex_lock">Activer le Verrouillage Trustiatis</string>
+    <string name="auth_disable_simplex_lock">Désactiver le Verrouillage Trustiatis</string>
     <string name="auth_unavailable">Authentification indisponible</string>
-    <string name="auth_device_authentication_is_disabled_turning_off">L\'authentification de l\'appareil est désactivée. Désactivation du Verrouillage SimpleX.</string>
+    <string name="auth_device_authentication_is_disabled_turning_off">L\'authentification de l\'appareil est désactivée. Désactivation du Verrouillage Trustiatis.</string>
     <string name="auth_open_chat_console">Ouvrir la console de messagerie</string>
     <string name="message_delivery_error_title">Erreur de distribution du message</string>
     <string name="message_delivery_error_desc">Il est fort probable que ce contact ait supprimé la connexion avec vous.</string>
@@ -117,11 +117,11 @@
     <string name="your_chats">Conversations</string>
     <string name="notification_preview_mode_message">Texte du message</string>
     <string name="notification_preview_mode_hidden">Caché</string>
-    <string name="la_notice_to_protect_your_information_turn_on_simplex_lock_you_will_be_prompted_to_complete_authentication_before_this_feature_is_enabled">Pour protéger vos informations, activez le Verrouillage SimpleX.\nUne authentification vous sera demandée avant que cette fonctionnalité ne soit activée.</string>
-    <string name="auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled">L\'authentification de l\'appareil n\'est pas activée. Vous pouvez activer le Verrouillage SimpleX dans les Paramètres une fois l\'authentification de l\'appareil activée.</string>
+    <string name="la_notice_to_protect_your_information_turn_on_simplex_lock_you_will_be_prompted_to_complete_authentication_before_this_feature_is_enabled">Pour protéger vos informations, activez le Verrouillage Trustiatis.\nUne authentification vous sera demandée avant que cette fonctionnalité ne soit activée.</string>
+    <string name="auth_device_authentication_is_not_enabled_you_can_turn_on_in_settings_once_enabled">L\'authentification de l\'appareil n\'est pas activée. Vous pouvez activer le Verrouillage Trustiatis dans les Paramètres une fois l\'authentification de l\'appareil activée.</string>
     <string name="database_initialization_error_desc">La base de données ne fonctionne pas correctement. Appuyez ici pour en savoir plus.</string>
-    <string name="ntf_channel_calls">Appels SimpleX Chat</string>
-    <string name="ntf_channel_messages">Messages SimpleX Chat</string>
+    <string name="ntf_channel_calls">Appels Trustiatis Secure</string>
+    <string name="ntf_channel_messages">Messages Trustiatis Secure</string>
     <string name="settings_notifications_mode_title">Service de notification</string>
     <string name="notifications_mode_periodic">Lancer périodiquement</string>
     <string name="notifications_mode_off">Exécuter lorsque l’app est ouverte</string>
@@ -133,7 +133,7 @@
     <string name="settings_notification_preview_title">Aperçu de notification</string>
     <string name="database_initialization_error_title">Échec d’initialisation de la base de données</string>
     <string name="enter_passphrase_notification_desc">Pour recevoir des notifications, veuillez entrer la phrase secrète de la base de données</string>
-    <string name="simplex_service_notification_title">service SimpleX Chat</string>
+    <string name="simplex_service_notification_title">Trustiatis Secure</string>
     <string name="group_preview_join_as">Rejoindre en tant que %s</string>
     <string name="group_preview_you_are_invited">Vous êtes invité·e au groupe</string>
     <string name="chat_with_developers">Discuter avec les développeurs</string>
@@ -196,7 +196,7 @@
     <string name="to_start_a_new_chat_help_header">Pour démarrer une nouvelle conversation</string>
     <string name="chat_help_tap_button">Appuyez sur le bouton</string>
     <string name="to_connect_via_link_title">Pour se connecter via un lien</string>
-    <string name="if_you_received_simplex_invitation_link_you_can_open_in_browser">Si vous avez reçu un lien d\'invitation SimpleX Chat, vous pouvez l\'ouvrir dans votre navigateur :</string>
+    <string name="if_you_received_simplex_invitation_link_you_can_open_in_browser">Si vous avez reçu un lien d\'invitation SimpleX, vous pouvez l\'ouvrir dans votre navigateur :</string>
     <string name="desktop_scan_QR_code_from_app_via_scan_QR_code"><![CDATA[💻 ordinateur : scannez le QR code affiché depuis l’application, via <b>Scanner le QR code</b>.]]></string>
     <string name="mobile_tap_open_in_mobile_app_then_tap_connect_in_app"><![CDATA[📱 mobile : appuyez sur <b>Ouvrir dans l\'application</b>, puis appuyez sur <b>se connecter</b> dans l\'app.]]></string>
     <string name="accept_contact_incognito_button">Accepter en incognito</string>
@@ -252,7 +252,7 @@
     <string name="contact_wants_to_connect_with_you">veut établir une connexion !</string>
     <string name="icon_descr_profile_image_placeholder">image de profil (placeholder)</string>
     <string name="image_descr_qr_code">QR Code</string>
-    <string name="image_descr_simplex_logo">Logo SimpleX</string>
+    <string name="image_descr_simplex_logo">Logo Trustiatis Secure</string>
     <string name="icon_descr_email">E-mail</string>
     <string name="connect_button">Se connecter</string>
     <string name="notifications_mode_off_desc">L\'application peut recevoir des notifications uniquement lorsqu\'elle est en cours d\'exécution, aucun service d\'arrière-plan ne sera lancé.</string>
@@ -272,7 +272,7 @@
     <string name="voice_message">Message vocal</string>
     <string name="toast_permission_denied">Autorisation refusée !</string>
     <string name="use_camera_button">Appareil\nphoto</string>
-    <string name="thank_you_for_installing_simplex">Merci d\'avoir installé SimpleX Chat !</string>
+    <string name="thank_you_for_installing_simplex">Merci d\'avoir installé Trustiatis Secure !</string>
     <string name="you_can_connect_to_simplex_chat_founder"><![CDATA[Vous pouvez <font color="#0088ff">vous connecter aux développeurs de SimpleX Chat pour leur poser des questions et recevoir des réponses :</font>.]]></string>
     <string name="above_then_preposition_continuation">ci-dessus, puis :</string>
     <string name="if_you_choose_to_reject_the_sender_will_not_be_notified">Si vous choisissez de la rejeter, l\'expéditeur·rice NE sera PAS notifié·e.</string>
@@ -299,7 +299,7 @@
     <string name="network_enable_socks_info">Accéder aux serveurs via un proxy SOCKS sur le port %d ? Le proxy doit être démarré avant d\'activer cette option.</string>
     <string name="network_use_onion_hosts">Utiliser les hôtes .onions</string>
     <string name="your_settings">Vos paramètres</string>
-    <string name="chat_lock">Verrouillage SimpleX</string>
+    <string name="chat_lock">Verrouillage Trustiatis</string>
     <string name="chat_console">Console de la messagerie</string>
     <string name="smp_servers_test_servers">Tester les serveurs</string>
     <string name="smp_servers_save">Enregistrer les serveurs</string>
@@ -332,7 +332,7 @@
     <string name="your_profile_is_stored_on_your_device">Votre profil, vos contacts et les messages reçus sont stockés sur votre appareil.</string>
     <string name="profile_is_only_shared_with_your_contacts">Le profil n\'est partagé qu\'avec vos contacts.</string>
     <string name="display_name_cannot_contain_whitespace">Le nom d\'affichage ne peut pas contenir d\'espace.</string>
-    <string name="about_simplex">À propos de SimpleX</string>
+    <string name="about_simplex">À propos de Trustiatis Secure</string>
     <string name="you_can_use_markdown_to_format_messages__prompt">Vous pouvez utiliser le format markdown pour mettre en forme les messages :</string>
     <string name="bold_text">gras</string>
     <string name="italic_text">italique</string>
@@ -350,7 +350,7 @@
     <string name="onboarding_notifications_mode_periodic">Périodique</string>
     <string name="onboarding_notifications_mode_service">Instantanée</string>
     <string name="onboarding_notifications_mode_off_desc"><![CDATA[<b>Économie de batterie</b>. Vous recevrez des notifications uniquement lorsque l\'application est en cours d\'exécution (PAS de service d\'arrière-plan)]]></string>
-    <string name="about_simplex_chat">À propos de SimpleX Chat</string>
+    <string name="about_simplex_chat">À propos de Trustiatis Secure</string>
     <string name="how_to_use_simplex_chat">Comment l\'utiliser</string>
     <string name="markdown_help">Aide Markdown</string>
     <string name="save_servers_button">Enregistrer</string>
@@ -532,7 +532,7 @@
     <string name="webrtc_ice_servers">Serveurs WebRTC ICE</string>
     <string name="relay_server_protects_ip">Le serveur relais protège votre adresse IP, mais il peut observer la durée de l\'appel.</string>
     <string name="relay_server_if_necessary">Le serveur relais n\'est utilisé que si nécessaire. Un tiers peut observer votre adresse IP.</string>
-    <string name="open_simplex_chat_to_accept_call">Ouvrez SimpleX Chat pour accepter l\'appel</string>
+    <string name="open_simplex_chat_to_accept_call">Ouvrez Trustiatis Secure pour accepter l\'appel</string>
     <string name="status_no_e2e_encryption">sans chiffrement de bout en bout</string>
     <string name="status_contact_has_e2e_encryption">Ce contact a le chiffrement de bout en bout</string>
     <string name="status_contact_has_no_e2e_encryption">Ce contact n\'a pas le chiffrement de bout en bout</string>
@@ -979,8 +979,8 @@
     <string name="network_socks_proxy_settings">Paramètres de proxy SOCKS</string>
     <string name="network_socks_toggle_use_socks_proxy">Utiliser un proxy SOCKS</string>
     <string name="disable_onion_hosts_when_not_supported"><![CDATA[Définissez <i>Utiliser les hôtes .onion</i> sur Non si le proxy SOCKS ne les prend pas en charge.]]></string>
-    <string name="la_lock_mode">Mode de Verrouillage SimpleX</string>
-    <string name="lock_not_enabled">Le Verrouillage SimpleX n\'est pas activé !</string>
+    <string name="la_lock_mode">Mode de Verrouillage Trustiatis</string>
+    <string name="lock_not_enabled">Le Verrouillage Trustiatis n\'est pas activé !</string>
     <string name="la_lock_mode_system">Authentification du système</string>
     <string name="la_authenticate">Authentification</string>
     <string name="la_auth_failed">Échec de l’authentification</string>
@@ -1035,7 +1035,7 @@
     <string name="la_could_not_be_verified">Vous n\'avez pas pu être vérifié·e ; veuillez réessayer.</string>
     <string name="alert_text_decryption_error_n_messages_failed_to_decrypt">%1$d messages n\'ont pas pu être déchiffrés.</string>
     <string name="alert_text_decryption_error_too_many_skipped">%1$d messages ignorés.</string>
-    <string name="you_can_turn_on_lock">Vous pouvez activer le Verrouillage SimpleX dans les Paramètres.</string>
+    <string name="you_can_turn_on_lock">Vous pouvez activer le Verrouillage Trustiatis dans les Paramètres.</string>
     <string name="v5_0_polish_interface_descr">Merci aux utilisateurs - contribuez via Weblate !</string>
     <string name="v5_0_large_files_support">Vidéos et fichiers jusqu\'à 1Go</string>
     <string name="v5_0_app_passcode">Code d\'accès à l\'app</string>
@@ -1055,7 +1055,7 @@
     <string name="stop_sharing">Cesser le partage</string>
     <string name="stop_sharing_address">Cesser le partage d\'adresse ?</string>
     <string name="invite_friends">Inviter des amis</string>
-    <string name="email_invite_subject">Discutons sur SimpleX Chat</string>
+    <string name="email_invite_subject">Discutons sur Trustiatis Secure</string>
     <string name="save_settings_question">Enregistrer les paramètres ?</string>
     <string name="address_section_title">Adresse</string>
     <string name="share_address">Partager l\'adresse…</string>
@@ -1067,7 +1067,7 @@
     <string name="import_theme">Importer un thème</string>
     <string name="import_theme_error">Erreur lors de l\'importation d\'un thème</string>
     <string name="color_secondary">Secondaire</string>
-    <string name="theme_simplex">SimpleX</string>
+    <string name="theme_simplex">Trustiatis</string>
     <string name="color_sent_message">Message envoyé</string>
     <string name="color_title">Titre</string>
     <string name="one_time_link_short">Lien à usage unique</string>
@@ -1081,7 +1081,7 @@
     <string name="continue_to_next_step">Continuer</string>
     <string name="error_setting_address">Erreur lors du réglage de l\'adresse</string>
     <string name="enter_welcome_message">Entrez un message de bienvenue…</string>
-    <string name="email_invite_body">Salut !\nConnectez-vous avec moi via SimpleX Chat : %s</string>
+    <string name="email_invite_body">Salut !\nConnectez-vous avec moi via Trustiatis Secure : %s</string>
     <string name="if_you_cant_meet_in_person">Si vous ne pouvez pas vous rencontrer en personne, montrez le code QR lors d\'un appel vidéo ou partagez le lien.</string>
     <string name="auth_open_chat_profiles">Modifier les profils de messagerie</string>
     <string name="color_surface">Menus et alertes</string>
@@ -1273,7 +1273,7 @@
     <string name="connect__your_profile_will_be_shared">Votre profil %1$s sera partagé.</string>
     <string name="system_restricted_background_in_call_title">Pas d\'appels en arrière-plan</string>
     <string name="turn_off_system_restriction_button">Ouvrir les paramètres de l\'app</string>
-    <string name="system_restricted_background_desc">SimpleX ne peut pas fonctionner en arrière-plan. Vous ne recevrez les notifications que lorsque l\'application sera en cours d\'exécution.</string>
+    <string name="system_restricted_background_desc">Trustiatis Secure ne peut pas fonctionner en arrière-plan. Vous ne recevrez les notifications que lorsque l\'application sera en cours d\'exécution.</string>
     <string name="system_restricted_background_in_call_desc">L\'application peut se fermer après 1 minute en arrière-plan.</string>
     <string name="system_restricted_background_in_call_warn"><![CDATA[Pour faire des appels en arrière-plan, veuillez choisir <b>Utilisation de la batterie de l\'app</b> / <b>Sans restriction</b> dans les paramètres de l\'app.]]></string>
     <string name="connect_use_current_profile">Utiliser le profil actuel</string>
@@ -2360,11 +2360,11 @@
     <string name="channel_webpage">Page web du canal</string>
     <string name="delete_channel_for_all_subscribers_cannot_undo_warning">Le canal sera supprimé pour tous les abonnés — cette action est irréversible !</string>
     <string name="action_button_channel_link">Lien</string>
-    <string name="why_built_p7">Parce que nous avons détruit le pouvoir de vous identifier. Pour que votre pouvoir ne puisse jamais vous être enlevé.</string>
+    <string name="why_built_p7">Certains seconds facteurs seront également remis ici. Un code à usage unique qui arrive dans cette application n\'est passé ni par votre boîte aux lettres, ni par le réseau mobile, qui sont les deux endroits où ces codes se volent d\'habitude.</string>
     <string name="chat_banner_bot">Bot</string>
     <string name="info_row_signed">Signé</string>
     <string name="info_row_signed_verified">Signé et vérifié</string>
-    <string name="tray_tooltip">SimpleX</string>
+    <string name="tray_tooltip">Trustiatis Secure</string>
     <string name="connect_plan_join_name">Rejoindre le canal %s</string>
     <string name="connect_plan_connect_to_name">Se connecter à %s</string>
     <string name="another_instance_title">L\'application est déjà en cours d\'exécution</string>
@@ -2514,7 +2514,7 @@
     <string name="deprecated_options_section">Options obsolètes</string>
     <string name="address_welcome_message">Message de bienvenue</string>
     <string name="new_1_time_link">Nouveau lien à usage unique</string>
-    <string name="onboarding_send_1_time_link">Envoyez le lien via n\'importe quelle messagerie : c\'est sécurisé. Demandez de le coller dans SimpleX.</string>
+    <string name="onboarding_send_1_time_link">Envoyez le lien via n\'importe quelle messagerie : c\'est sécurisé. Demandez de le coller dans Trustiatis Secure.</string>
     <string name="onboarding_or_show_qr_code">Ou présentez le QR code en personne ou par appel vidéo.</string>
     <string name="onboarding_post_address">Utilisez cette adresse dans votre profil de réseau social, sur votre site web ou dans votre signature électronique.</string>
     <string name="onboarding_or_use_qr_code">Ou utilisez ce QR code : imprimez-le ou affichez-le en ligne.</string>
@@ -2530,25 +2530,25 @@
     <string name="save_admission_question">Enregistrer les paramètres d\'admission ?</string>
     <string name="save_and_notify_channel_subscribers">Enregistrer et avertir les abonnés du canal</string>
     <string name="short_descr">Votre bio :</string>
-    <string name="onboarding_be_free">Soyez libre\ndans votre réseau</string>
-    <string name="onboarding_private_and_secure">Messagerie privée et sécurisée.</string>
-    <string name="onboarding_first_network">Le premier réseau où vous possédez\nvos contacts et vos groupes.</string>
+    <string name="onboarding_be_free">Votre canal\nconfidentiel</string>
+    <string name="onboarding_private_and_secure">Chiffré de bout en bout, sans compte.</string>
+    <string name="onboarding_first_network">Le canal que Trustiatis emploie pour tout ce qui est sensible,\net celui dont vous pouvez vous servir en interne.</string>
     <string name="get_started">Commencer</string>
-    <string name="why_simplex_is_built">Pourquoi SimpleX a été créé.</string>
+    <string name="why_simplex_is_built">Pourquoi cette application, et comment elle fonctionne.</string>
     <string name="onboarding_your_profile">Votre profil</string>
     <string name="onboarding_on_your_phone">Sur votre téléphone, pas sur les serveurs.</string>
     <string name="onboarding_no_account">Pas de compte. Pas de numéro de téléphone. Pas d\'email. Pas d\'identité.\nLe chiffrement le plus sécurisé.</string>
     <string name="enter_profile_name">Saisissez le nom du profil…</string>
     <string name="migrate">Migrer</string>
-    <string name="why_built_heading">Vous êtes né·e sans compte.</string>
-    <string name="why_built_p1">Personne n\'a tracé vos conversations. Personne n\'a dressé la carte de vos déplacements. La confidentialité n\'a jamais été une fonctionnalité — c\'était un mode de vie.</string>
-    <string name="why_built_p2">Puis nous sommes passés en ligne, et chaque plateforme a réclamé une partie de vous : votre nom, votre numéro, vos amis. Nous avons accepté que le prix à payer pour parler aux autres soit de permettre à quelqu\'un de savoir avec qui nous parlons. Chaque génération, humaine et technologique, a fonctionné ainsi : téléphone, email, messageries, réseaux sociaux. Il semblait que ce fût la seule voie possible.</string>
-    <string name="why_built_p3">Il existe une autre voie. Un réseau sans numéros de téléphone. Sans noms d\'utilisateur. Sans comptes. Sans aucune identité utilisateur. Un réseau qui connecte les personnes et achemine des messages chiffrés sans savoir qui est connecté.</string>
-    <string name="why_built_p4">Pas une meilleure serrure sur la porte de quelqu\'un d\'autre. Pas un propriétaire plus attentionné qui respecte votre vie privée, mais conserve toujours le registre de tous les visiteurs. Vous n\'êtes pas un invité. Vous êtes chez vous. Aucun roi ne peut y entrer — vous êtes souverain.</string>
-    <string name="why_built_p5">Vos conversations vous appartiennent, comme c\'était toujours le cas avant Internet. Le réseau n\'est pas un lieu que vous visitez. C\'est un lieu que vous créez et possédez. Et personne ne peut vous l\'enlever, que vous le rendiez privé ou public.</string>
+    <string name="why_built_heading">Un canal qu\'on ne peut pas lire en route.</string>
+    <string name="why_built_p1">Trustiatis travaille sur votre infrastructure, vos serveurs et vos comptes. Ce travail produit des choses qui n\'ont rien à faire dans une boîte aux lettres ordinaire : des identifiants d\'accès, des constats d\'audit, des schémas de réseau, des clés de récupération. Le courriel n\'a pas été conçu pour les transporter, et les messageries habituelles réclament un numéro de téléphone avant de transporter quoi que ce soit.</string>
+    <string name="why_built_p2">Cette application est une version Trustiatis d\'une messagerie libre qui fonctionne sur le réseau SimpleX. Le nom, les couleurs et ces explications sont les nôtres. La cryptographie et le protocole ne sont pas touchés, et l\'intégralité du code source est publiée, pour que personne n\'ait à nous croire sur parole.</string>
+    <string name="why_built_p3">Il n\'y a ni compte, ni identifiant, ni numéro de téléphone. Vous vous connectez une fois à quelqu\'un, par un lien ou un code QR à usage unique, et cette liaison dispose ensuite de ses propres files de remise. Les messages sont chiffrés sur votre appareil et déchiffrés sur celui de votre correspondant. Les serveurs relais les transmettent sans savoir qui parle à qui, et Trustiatis n\'en exploite aucun : nous ne pourrions pas lire vos messages, même si on nous le demandait.</string>
+    <string name="why_built_p4">Vous n\'êtes pas limité à vos échanges avec les départements de Trustiatis. La même application porte vos conversations internes, entre vos collègues, avec les mêmes garanties et sans coût supplémentaire. Aucune licence à acheter, aucun compte à créer, aucun administrateur qui lise par dessus votre épaule.</string>
+    <string name="why_built_p5">Comme le réseau ne détient aucune identité, l\'identité se prouve en dehors de lui. Chaque interlocuteur de Trustiatis présente sa carte d\'identité issue de id.trustiatis.com à l\'ouverture d\'une conversation, et nous vous demandons d\'en faire autant avec vos propres interlocuteurs. Réclamez la carte, vérifiez que le nom et la fonction correspondent à la personne attendue, et n\'abordez rien de sensible avant de l\'avoir.</string>
     <string name="group_invitations">Invitations de groupe</string>
-    <string name="why_built_p6">La plus ancienne liberté humaine : parler à une autre personne sans être surveillé — bâtie sur une infrastructure qui ne peut la trahir.</string>
-    <string name="why_built_tagline">Soyez libre dans votre réseau.</string>
+    <string name="why_built_p6">C\'est le canal à privilégier avec Trustiatis, et pour les informations et les données sensibles c\'est le seul que nous employons. Personne chez Trustiatis ne vous demandera jamais un mot de passe, une clé ou un code d\'accès par courriel, par téléphone ou par une autre messagerie. Une demande qui vous parvient par une autre voie ne vient pas de nous.</string>
+    <string name="why_built_tagline">Ouvrez l\'application, réclamez la carte, puis parlez librement.</string>
     <string name="onboarding_conditions_by_using_you_agree">Vous vous engagez à :\n- Ne publier que du contenu légal dans les groupes publics\n- Respecter les autres utilisateurs — pas de spam</string>
     <string name="onboarding_conditions_accept">Accepter</string>
     <string name="onboarding_network_routers_cannot_know">Les routeurs du réseau ne peuvent savoir\nqui parle à qui</string>
@@ -2801,9 +2801,9 @@
     <string name="close_behavior_dialog_text">Si vous choisissez Fermer, les messages ne seront pas reçus.\nVous pouvez modifier ce choix ultérieurement dans les paramètres d’apparence.</string>
     <string name="close_behavior_dialog_close">Fermer l\'application</string>
     <string name="close_behavior_dialog_minimize">Réduire dans la zone de notification</string>
-    <string name="tray_show">Afficher SimpleX</string>
-    <string name="tray_quit">Quitter SimpleX</string>
-    <string name="tray_tooltip_unread">SimpleX — %d non lus</string>
+    <string name="tray_show">Afficher Trustiatis Secure</string>
+    <string name="tray_quit">Quitter Trustiatis Secure</string>
+    <string name="tray_tooltip_unread">Trustiatis Secure : %d non lus</string>
     <string name="appearance_minimize_to_tray">Fermer dans la zone de notification</string>
     <string name="appearance_minimize_to_tray_desc">Fonctionne en arrière-plan pour recevoir les messages</string>
     <string name="badge_supports_simplex">%s soutient SimpleX Chat.</string>
@@ -2848,7 +2848,7 @@
     <string name="badges_billing_footer_one_month">Se termine le %1$s.</string>
     <string name="badges_support_simplex_title">Soutenir SimpleX</string>
     <string name="badges_support_simplex_body">Obtenez un badge pour envoyer des fichiers plus volumineux (2-5 Go) qui restent disponibles plus longtemps (7-21 jours), et pour l’afficher sur votre profil.</string>
-    <string name="badges_why_simplex_is_built">Pourquoi SimpleX a été créé.</string>
+    <string name="badges_why_simplex_is_built">Pourquoi cette application, et comment elle fonctionne.</string>
     <string name="badges_redeem_code_button">Utiliser un code de badge</string>
     <string name="badges_continue">Continuer</string>
     <string name="badges_how_it_works_button">Comment les badges protègent votre vie privée</string>
@@ -3058,4 +3058,7 @@
     <string name="v7_1_channels_descr">Ajoutez des modérateurs et signez chaque message.</string>
     <string name="v7_1_flat_layout">Mise en page plate et Markdown</string>
     <string name="v7_1_flat_layout_descr">À activer dans les paramètres d’apparence.</string>
+  <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->
+  <string name="trustiatis_non_affiliation">Trustiatis Secure est un produit indépendant édité par Trustiatis, dérivé du logiciel libre SimpleX Chat et compatible avec le réseau SimpleX. Il n\'est ni édité, ni soutenu, ni approuvé par SimpleX Chat Ltd. « SimpleX » est une marque de SimpleX Chat Ltd.</string>  <!-- marque-ok: mention obligatoire de non affiliation, NOTICE-AGPL.md -->
+  <string name="trustiatis_updates_from_portal">Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com. L\'application ne les cherche pas d\'elle même.</string>
 </resources>

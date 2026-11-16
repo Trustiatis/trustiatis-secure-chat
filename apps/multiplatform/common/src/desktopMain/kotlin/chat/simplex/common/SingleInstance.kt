@@ -235,7 +235,7 @@ fun startShowFileWatcher() {
   }
   dir.register(ws, StandardWatchEventKinds.ENTRY_CREATE)
   watcher = ws
-  thread(name = "simplex-single-instance", isDaemon = true) {
+  thread(name = "trustiatis-secure-single-instance", isDaemon = true) {
     watchShowSignals(ws, dir) { signal ->
       SwingUtilities.invokeLater {
         if (signal.link != null) openDesktopLink(signal.link) else showWindow()

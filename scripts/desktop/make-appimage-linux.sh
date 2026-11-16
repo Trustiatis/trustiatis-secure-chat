@@ -30,18 +30,22 @@ rm -rf $release_app_dir/AppDir 2>/dev/null
 mkdir -p $release_app_dir/AppDir/usr
 
 cd $release_app_dir/AppDir
-cp -r ../*imple*/{bin,lib} usr
-cp usr/lib/simplex.png .
+# Le nom du répertoire et celui du binaire viennent de packageName, dans
+# desktop/build.gradle.kts. Les motifs *imple* de l'amont ne correspondent
+# plus : on nomme, au lieu de deviner.
+app=trustiatis-secure
+cp -r ../$app/{bin,lib} usr
+cp usr/lib/$app.png .
 
 # For https://github.com/TheAssassin/AppImageLauncher to be able to show the icon
 mkdir -p usr/share/{icons,metainfo,applications}
-cp usr/lib/simplex.png usr/share/icons
+cp usr/lib/$app.png usr/share/icons
 
-ln -s usr/bin/*imple* AppRun
-cp $multiplatform_dir/desktop/src/jvmMain/resources/distribute/*imple*.desktop chat.simplex.app.desktop
-sed -i 's|^Exec=[^ ]*|Exec=simplex|' *imple*.desktop
-sed -i 's|Icon=.*|Icon=simplex|g' *imple*.desktop
-cp *imple*.desktop usr/share/applications/
+ln -s usr/bin/$app AppRun
+cp $multiplatform_dir/desktop/src/jvmMain/resources/distribute/TrustiatisSecure.desktop com.trustiatis.secure.desktop
+sed -i "s|^Exec=[^ ]*|Exec=$app|" com.trustiatis.secure.desktop
+sed -i "s|Icon=.*|Icon=$app|g" com.trustiatis.secure.desktop
+cp com.trustiatis.secure.desktop usr/share/applications/
 cp $multiplatform_dir/desktop/src/jvmMain/resources/distribute/*.appdata.xml usr/share/metainfo
 
 if [ ! -f ../appimagetool-${ARCH}.AppImage ]; then
@@ -59,13 +63,13 @@ export SOURCE_DATE_EPOCH=1704067200
 
 # Delete redundant jar file and modify cfg
 rm -f ./usr/lib/app/*skiko-awt-runtime-linux*
-sed -i -e '/skiko-awt-runtime-linux/d' ./usr/lib/app/simplex.cfg
+sed -i -e '/skiko-awt-runtime-linux/d' "./usr/lib/app/$app.cfg"
 
 # Set all files to fixed time
 find . -exec touch -d "@$SOURCE_DATE_EPOCH" {} +
 
 ../appimagetool-${ARCH}.AppImage --verbose --no-appstream --runtime-file ../runtime-${ARCH} .
-mv *imple*.AppImage ../../
+mv ./*.AppImage ../../
 
 # Just a safeguard
-strip-nondeterminism ../../*imple*.AppImage
+strip-nondeterminism ../../*.AppImage
