@@ -56,6 +56,27 @@ en est une. C'est aussi pourquoi `git push --mirror` est à éviter ici, il les 
 tools/pousser-miroir-github.sh
 ```
 
+## Fait le 2026-11-16 : les onze branches sont sur le miroir
+
+Le dépôt a été créé par le Membre, la clé acceptée, et la poussée est passée :
+
+| Contrôle | Résultat |
+|---|---|
+| Branches sur le miroir | **11**, aux mêmes empreintes que sur GitLab (`main` 6720971f6, `develop` 9817011be, `feature/branding` d516ef9c5) |
+| Étiquettes sur le miroir | **0**, comme voulu |
+| Branche par défaut | `refs/heads/main`, vérifiée par `git ls-remote --symref` |
+| Nom de compte personnel dans l'arbre | aucune occurrence, sur les deux plateformes |
+
+Le dépôt local porte désormais un distant `miroir` pour ce dépôt là. `origin` reste GitLab,
+qui est la référence.
+
+**Un point de sécurité relevé à l'occasion.** La réponse de GitHub à l'authentification est
+« Hi Trustiatis! » et non « Hi Trustiatis/trustiatis-secure-chat! » : la clé a été déposée
+comme **clé du compte** et non comme clé de déploiement. Elle donne donc l'écriture sur les
+quatre autres dépôts du compte, et elle est sans phrase de passe sur une VM. À reposer dans
+Settings puis Deploy keys de ce seul dépôt, avec « Allow write access », puis à retirer des
+clés du compte. Même clé, même empreinte, portée réduite à ce qui est nécessaire.
+
 ## 4. Neutraliser les huit fichiers hérités
 
 Cette neutralisation ne passe **pas** par une modification des fichiers : les éditer créerait
