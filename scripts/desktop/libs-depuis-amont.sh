@@ -103,9 +103,35 @@ case "$cible" in
     # réelle au lieu des noms opaques du CAB. C'est la seule façon simple d'ouvrir un
     # .msi, et elle n'existe que sous Windows.
     command -v msiexec >/dev/null 2>&1 || { echo "ERREUR : msiexec absent, ce script doit tourner sous Windows pour cette cible." >&2; exit 2; }
-    cible_win="$(cd "$travail" && pwd -W 2>/dev/null || echo "$travail")"
-    paquet_win="$(cd "$(dirname "$paquet")" && pwd -W 2>/dev/null || dirname "$paquet")/$(basename "$paquet")"
-    msiexec //a "$paquet_win" //qn TARGETDIR="$cible_win"
+    # msiexec n'ouvre un paquet que si son chemin est donné à la forme Windows, avec des
+    # barres obliques inverses. Le « C:/... » que rend « pwd -W » lui arrache « This
+    # installation package could not be opened » et le code 1619, vu par le shell comme 83.
+    # C'est ce qui a mis en échec la première construction Windows, le 2026-11-16.
+    en_windows() {
+      if command -v cygpath >/dev/null 2>&1; then
+        cygpath -w "$1"
+      else
+        local brut
+        brut="$(cd "$(dirname "$1")" && pwd -W)/$(basename "$1")"
+        printf '%s' "${brut//\//\\}"
+      fi
+    }
+    paquet_win="$(en_windows "$paquet")"
+    cible_win="$(en_windows "$travail")"
+    journal="$cache/msiexec-$cible.log"
+    rm -f "$journal"
+    # Le journal verbeux n'est pas du confort : une installation administrative en échec
+    # n'affiche qu'une phrase, et la cause est dans le journal. Il est en UTF-16.
+    if ! msiexec //a "$paquet_win" //qn "//l*v" "$(en_windows "$journal")" TARGETDIR="$cible_win"; then
+      echo "ERREUR : msiexec n'a pas ouvert $actif." >&2
+      echo "  paquet : $paquet_win" >&2
+      echo "  cible  : $cible_win" >&2
+      if [ -f "$journal" ]; then
+        echo "--- fin du journal msiexec ---" >&2
+        { iconv -f UTF-16LE -t UTF-8 "$journal" 2>/dev/null || cat "$journal"; } | tail -40 >&2
+      fi
+      exit 1
+    fi
     arbre="$travail"
     ;;
   macos-*)
