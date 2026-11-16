@@ -81,11 +81,19 @@ IDENTIFIANTS_AUTORISES = [
     r"SimpleXChat",                    # nom du framework iOS et du module
     r"SimpleXTheme",
     r"simplex(chat)?:",                # schémas d'URI, conservés (décision D-3)
-    r"\bDefaultTheme\.SIMPLEX\b",      # énumération persistée, conservée
-    r"\bSIMPLEX\b",                    # valeur de l'énumération de thème
     r"SimplexBlue|SimplexGreen",       # couleurs nommées, valeurs changées mais nom conservé
     r"simplex\.im|simplex\.chat|simplexonflux\.com",   # serveurs communautaires (décision D-4)
     r"simplexmq",
+    r"(?:send|recv)SimpleX(?:Cmd|Msg)\w*",   # fonctions du pont FFI vers le coeur
+]
+
+# Identifiants dont la CASSE fait tout le sens : « SIMPLEX » en capitales est une valeur
+# d'énumération persistée, « SimpleX » est la marque. Les confondre, comme le faisait la
+# version précédente de ce fichier, revenait à autoriser la marque partout où elle est un
+# mot isolé, c'est à dire dans presque toutes les phrases vues par un utilisateur.
+IDENTIFIANTS_AUTORISES_CASSE = [
+    r"\bDefaultTheme\.SIMPLEX\b",      # énumération persistée, conservée
+    r"\bSIMPLEX\b",                    # valeur de l'énumération de thème, en capitales
 ]
 
 # Désignations du réseau et du protocole : autorisées par la politique de marque.
@@ -94,10 +102,12 @@ RESEAU_AUTORISE = [
     r"SimpleX address", r"adresse SimpleX",
     r"compatible (?:avec le réseau |with (?:the )?)SimpleX",
     r"SimpleX Chat Ltd",               # attribution, obligation de licence
+    r"Copyright .{0,12}\d{4} SimpleX Chat\. All rights reserved\.",   # idem, en tête de fichier
 ]
 
 MOTIF_MARQUE = re.compile(r"simplex", re.IGNORECASE)
 MOTIF_AUTORISE = re.compile("|".join(IDENTIFIANTS_AUTORISES + RESEAU_AUTORISE), re.IGNORECASE)
+MOTIF_AUTORISE_CASSE = re.compile("|".join(IDENTIFIANTS_AUTORISES_CASSE))
 
 # Marqueur de dérogation explicite, à poser en commentaire sur la ligne, avec une raison.
 MOTIF_DEROGATION = re.compile(r"marque-ok\s*:\s*\S+")
@@ -132,7 +142,8 @@ def signalements(racine: str):
                     continue
                 if MOTIF_DEROGATION.search(ligne):
                     continue
-                reste = MOTIF_AUTORISE.sub("", ligne)
+                reste = MOTIF_AUTORISE_CASSE.sub("", ligne)
+                reste = MOTIF_AUTORISE.sub("", reste)
                 if MOTIF_MARQUE.search(reste):
                     yield {
                         "fichier": relatif,

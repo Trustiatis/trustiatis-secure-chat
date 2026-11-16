@@ -54,11 +54,11 @@ Rappels qui restent valables :
   connecté. Deux conséquences immédiates : tout l'historique poussé était lisible par
   n'importe qui, adresse de commit comprise, et le fork s'affichait avant toute
   personnalisation, donc avec la marque de l'amont encore partout.
-  **Décision du Membre le 2026-11-15 : repasser le projet en privé.** L'AGPLv3 n'exige la
-  mise à disposition du code qu'au moment où un binaire est **distribué** (voir
-  `NOTICE-AGPL.md`), et rien n'est compilé. Réglage dans
-  `Settings > General > Visibility, project features, permissions`. **À rouvrir en public
-  avant la première distribution**, et cette case figure à l'étape 7.
+  **Décision du Membre le 2026-11-15 : repasser le projet en privé. C'est fait**, le même
+  jour, dans `Settings > General > Visibility, project features, permissions` (relevé à
+  l'étape 5). L'AGPLv3 n'exige la mise à disposition du code qu'au moment où un binaire est
+  **distribué** (voir `NOTICE-AGPL.md`), et rien n'est compilé. **À rouvrir en public avant
+  la première distribution**, et cette case figure à l'étape 7.
 - Le projet doit être **vierge**, sans README d'initialisation, sinon le premier envoi sera
   refusé pour divergence.
 
@@ -176,6 +176,48 @@ Puis `Settings > Merge requests` :
 - gabarit de description par défaut : `.gitlab/merge_request_templates/Default.md`.
 
 Et `Settings > Repository > Protected tags` : motif `v*`, création réservée aux mainteneurs.
+
+### Appliqué le 2026-11-15
+
+Le Membre a ouvert une session GitLab authentifiée dans le navigateur, et les réglages
+ci-dessus ont été posés un par un. Relevé par l'API du projet (`id` 88961979), après coup :
+
+| Branche | Autorisé à fusionner | Autorisé à pousser | Envoi forcé |
+|---|---|---|---|
+| `main` | Maintainers | No one | désactivé |
+| `develop` | Developers + Maintainers | Developers + Maintainers | désactivé |
+| `upstream-*` | Maintainers | No one | désactivé |
+
+`upstream-*` est un motif générique, pas une branche : GitLab affiche « 1 matching branch »,
+`upstream-v7.1.3`, et couvrira les greffes suivantes sans nouvelle manipulation. Motif de tag
+`v*`, création réservée aux Maintainers, « 1 matching tag ».
+
+Côté `Settings > Merge requests`, l'API confirme
+`only_allow_merge_if_pipeline_succeeds: true`,
+`only_allow_merge_if_all_discussions_are_resolved: true` et
+`remove_source_branch_after_merge: true`.
+
+Une nuance sur le gabarit de description : le réglage « Default description template for
+merge requests » de l'interface est une fonction payante, elle n'existe pas sur ce projet.
+Elle est inutile ici, car GitLab applique **automatiquement** le gabarit nommé `Default.md`
+à toute nouvelle demande de fusion, sur toutes les formules. Le fichier
+`.gitlab/merge_request_templates/Default.md` est déjà dans le dépôt : rien à régler.
+
+**Le projet est passé en privé**, même jour, même session. Contrôle depuis une requête
+anonyme, hors session :
+
+```text
+https://gitlab.com/Trustiatis/trustiatis-secure-chat       -> 302 (redirection vers la connexion)
+https://gitlab.com/Trustiatis/trustiatis-secure-chat-site  -> 302
+```
+
+Un projet public répondrait 200. L'historique n'est donc plus lisible sans compte, mais il
+l'a été : ce qui a été poussé le 2026-11-15 avant ce réglage doit être considéré comme ayant
+circulé, adresse de commit comprise.
+
+Le projet du portail, `trustiatis-secure-chat-site` (`id` 88964236), a été créé privé et sa
+branche `main` est protégée par défaut (Maintainers des deux côtés). Ses contrôles de fusion
+restent désactivés : il n'a pas encore de chaîne d'intégration à faire réussir.
 
 ## Étape 6, vérifications finales
 

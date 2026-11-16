@@ -12,7 +12,6 @@ import SimpleXChat
 struct NotificationsView: View {
     @EnvironmentObject var m: ChatModel
     @EnvironmentObject var theme: AppTheme
-    @State private var notificationMode: NotificationsMode = ChatModel.shared.notificationMode
     @State private var ntfAlert: NotificationAlert?
     @State private var legacyDatabase = dbContainerGroupDefault.get() == .documents
     @State private var testing = false
@@ -26,53 +25,30 @@ struct NotificationsView: View {
             }
         }
         .alert(item: $ntfAlert) { alert in
-            if let token = m.deviceToken {
-                return notificationAlert(alert, token)
-            } else {
-                return Alert(title: Text("No device token!"))
-            }
+            notificationAlert(alert)
         }
     }
 
     private func viewBody() -> some View {
         List {
             Section {
-                NavigationLink {
-                    List {
-                        Section {
-                            SelectionListView(list: NotificationsMode.values, selection: $notificationMode) { mode in
-                                ntfAlert = .setMode(mode: mode)
-                            }
-                        } footer: {
-                            VStack(alignment: .leading) {
-                                Text(ntfModeDescription(notificationMode))
-                                    .foregroundColor(theme.colors.secondary)
-                            }
-                            .font(.callout)
-                            .padding(.top, 1)
-                        }
-                    }
-                    .navigationTitle("Send notifications")
-                    .modifier(ThemedBackground(grouped: true))
-                    .navigationBarTitleDisplayMode(.inline)
-                } label: {
-                    HStack {
-                        Text("Send notifications")
-                        Spacer()
-                        Text(m.notificationMode.label)
-                    }
-                }
+                // Trustiatis Secure: the mode selector is removed, see docs/DECISIONS.md P-5.
+                // Instant and periodic notifications send the device token to a notification
+                // server that cannot push to this app, so the only honest mode is off.
+                Text(ntfModeDescription(.off))
+                    .foregroundColor(theme.colors.secondary)
+                    .font(.callout)
 
                 if let server = m.notificationServer {
                     smpServers("Push server", [server], theme.colors.secondary)
                     testTokenButton(server)
                 }
             } header: {
-                Text("Push notifications")
+                Text("Notifications")
                     .foregroundColor(theme.colors.secondary)
             } footer: {
                 if legacyDatabase {
-                    Text("Please restart the app and migrate the database to enable push notifications.")
+                    Text("Please restart the app and migrate the database.")
                         .foregroundColor(theme.colors.secondary)
                         .font(.callout)
                         .padding(.top, 1)
@@ -85,19 +61,8 @@ struct NotificationsView: View {
         }
     }
 
-    private func notificationAlert(_ alert: NotificationAlert, _ token: DeviceToken) -> Alert {
+    private func notificationAlert(_ alert: NotificationAlert) -> Alert {
         switch alert {
-        case let .setMode(mode):
-            return Alert(
-                title: Text(ntfModeAlertTitle(mode)),
-                message: Text(ntfModeDescription(mode)),
-                primaryButton: .default(Text(mode == .off ? "Turn off" : "Enable")) {
-                    setNotificationsMode(token, mode)
-                },
-                secondaryButton: .cancel() {
-                    notificationMode = m.notificationMode
-                }
-            )
         case let .testFailure(testFailure):
             return Alert(
                 title: Text("Server test failed!"),
@@ -105,56 +70,6 @@ struct NotificationsView: View {
             )
         case let .error(title, error):
             return Alert(title: Text(title), message: Text(error))
-        }
-    }
-
-    private func ntfModeAlertTitle(_ mode: NotificationsMode) -> LocalizedStringKey {
-        switch mode {
-        case .off: return "Use only local notifications?"
-        case .periodic: return "Enable periodic notifications?"
-        case .instant: return "Enable instant notifications?"
-        }
-    }
-
-    private func setNotificationsMode(_ token: DeviceToken, _ mode: NotificationsMode) {
-        Task {
-            switch mode {
-            case .off:
-                do {
-                    try await apiDeleteToken(token: token)
-                    await MainActor.run {
-                        m.tokenStatus = .new
-                        notificationMode = .off
-                        m.notificationMode = .off
-                        m.notificationServer = nil
-                        testedSuccess = nil
-                    }
-                } catch let error {
-                    await MainActor.run {
-                        let err = responseError(error)
-                        logger.error("apiDeleteToken error: \(err)")
-                        ntfAlert = .error(title: "Error deleting token", error: err)
-                    }
-                }
-            default:
-                do {
-                    let _ = try await apiRegisterToken(token: token, notificationMode: mode)
-                    let (_, tknStatus, ntfMode, ntfServer) = apiGetNtfToken()
-                    await MainActor.run {
-                        m.tokenStatus = tknStatus
-                        notificationMode = ntfMode
-                        m.notificationMode = ntfMode
-                        m.notificationServer = ntfServer
-                        testedSuccess = nil
-                    }
-                } catch let error {
-                    await MainActor.run {
-                        let err = responseError(error)
-                        logger.error("apiRegisterToken error: \(err)")
-                        ntfAlert = .error(title: "Error enabling notifications", error: err)
-                    }
-                }
-            }
         }
     }
 
@@ -246,17 +161,15 @@ struct NotificationsView: View {
 
 func ntfModeDescription(_ mode: NotificationsMode) -> LocalizedStringKey {
     switch mode {
-    case .off: return "**Most private**: do not use SimpleX Chat push server. The app will check messages in background, when the system allows it, depending on how often you use the app."
-    case .periodic: return "**More private**: check new messages every 20 minutes. Only device token is shared with our push server. It doesn't see how many contacts you have, or any message metadata."
-    case .instant: return "**Recommended**: device token and end-to-end encrypted notifications are sent to SimpleX Chat push server, but it does not see the message content, size or who it is from."
+    case .off: return "**The only mode in this app**: no push server is used. Your device token stays on your device, and no notification server learns that this app is installed. The app checks for new messages while it runs, and in the background when the system allows it, depending on how often you use the app."
+    case .periodic, .instant: return "**Not available in this app.** Push notifications would require a notification server allowed to push to this app, and this app has none. Turning this on would send your device token to someone else's server, which could never deliver a single notification in return."
     }
 }
 
 func ntfModeShortDescription(_ mode: NotificationsMode) -> LocalizedStringKey {
     switch mode {
     case .off: return "Check messages when allowed."
-    case .periodic: return "Check messages every 20 min."
-    case .instant: return "E2E encrypted notifications."
+    case .periodic, .instant: return "Not available in this app."
     }
 }
 
@@ -293,13 +206,11 @@ struct SelectionListView<Item: SelectableItem>: View {
 }
 
 enum NotificationAlert: Identifiable {
-    case setMode(mode: NotificationsMode)
     case testFailure(testFailure: ProtocolTestFailure)
     case error(title: LocalizedStringKey, error: String)
 
     var id: String {
         switch self {
-        case let .setMode(mode): return "enable \(mode.rawValue)"
         case let .testFailure(testFailure): return "testFailure \(testFailure.testStep) \(testFailure.testError)"
         case let .error(title, error): return "error \(title): \(error)"
         }

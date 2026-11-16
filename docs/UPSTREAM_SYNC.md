@@ -21,8 +21,40 @@ modifications et leur date.
 3. Reporter d'abord sur `develop`, jamais directement sur `main`.
 4. Un report est une demande de fusion comme une autre : revue, CI verte, contrôle de marque
    vert.
+5. **Vérifier que la version visée est publiée en entier avant de s'y greffer.** Une version
+   stable de l'amont porte vingt-quatre actifs sur GitHub. La `v7.1.3` n'en avait que neuf,
+   sans aucun paquet Linux, ce qui a coûté un aller-retour (décision P-6). Le contrôle tient
+   en une ligne :
+
+   ```bash
+   curl -s https://api.github.com/repos/simplex-chat/simplex-chat/releases/tags/vX.Y.Z \
+     | python3 -c 'import json,sys; print(len(json.load(sys.stdin)["assets"]), "actifs")'
+   ```
+6. **La base d'amont est écrite dans `tools/amont-courant.txt`**, jamais déduite. Le job
+   `coeur-intact` de la CI lit ce fichier, et `tools/greffer-upstream.sh` l'écrit. Un report
+   qui oublie de le mettre à jour fait comparer le dépôt à la mauvaise version.
 
 ## Procédure de report d'une version
+
+> **À lire avant de pousser `upstream-vX.Y.Z`.** Le motif `upstream-*` est une branche
+> protégée dont la poussée est fermée à **personne**, mainteneurs compris, et GitLab compte la
+> **création** d'une branche comme une poussée. `git push` est donc refusé :
+>
+> ```
+> remote: GitLab: You can only create protected branches using the web interface and API.
+>  ! [remote rejected]     upstream-v7.1.2 -> upstream-v7.1.2 (pre-receive hook declined)
+> ```
+>
+> Le message dit la marche à suivre, et elle est meilleure que celle écrite ici d'abord :
+> **créer la branche par l'interface ou par l'API, sans jamais retirer la protection.**
+> `Repository > Branches > New branch`, nom `upstream-vX.Y.Z`, créée depuis l'empreinte du
+> commit d'amont, qui est déjà sur le distant puisque `develop` le contient. Ne pas retirer
+> puis reposer la protection : cela ouvre une fenêtre pendant laquelle la référence qui
+> prouve l'intégrité du coeur est modifiable.
+>
+> Cela demande une session GitLab, donc le Membre : l'agent ne s'authentifie pas à sa place.
+> C'est volontairement pénible : cette référence est la preuve que le coeur de l'amont n'a
+> pas été touché, et le job `coeur-intact` s'appuie sur elle.
 
 ```bash
 cd ~/Documents/claude/trustiatis-secure
@@ -103,3 +135,4 @@ modifications et leur date.
 | Date | Version d'amont | Version Trustiatis | Nature du report | Auteur | Demande de fusion |
 |---|---|---|---|---|---|
 | 2026-11-15 | `v7.1.3` | (aucune livraison) | **greffe initiale, exécutée.** Point de départ du fork. Commit d'amont `19889b1a0ee11b6071c41146b6549f46e2b5b6af`, daté du 2026-11-11. Deux fichiers de l'amont touchés, et deux seulement : `.gitignore` concaténé, et `README.md` remplacé par le nôtre (son contenu est conservé dans `README-AMONT.md`). `git diff upstream-v7.1.3 main -- src/ scripts/ flake.nix flake.lock cabal.project` est **vide** | Trustiatis | sans objet, mise en place |
+| 2026-11-15 | `v7.1.2` | (aucune livraison) | **retour en arrière, décision P-6.** La publication de `v7.1.2` est complète (24 actifs), celle de `v7.1.3` ne l'est pas (9 actifs, aucun paquet Linux), ce qui rendait le Desktop Linux impossible sans recompiler le coeur. Trois commits et six fichiers annulés, **aucun correctif de sécurité** dans le lot. Commit d'amont `50a575e44867a6f1b2cba485a6a655c24b2c9aef`. P-5 reportée sans conflit | Trustiatis | directe sur `develop`, commit `319380c0f` |
