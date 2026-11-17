@@ -130,8 +130,21 @@ vlc_livre="$(find "$tmp/opt" -type d -name vlc -path '*resources*' | head -1)"
 if find "$tmp/opt" -name '*skiko-awt-runtime-linux*' | grep -q .; then
   echo "ERREUR : skiko est encore en double dans le paquet fini." >&2; exit 1
 fi
+# -type f, et ce n'est pas une precaution de style : le JDK embarque un repertoire
+# « lib/runtime/legal/java.desktop », que « -name '*.desktop' » attrape. grep s'en
+# plaignait a chaque construction (« Is a directory »), et surtout, ce controle ne
+# verifiait rien : il affichait, sans jamais echouer. Si l'entree de bureau avait
+# disparu, il n'aurait affiche que le message d'erreur de grep, et le paquet serait
+# sorti sans gestionnaire de liens d'invitation, ce qui est exactement le defaut
+# numero 2 de 7.1.2-ts1 que ce script existe pour fermer.
+entree_livree="$(find "$tmp/opt" -type f -name '*.desktop' | head -1)"
+[ -n "$entree_livree" ] || { echo "ERREUR : aucune entree de bureau dans le paquet fini." >&2; exit 1; }
 echo "Entree de bureau du paquet fini :"
-find "$tmp/opt" -name '*.desktop' -exec grep -E '^(Exec|MimeType)=' {} \;
+grep -E '^(Exec|MimeType)=' "$entree_livree"
+grep -q '^Exec=.*%u' "$entree_livree" || {
+  echo "ERREUR : l'entree de bureau du paquet fini ne recoit aucune URL." >&2; exit 1; }
+grep -q '^MimeType=.*x-scheme-handler/simplex;' "$entree_livree" || {  # marque-ok: reseau, decision D-3
+  echo "ERREUR : l'entree de bureau du paquet fini n'enregistre pas les liens." >&2; exit 1; }
 
 echo
 ls -l "$final"
