@@ -18,7 +18,8 @@
 # sous Windows et un .dmg que sous macOS, faute d'outil portable pour les ouvrir ailleurs.
 #
 # Variables :
-#   CACHE_AMONT   dossier où garder les paquets téléchargés (défaut : build/amont)
+#   CACHE_AMONT   dossier où garder les paquets téléchargés (défaut : build/amont).
+#                 Les paquets y sont rangés dans un sous dossier par tag d'amont.
 #   GARDER_CACHE  à 1, ne supprime pas le paquet après extraction
 #
 set -euo pipefail
@@ -53,6 +54,16 @@ fi
 read -r _ dossier lien actif attendu <<< "$ligne"
 
 cache="${CACHE_AMONT:-$racine/apps/multiplatform/build/amont}"
+# Le paquet est rangé sous le tag de l'amont, et non sous son seul nom de fichier.
+# L'amont nomme ses paquets sans version : « simplex-desktop-ubuntu-22_04-x86_64.deb »
+# désigne la 7.1.2 comme la 7.1.4. Rangés sous ce nom seul, ils se recouvrent, et au
+# changement de version le fichier de la précédente reste là. Le contrôle d'empreinte le
+# rattrape, mais il annonce « empreinte inattendue », ce qui envoie chercher une
+# republication ou une falsification là où il n'y a qu'un cache périmé. Le 17 novembre
+# 2026, le poste gardait encore le .deb de la 7.1.2 sous ce nom après le passage à la
+# 7.1.4 : il a fallu comparer les empreintes à la main pour s'assurer que les
+# bibliothèques posées n'étaient pas celles de la version précédente.
+cache="$cache/$tag"
 mkdir -p "$cache"
 paquet="$cache/$actif"
 url="https://github.com/simplex-chat/simplex-chat/releases/download/$tag/$actif"

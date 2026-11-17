@@ -621,3 +621,84 @@ dangereuse qu'une étape absente : elle laisse la chaîne réussir et le défaut
 l'utilisateur. Le `mkdir || exit 0` de l'amont et le `|| true` d'un journal de CI sont la
 même faute. Partout où une étape peut ne pas avoir lieu, le contrôle doit porter sur son
 **résultat**, pas sur son code de retour.
+
+## 14. Le dernier pas manquait : du nom de la chaîne au nom publié
+
+Les paquets ne sortent pas de la chaîne sous le nom qu'ils portent sur le portail.
+`jpackage` les nomme d'après le produit et la version qu'il connaît, sans notre suffixe :
+
+| Nom à la sortie de la chaîne | Nom attendu par le portail |
+|---|---|
+| `trustiatis-secure_x86_64.deb` | `trustiatis-secure-7.1.4-ts1-amd64.deb` |
+| `Trustiatis Secure-7.1.4.msi` | `trustiatis-secure-7.1.4-ts1-windows-x86_64.msi` |
+| `Trustiatis Secure-7.1.4.exe` | `trustiatis-secure-7.1.4-ts1-windows-x86_64.exe` |
+| `Trustiatis Secure-7.1.4.dmg` | `trustiatis-secure-7.1.4-ts1-macos-aarch64.dmg` |
+| `Trustiatis Secure-7.1.4.dmg` | `trustiatis-secure-7.1.4-ts1-macos-x86_64.dmg` |
+
+Les deux dernières lignes disent tout : **les deux `.dmg` sortent sous exactement le même
+nom**, et rien, dans le fichier lui même, ne dit lequel vient d'Apple Silicon. Seul le nom
+du dossier d'artefact le dit. Pour 7.1.2-ts1, ce renommage a été fait à la main, et il
+s'est trouvé juste. C'est une chance qu'on ne reconduit pas.
+
+`tools/nommer-livraison.py` fait ce pas, et vérifie avant de ranger :
+
+```bash
+tools/nommer-livraison.py --version 7.1.4-ts1 --artefacts ~/telechargements/artefacts --simuler
+tools/nommer-livraison.py --version 7.1.4-ts1 --artefacts ~/telechargements/artefacts
+```
+
+Il refuse de deviner : un fichier qu'aucune règle ne reconnaît n'est pas rangé au hasard,
+il est signalé. Et il recalcule l'empreinte de chaque paquet pour la comparer à celle que
+la machine de construction a inscrite dans `empreintes-<cible>.txt` : un paquet de 250 Mio
+qui a mal voyagé est écarté ici, et non chez l'utilisateur. À la première anomalie, rien
+n'est rangé du tout.
+
+### Le premier essai de cet outil est tombé dans le piège qu'il devait fermer
+
+Sa table d'empreintes était indexée sur le seul nom de fichier. Les deux `.dmg` portant le
+même nom, le second écrasait le premier, et l'outil comparait le paquet d'Apple Silicon à
+l'empreinte de celui d'Intel : il annonçait un écart sur un fichier intact. La clé est
+maintenant la paire (cible, nom), la cible étant lue dans le nom du fichier d'empreintes.
+Éprouvé dans les deux sens : cinq paquets rangés sous leur bon nom, puis un `.dmg` abîmé et
+un fichier inconnu, tous deux refusés, sans que rien ne soit rangé.
+
+## 15. Deux pièges du poste, rencontrés au report de la 7.1.4
+
+### Le cache d'amont ne portait pas la version
+
+`libs-depuis-amont.sh` garde les paquets téléchargés sous `build/amont/`, et il les y
+range sous le nom que l'amont leur donne. Or l'amont ne versionne pas ses noms de
+fichiers : `simplex-desktop-ubuntu-22_04-x86_64.deb` désigne la 7.1.2 comme la 7.1.4. Le
+fichier de la version précédente reste donc en place, et le script, qui ne télécharge que
+si le fichier manque, se contente de ce qu'il trouve.
+
+Le contrôle d'empreinte rattrape le cas : le script s'arrête. Mais son message dit
+« empreinte inattendue » et invite à relever l'empreinte publiée par l'API de GitHub, ce
+qui envoie chercher une republication ou une falsification là où il n'y a qu'un cache
+périmé. Le 17 novembre 2026, le poste gardait encore le `.deb` de la 7.1.2 sous ce nom
+après le passage à la 7.1.4 ; il a fallu comparer les empreintes à la main pour s'assurer
+que les bibliothèques posées n'étaient pas celles de la version précédente.
+
+Les paquets sont maintenant rangés dans un sous dossier par tag, `build/amont/v7.1.4/`.
+Deux versions coexistent sans se recouvrir, et un retour en arrière ne retélécharge rien.
+
+### L'ordre des deux scripts se paie comptant
+
+C'était déjà écrit en tête de `verifier-vlc-linux.sh`, et cela s'est reproduit le même
+jour : `libs-depuis-amont.sh` commence par un `rm -rf` sur le répertoire de destination,
+donc il efface `vlc/`. Relancé après `prepare-vlc-linux.sh`, ne serait ce que pour
+éprouver une correction du cache, il défait le travail du second, qui rendra ensuite la
+main en silence si on le relance sans supprimer le répertoire.
+
+La seule défense qui tienne est celle qui est déjà en place : `paquet-deb-trustiatis.sh`
+appelle `verifier-vlc-linux.sh` avant d'empaqueter, et refuse de construire sur un arbre
+incomplet. Elle a fonctionné : l'arbre a été refait, et vérifié, avant l'empaquetage.
+
+### Le tas de la compilation ne se rogne pas
+
+La section 8 donne `-Xmx2200m`. Ce n'est pas une valeur de confort. Essayée à 1,6 Gio, la
+compilation du module `common` échoue sur un `OutOfMemoryError` pendant l'abaissement IR
+du compilateur Kotlin, et elle y met douze minutes : l'échec arrive à la fin, pas au
+début. Le réglage vit désormais dans `~/.gradle/gradle.properties`, hors du dépôt, pour
+qu'il s'applique aussi aux lancements qui ne passent pas par une ligne de commande à nous,
+`paquet-deb-trustiatis.sh` en premier.

@@ -23,6 +23,7 @@ cd "$racine"
 branches=(
   upstream-v7.1.2
   upstream-v7.1.3
+  upstream-v7.1.4
   main
   develop
   couche-trustiatis-initiale
