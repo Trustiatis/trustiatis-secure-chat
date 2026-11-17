@@ -1006,6 +1006,7 @@ private fun BoxScope.ChatList(searchText: MutableState<TextFieldValue>, listStat
   val getStakeBannerDismissed = remember { appPrefs.getStakeBannerDismissed.state }
   // read here rather than in the LazyColumn: it launches an effect, so it needs a composable scope
   val crowdfunding = crowdfundingAvailable()
+  val badgePitch = badgePitchAvailable()
   val activeFilter = remember { chatModel.activeChatTagFilter }
 
   LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
@@ -1123,7 +1124,7 @@ private fun BoxScope.ChatList(searchText: MutableState<TextFieldValue>, listStat
           }
         }
       }
-    } else if (chatModel.bannerSlotFree(ChatListBanner.BadgePitch) && !supporterBannerShown.value && noShownBadge() && chatModel.chats.value.size > 3) {
+    } else if (badgePitch && chatModel.bannerSlotFree(ChatListBanner.BadgePitch) && !supporterBannerShown.value && noShownBadge() && chatModel.chats.value.size > 3) {
       item {
         SideEffect { chatModel.chatListBanner = ChatListBanner.BadgePitch }
         Box(Modifier.zIndex(1f).padding(16.dp)) {

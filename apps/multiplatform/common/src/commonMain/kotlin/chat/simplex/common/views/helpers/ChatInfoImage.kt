@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
+import chat.simplex.common.views.onboarding.badgePitchAvailable
 import chat.simplex.common.model.BadgeStatus
 import chat.simplex.common.model.BadgeType
 import chat.simplex.common.model.ChatInfo
@@ -248,7 +249,9 @@ fun showBadgeInfoAlert(name: String, badge: LocalBadge, uriHandler: UriHandler) 
           String.format(generalGetString(MR.strings.badge_supported_simplex), name, localDate(badge.badge.badgeExpiry))
         else
           String.format(generalGetString(MR.strings.badge_supports_simplex), name)
-      if (noShownBadge()) {
+      // P-7 ter : le badge d'un correspondant reste affiché et reste expliqué, mais le
+      // bouton qui menait à l'achat ne paraît plus. La branche `else` dit le même texte.
+      if (badgePitchAvailable() && noShownBadge()) {
         AlertManager.shared.showAlertDialog(
           title = title,
           text = supports,

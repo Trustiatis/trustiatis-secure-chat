@@ -27,6 +27,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.*
+import chat.simplex.common.views.onboarding.badgePitchAvailable
 import chat.simplex.common.model.*
 import chat.simplex.common.model.ChatModel.controller
 import chat.simplex.common.model.ChatModel.filesToDelete
@@ -326,7 +327,10 @@ private fun isWebmUri(uri: URI): Boolean = getFileName(uri)?.lowercase()?.endsWi
 fun showLargeFileAlert(fileSize: Long, incognito: Boolean, senderProfile: LocalProfile?) {
   val title = generalGetString(MR.strings.large_file)
   val text = largeFileMessage(fileSize, incognito, expiredBadgeReason(fileSize, senderProfile))
-  if (!incognito && fileSize <= MAX_FILE_SIZE_XFTP_LEGEND && noShownBadge()) {
+  // P-7 ter : sans `badgePitchAvailable()`, le bouton de cette alerte proposait d'acheter
+  // un badge chez l'amont pour lever la limite de taille. La branche `else` dit la même
+  // chose sans ce bouton, et c'est celle que l'on prend.
+  if (badgePitchAvailable() && !incognito && fileSize <= MAX_FILE_SIZE_XFTP_LEGEND && noShownBadge()) {
     AlertManager.shared.showAlertDialog(
       title = title,
       text = text,

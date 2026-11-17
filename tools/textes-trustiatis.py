@@ -29,12 +29,24 @@ CATALOGUES = RACINE / "apps/multiplatform/common/src/commonMain/moko-resources"
 # Les textes. Une clé par ligne, une langue par dictionnaire. L'apostrophe
 # s'échappe en \\' comme partout dans ces fichiers, c'est la convention
 # d'Android et l'amont la suit.
+# Longueur des trois textes du premier écran, et ce n'est pas du zèle. Le Membre a vu,
+# dans la version 7.1.2-ts1 sur Android, les textes et les icônes de l'écran d'accueil se
+# chevaucher. La cause n'est pas la mise en page, qui est celle de l'amont et n'a pas été
+# touchée : ce sont nos textes. `SimpleXInfoLayout` pose des interlignes FIXES, 42, 25 et
+# 20 sp, alors que le corps des caractères suit le réglage de taille du système ; et
+# `OnboardingShrinkingLayout` rétrécit l'image pour faire tenir le reste, jusqu'à un
+# point. Notre « onboarding_first_network » faisait 101 caractères contre 58 à l'amont,
+# soit deux lignes de plus sur un téléphone.
+#
+# Budget de l'amont en v7.1.4, à ne pas dépasser : onboarding_be_free 24, base 29 et
+# fr 31 pour onboarding_private_and_secure, base 58 et fr 64 pour onboarding_first_network.
+# Toute reformulation de ces trois clés se vérifie contre ces nombres.
 TEXTES: dict[str, dict[str, str]] = {
     "base": {
         "app_name": "Trustiatis Secure",
         "onboarding_be_free": "Your confidential\\nchannel",
-        "onboarding_private_and_secure": "Encrypted end to end, with no account.",
-        "onboarding_first_network": "The channel Trustiatis uses for anything sensitive,\\nand the one you can use inside your own company.",
+        "onboarding_private_and_secure": "Encrypted end to end, no account.",
+        "onboarding_first_network": "The channel Trustiatis uses\\nfor anything sensitive.",
         "why_simplex_is_built": "Why this application, and how it works.",
         "badges_why_simplex_is_built": "Why this application, and how it works.",
         "why_built_heading": "A channel that cannot be read in transit.",
@@ -91,7 +103,7 @@ TEXTES: dict[str, dict[str, str]] = {
         "app_name": "Trustiatis Secure",
         "onboarding_be_free": "Votre canal\\nconfidentiel",
         "onboarding_private_and_secure": "Chiffré de bout en bout, sans compte.",
-        "onboarding_first_network": "Le canal que Trustiatis emploie pour tout ce qui est sensible,\\net celui dont vous pouvez vous servir en interne.",
+        "onboarding_first_network": "Le canal que Trustiatis emploie\\npour tout ce qui est sensible.",
         "why_simplex_is_built": "Pourquoi cette application, et comment elle fonctionne.",
         "badges_why_simplex_is_built": "Pourquoi cette application, et comment elle fonctionne.",
         "why_built_heading": "Un canal qu\\'on ne peut pas lire en route.",

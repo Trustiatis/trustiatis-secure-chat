@@ -1335,8 +1335,8 @@
   <string name="migrate_from_another_device">Migrate from another device</string>
   <string name="how_it_works">How it works</string>
   <string name="onboarding_be_free">Your confidential\nchannel</string>
-  <string name="onboarding_private_and_secure">Encrypted end to end, with no account.</string>
-  <string name="onboarding_first_network">The channel Trustiatis uses for anything sensitive,\nand the one you can use inside your own company.</string>
+  <string name="onboarding_private_and_secure">Encrypted end to end, no account.</string>
+  <string name="onboarding_first_network">The channel Trustiatis uses\nfor anything sensitive.</string>
   <string name="get_started">Get started</string>
   <string name="why_simplex_is_built">Why this application, and how it works.</string>
   <string name="onboarding_your_profile">Your profile</string>

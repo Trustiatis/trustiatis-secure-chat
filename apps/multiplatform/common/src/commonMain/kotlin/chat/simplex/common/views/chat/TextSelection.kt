@@ -34,6 +34,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import chat.simplex.common.ui.theme.TrustiatisSelectionHighlight
 import chat.simplex.common.model.*
 import chat.simplex.common.platform.*
 import chat.simplex.common.views.chat.item.itemPrefixText
@@ -43,7 +44,8 @@ import chat.simplex.res.*
 import dev.icerock.moko.resources.compose.painterResource
 import kotlinx.coroutines.*
 
-val SelectionHighlightColor = Color(0x4D0066FF)
+// Teinte de la marque, opacite de l'amont. Valeur dans ColorTrustiatis.kt.
+val SelectionHighlightColor = TrustiatisSelectionHighlight
 
 data class ItemContext(
     val selectionIndex: Int = -1

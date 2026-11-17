@@ -2532,7 +2532,7 @@
     <string name="short_descr">Votre bio :</string>
     <string name="onboarding_be_free">Votre canal\nconfidentiel</string>
     <string name="onboarding_private_and_secure">Chiffré de bout en bout, sans compte.</string>
-    <string name="onboarding_first_network">Le canal que Trustiatis emploie pour tout ce qui est sensible,\net celui dont vous pouvez vous servir en interne.</string>
+    <string name="onboarding_first_network">Le canal que Trustiatis emploie\npour tout ce qui est sensible.</string>
     <string name="get_started">Commencer</string>
     <string name="why_simplex_is_built">Pourquoi cette application, et comment elle fonctionne.</string>
     <string name="onboarding_your_profile">Votre profil</string>

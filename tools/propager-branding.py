@@ -331,6 +331,13 @@ THEMES_AMONT = {
         "primaryVariant2": ("derive", "#172941"),
         "sentMessage": ("derive", "#172941"),
         "sentQuote": ("derive", "#1C3A57"),
+        # Seul thème de l'amont dont les bulles RECUES sont teintées : c'est son
+        # thème de marque, et il les met au bleu. Dans les trois autres, elles
+        # sont des gris neutres, que `teinte_de` laisse d'ailleurs intacts. Les
+        # dériver ici, et nulle part ailleurs, est ce qui fait que l'écran de
+        # conversation ne mélange plus deux teintes.
+        "receivedMessage": ("derive", "#25283A"),
+        "receivedQuote": ("derive", "#36394A"),
     },
     "Black": {
         "primary": ("palette", "primaire_clair"),
@@ -381,6 +388,39 @@ def couleurs_kotlin() -> bytes:
     lignes.append(f"// Encre des QR codes : l'amont {QR_AMONT} à notre teinte, contraste conservé")
     lignes.append(
         f"val TrustiatisQrEncre = Color(0xFF{teinte_de(QR_AMONT, marque)})  // amont #{QR_AMONT}, teinte de la marque"
+    )
+    lignes.append("")
+
+    # L'incognito. Ce n'est pas une couleur de decor : c'est le signal qui
+    # distingue un profil incognito partout dans l'application, et l'amont lui
+    # donne une teinte franchement distincte de la sienne. Le sauge l'effacerait,
+    # puisque le sauge est deja la couleur de tout le reste.
+    #
+    # Pourquoi l'accent TEL QUEL et non `teinte_de`. La derivation garde la
+    # saturation de l'amont, et celle de son indigo est tres haute : l'appliquer
+    # a la teinte du terracotta donnait #F33D50, un rouge vif que l'on prendrait
+    # pour une alerte. Un signal ne se derive donc pas, il se choisit dans la
+    # palette, comme les autres couleurs de marque de ce fichier.
+    #
+    # Contraste, et il faut le dire franchement : le terracotta est a 3,6 contre
+    # 1 sur blanc, la ou l'indigo de l'amont est a 4,1. Les deux sont sous le
+    # seuil de 4,5 du petit texte, et l'ecart ne change pas de categorie. Sur le
+    # fond sombre de la charte, le terracotta est a 5,6.
+    INCOGNITO = p["marque"]["accent"]["hex"].lstrip("#").upper()
+    lignes.append("// Incognito : l'accent de la palette, pris tel quel. Un signal ne se derive pas.")
+    lignes.append(
+        f"val TrustiatisIncognito = Color(0xFF{INCOGNITO})  // palette, marque.accent"
+    )
+    lignes.append("")
+
+    # La surbrillance de selection de texte. L'amont la pose a 0x4D0066FF, donc
+    # un bleu pur a 30 % d'opacite. L'opacite est conservee telle quelle : elle
+    # fait la lisibilite du texte par dessous, et n'a rien d'une couleur.
+    SELECTION_AMONT = "0066FF"
+    lignes.append("// Surbrillance de selection : l'amont 0066FF a notre teinte, opacite 30 % conservee")
+    lignes.append(
+        f"val TrustiatisSelectionHighlight = Color(0x4D{teinte_de(SELECTION_AMONT, marque)})"
+        f"  // amont #{SELECTION_AMONT}, teinte de la marque"
     )
     lignes.append("")
 

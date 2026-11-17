@@ -28,7 +28,7 @@
 # « lien » est relatif à apps/multiplatform/build/links/, et ces noms ne sont pas libres :
 # Compose Desktop les compose lui même à partir du système et de l'architecture.
 
-linux-x86_64   linux-x86_64    linux-x64     simplex-desktop-ubuntu-22_04-x86_64.deb  4db7f96c557b87a560a3d4cb719e45f48d2afd6541b45e31d9cb29200dff078f
-windows-x86_64 windows-x86_64  windows-x64   simplex-desktop-windows-x86_64.msi       b4cf5b74c1d1e1acd53ebd85de99696c49a49e301bb90cfd0572a210ef0660b0
-macos-aarch64  mac-aarch64     macos-arm64   simplex-desktop-macos-aarch64.dmg        1d502b180ba1b58894d6705cd9737d7c0bc5a7d6490e51e7bc33f07a1252de80
-macos-x86_64   mac-x86_64      macos-x64     simplex-desktop-macos-x86_64.dmg         490fee5466a0ed8871e2e9f3b324277e27b88c78cd68c182dd8910ebbd044579
+linux-x86_64   linux-x86_64    linux-x64     simplex-desktop-ubuntu-22_04-x86_64.deb  9b0229bbc2698ad1e3d3e1d15e0afb8a755a7bdf426ca8e91c7b8b57a4f38488
+windows-x86_64 windows-x86_64  windows-x64   simplex-desktop-windows-x86_64.msi       3979dda4c44f67e7bfcb5c8fd2378537b72af6e7e3c73118344935a2e5c31b0b
+macos-aarch64  mac-aarch64     macos-arm64   simplex-desktop-macos-aarch64.dmg        d6aae0906b8adf9c18299cb795d7bd5ef79dd007d40ace37912cfb61d3617f7e
+macos-x86_64   mac-x86_64      macos-x64     simplex-desktop-macos-x86_64.dmg         5a972ff6aa0aa457c4f38324d6785abee7f10444b64de446078aaa520c622e75

@@ -16,6 +16,12 @@ import androidx.compose.ui.graphics.Color
 // Encre des QR codes : l'amont 062D56 à notre teinte, contraste conservé
 val TrustiatisQrEncre = Color(0xFF00362B)  // amont #062D56, teinte de la marque
 
+// Incognito : l'accent de la palette, pris tel quel. Un signal ne se derive pas.
+val TrustiatisIncognito = Color(0xFFBE7C7B)  // palette, marque.accent
+
+// Surbrillance de selection : l'amont 0066FF a notre teinte, opacite 30 % conservee
+val TrustiatisSelectionHighlight = Color(0x4D008971)  // amont #0066FF, teinte de la marque
+
 // Thème Dark
 val TrustiatisDarkPrimary = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
 val TrustiatisDarkPrimaryVariant = Color(0xFF509482)  // palette, marque.primaire
@@ -42,6 +48,8 @@ val TrustiatisSignatureTitle = Color(0xFF6FB3A1)  // palette, marque.primaire_cl
 val TrustiatisSignaturePrimaryVariant2 = Color(0xFF033027)  // amont #172941, teinte de la marque
 val TrustiatisSignatureSentMessage = Color(0xFF033027)  // amont #172941, teinte de la marque
 val TrustiatisSignatureSentQuote = Color(0xFF034236)  // amont #1C3A57, teinte de la marque
+val TrustiatisSignatureReceivedMessage = Color(0xFF162F28)  // amont #25283A, teinte de la marque
+val TrustiatisSignatureReceivedQuote = Color(0xFF293F39)  // amont #36394A, teinte de la marque
 
 // Thème Black
 val TrustiatisBlackPrimary = Color(0xFF6FB3A1)  // palette, marque.primaire_clair

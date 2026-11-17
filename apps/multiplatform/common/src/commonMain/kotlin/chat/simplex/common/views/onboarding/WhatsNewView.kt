@@ -1122,6 +1122,29 @@ private val crowdfundingLayout = if (appPlatform.isDesktop)
 else
   CrowdfundingLayout(Dp.Unspecified, RoundedCornerShape(CROWDFUNDING_IMAGE_CORNER_RADIUS), null)
 
+// Second volet de la même décision, posé ici pour que les deux portes se lisent ensemble.
+//
+// Le retrait de l'entrée des badges dans les réglages ne suffisait pas : la liste de
+// discussions pose d'elle même une bannière « Support SimpleX » dès que l'utilisateur
+// passe trois conversations, et elle mène au même achat. C'est un appel à financer
+// l'amont, affiché sans que personne l'ait demandé, dans une application qui porte un
+// autre nom. Le Membre l'a vu dans la version 7.1.2-ts1.
+//
+// Même méthode que P-5 et que P-7 bis : on neutralise la porte, pas ses appelants. La
+// bannière, son texte et BadgesView restent en place, donc un report de l'amont ne
+// conflicte que sur cette ligne.
+//
+// Ce qui n'est PAS neutralisé, et c'est voulu : les alertes qui informent un utilisateur
+// d'un badge qu'il a réellement payé, par exemple après l'import d'une base venue de
+// l'application officielle. Elles renseignent, elles ne sollicitent pas : chacune des
+// trois portes ci dessous a déjà, chez l'amont, une branche qui dit la même chose sans
+// le bouton d'achat, et c'est dans cette branche que l'on retombe.
+//
+// Contrairement à `crowdfundingAvailable()`, cette fonction n'est PAS composable : elle
+// rend une constante, et deux de ses trois appelants, les alertes de ComposeView.kt et
+// de ChatInfoImage.kt, sont des fonctions ordinaires.
+fun badgePitchAvailable(): Boolean = false
+
 // Décision du Membre du 2026-11-15 au soir, qui renverse P-7 : l'appel au soutien de
 // l'amont ne doit pas apparaître dans Trustiatis Secure.
 //

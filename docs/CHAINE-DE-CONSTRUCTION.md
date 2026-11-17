@@ -532,3 +532,92 @@ appliquée.
 ni chez Apple ni pour Windows, et la décision appartient au Membre. Conséquence pour qui
 télécharge : macOS refuse le premier lancement, SmartScreen avertit. Le portail de
 téléchargement l'explique et donne la manoeuvre pour les deux systèmes.
+
+## 13. Ce que le paquet Linux 7.1.2-ts1 avait de faux, et pourquoi rien ne l'a vu
+
+Le Membre a rapporté, le 2026-11-17, que l'application plante sous Linux au moment d'un
+appel, les messages continuant de passer. La trace qu'il a jointe nomme la cause sans
+détour :
+
+```
+libvlccore.so.9: cannot open shared object file: No such file or directory
+```
+
+### Le défaut, et sa preuve
+
+L'arbre VLC livré dans `trustiatis-secure-7.1.2-ts1-amd64.deb` porte `libvlccore.so`, et
+**pas** `libvlccore.so.9`. Or `libvlc.so` déclare :
+
+```
+RUNPATH              $ORIGIN
+NEEDED               libvlccore.so.9
+```
+
+L'éditeur de liens dynamique cherche donc un nom qui n'existe pas, dans un répertoire qui
+contient pourtant la bibliothèque, sous un autre nom. C'est la signature d'une copie qui a
+suivi les liens symboliques : les trois noms `libvlccore.so`, `libvlccore.so.9` et
+`libvlccore.so.9.0.1` s'effondrent sur celui du lien, et la version disparaît. Le paquet
+livré compte 424 entrées VLC ; l'arbre que `prepare-vlc-linux.sh` dépose en compte 1 035,
+dont les six liens symboliques qui portent les noms versionnés.
+
+### Pourquoi la chaîne ne s'en est pas aperçue
+
+Trois raisons, et aucune ne fait de bruit.
+
+1. **L'ordre des deux scripts ne se devine pas.** `libs-depuis-amont.sh` commence par un
+   `rm -rf` sur le répertoire de destination, donc il efface aussi `vlc/`. Il doit passer
+   avant `prepare-vlc-linux.sh`, jamais après.
+2. **`prepare-vlc-linux.sh` échoue en silence.** Sa première ligne utile est
+   `mkdir $vlc_dir || exit 0` : si le répertoire existe déjà, même incomplet, le script
+   rend la main avec un code 0 sans rien faire.
+3. **La construction réussit quand même.** Le manque ne se voit qu'à l'exécution, et
+   seulement si l'on passe un appel. Un contrôle de compilation ne pouvait pas le trouver.
+
+L'horodatage le confirme : le `.deb` est daté du 2026-11-16 à 07:05, l'arbre VLC correct
+du même jour à 08:52. Le paquet a été fabriqué avant que l'arbre ne soit posé.
+
+### Deux autres défauts, trouvés en ouvrant le même paquet
+
+L'entrée de bureau livrée portait :
+
+```
+Exec=/opt/trustiatis-secure/bin/trustiatis-secure
+MimeType=
+```
+
+Sans `%u` et sans type MIME, **les liens `simplex:` et `simplexchat:` ne sont enregistrés
+nulle part** : un lien d'invitation cliqué sous Linux n'ouvre rien. La décision D-3 dit de
+garder ces schémas ; elle n'était pas tenue. La bibliothèque `skiko` était en outre
+présente deux fois, dans son `.jar` et extraite à côté.
+
+Ces deux défauts ont la même origine que le premier : le paquet est sorti d'un
+`./gradlew packageDeb` nu. L'amont, lui, repasse derrière jpackage avec
+`scripts/desktop/make-deb-linux.sh`. Ce script ne pouvait pas servir ici, pour deux
+raisons dont aucune n'est un oubli de notre part :
+
+- il commence par `scripts/desktop/build-lib-linux.sh`, qui recompile le coeur Haskell,
+  ce que la décision D-2 interdit ;
+- toutes ses recherches de fichiers portent le nom de l'amont, `simplex*.deb`,
+  `/opt/*imple*/`, `simplex.cfg`, et il renomme en `simplex_<arch>.deb`. Aucun de ces
+  motifs ne rencontre `trustiatis-secure`.
+
+### Ce qui a été mis en place
+
+| Pièce | Rôle |
+|---|---|
+| `scripts/desktop/verifier-vlc-linux.sh` | lit les `NEEDED` de chaque ELF du premier niveau de l'arbre et refuse tout nom absent dont l'arbre fournit pourtant la racine sous un autre nom. Vérifie en plus, nommément, `libvlc.so` et `libvlccore.so.9` |
+| `scripts/desktop/paquet-deb-trustiatis.sh` | transpose à notre nom les étapes d'après empaquetage de l'amont, et refuse de rendre la main si l'une d'elles n'a pas pris. Vérifie le paquet fini sans l'installer |
+| travail `linux` de `.github/workflows/paquets-bureau.yml` | part d'un arbre vide à chaque fois, sur `ubuntu-22.04`, et fixe l'ordre des étapes une bonne fois |
+
+Le garde-fou a été éprouvé **dans les deux sens** : il passe sur l'arbre courant (1 035
+fichiers, les deux noms présents, aucune dépendance interne perdue) et il refuse l'arbre
+extrait du paquet réellement livré, en nommant `libvlccore.so.9`.
+
+### La leçon
+
+Elle vaut d'être écrite, parce qu'elle s'est produite deux fois dans ce projet. Une étape
+de préparation qui se saute elle même en silence, avec un code de sortie 0, est plus
+dangereuse qu'une étape absente : elle laisse la chaîne réussir et le défaut partir chez
+l'utilisateur. Le `mkdir || exit 0` de l'amont et le `|| true` d'un journal de CI sont la
+même faute. Partout où une étape peut ne pas avoir lieu, le contrôle doit porter sur son
+**résultat**, pas sur son code de retour.
