@@ -111,6 +111,12 @@ rm -f "$final"
 dpkg-deb --build --root-owner-group --uniform-compression ./extracted "$final"
 command -v strip-nondeterminism >/dev/null 2>&1 && strip-nondeterminism "$final"
 
+# Le paquet brut de jpackage s'en va. Il n'a aucune des corrections ci dessus, en
+# particulier pas l'enregistrement des liens « simplex: », et le laisser a cote du
+# paquet fini, dans le meme repertoire que l'artefact ramasse, reviendrait a livrer
+# deux paquets dont un seul fonctionne.
+rm -f "$brut"
+
 # --- Verification du paquet fini, sans l'installer. -------------------------------------
 echo
 echo "Verification du paquet fini :"
