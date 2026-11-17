@@ -70,6 +70,12 @@ Première tâche de la Phase 2, **faite le 2026-11-15** :
       `design-system/trustiatis/logo-icon.png` est aplati sur une plaque blanche. Une
       recette a été ajoutée à `design-system/detramer.py` pour le reconstruire
 - [x] deux thèmes définis dans `palette.json`, `theme_sombre` et `theme_clair`
+- [x] **2026-11-17**, section `surfaces` ajoutée à `palette.json` : les panneaux et
+      les filets translucides, plus l'opacité des voiles, repris de la charte fournie
+      par le Membre (page « Entretien Collaborateur », variables `--panel`, `--panel2`,
+      `--line`, `--line2`, `--orange-soft`, `--green-soft`). Ils servent le portail de
+      téléchargement et **ne sont pas propagés dans les applications** : Compose n'a
+      pas de notion de surface translucide au dessus d'un arrière plan animé
 
 Deux défauts de `detramer.py` ont été corrigés au passage, et ils valaient d'être trouvés :
 son diagnostic plantait sur une cible absente au lieu de dire qu'elle était à construire, et
