@@ -42,8 +42,29 @@ adresse publique documentée, et les bibliothèques ne figurent pas parmi les ac
 versions publiées sur GitHub.
 
 Elles figurent en revanche **dans les APK officiels**, qui sont eux publiés. Les deux
-bibliothèques ont donc été extraites de l'APK officiel de la version greffée, ce qui garantit
+bibliothèques sont donc extraites de l'APK officiel de la version greffée, ce qui garantit
 qu'elles proviennent de la compilation de l'amont pour ce commit précis.
+
+**Depuis le 2026-11-17, cela se fait par un script**, `scripts/android/libs-depuis-amont.sh`,
+et non plus à la main :
+
+```bash
+scripts/android/libs-depuis-amont.sh              # les deux architectures
+scripts/android/libs-depuis-amont.sh arm64-v8a    # une seule
+```
+
+Il lit le tag dans `tools/amont-courant.txt`, les empreintes dans `tools/apk-amont.txt`, et
+refuse d'extraire quoi que ce soit d'un APK dont l'empreinte ne correspond pas. Les
+empreintes de ce manifeste sont celles que **l'API de GitHub publie** pour les actifs de la
+version, pas des sommes calculées sur le poste : elles valent donc contrôle de provenance.
+
+Pourquoi ce script a manqué si longtemps, et ce que cela a coûté : il n'y en avait pas,
+alors que le bureau avait le sien depuis le début. Rien ne rafraîchissait donc ces fichiers
+au report d'une version, **et rien ne le signalait**. Le 17 novembre 2026, le poste portait
+encore les `.so` de la v7.1.2 alors que la base était passée à la v7.1.4 depuis le report.
+Une compilation signée aurait produit des APK estampillés « 7.1.4-ts1 » portant le coeur de
+la version précédente, sans un mot. Les empreintes le disent : `libsimplex.so` arm64 est
+passée de `e6371efc…` à `84fb5ddc…` au premier passage du script.
 
 | Fichier | Empreinte SHA-256 de l'APK d'origine |
 |---|---|
@@ -322,10 +343,14 @@ export TRUSTIATIS_KEYSTORE="$HOME/trustiatis-secure.jks"
 export TRUSTIATIS_KEY_ALIAS=trustiatis
 read -rsp "Mot de passe du magasin : " TRUSTIATIS_KEYSTORE_PASSWORD && echo
 export TRUSTIATIS_KEYSTORE_PASSWORD
-./gradlew assembleFossRelease --no-daemon --console=plain \
-  -Dorg.gradle.jvmargs="-Xmx2200m -Dfile.encoding=UTF-8" \
-  -Pkotlin.compiler.execution.strategy=in-process
+./gradlew assembleFossRelease --no-daemon --console=plain
 ```
+
+**Ne plus passer `-Dorg.gradle.jvmargs` ici.** Depuis le 2026-11-17 le réglage de mémoire du
+poste vit dans `~/.gradle/gradle.properties`, hors du dépôt, et il donne 3,8 Gio avec la
+compilation en processus unique. Une valeur passée en ligne de commande **prime** sur ce
+fichier : reprendre l'ancien `-Xmx2200m` rognerait le tas au lieu de l'assurer. Voir le
+chapitre 15.
 
 Contrôle d'après construction, qui ne demande aucun secret :
 

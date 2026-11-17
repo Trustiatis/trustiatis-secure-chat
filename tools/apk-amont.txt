@@ -1,0 +1,20 @@
+# APK officiels de l'amont, d'où sont extraites les bibliothèques du coeur pour Android.
+#
+# Pourquoi ce fichier, et pourquoi des APK. La décision D-2 interdit de recompiler le coeur
+# Haskell. Le script prévu par l'amont, scripts/android/download-libs.sh, veut l'URL d'un
+# dépôt de jobs Hydra, qui n'est pas une adresse publique documentée, et les .so ne sont pas
+# des actifs des versions publiées. Ils sont en revanche DANS les APK officiels, qui le sont.
+#
+# Les empreintes sont celles que l'API de GitHub publie pour les actifs de la version, pas
+# des sommes calculées ici : elles valent donc contrôle de provenance.
+#
+# Colonnes : cible  abi  actif  sha256
+#
+# Les empreintes valent pour le tag écrit dans tools/amont-courant.txt, et pour lui seul :
+# l'amont nomme ses APK sans version, « simplex-aarch64.apk » désigne toutes les versions.
+# À chaque report, relever les nouvelles empreintes avec :
+#   curl -sS https://api.github.com/repos/simplex-chat/simplex-chat/releases/tags/<tag> \
+#     | python3 -c 'import json,sys; [print(a["name"], a.get("digest")) for a in json.load(sys.stdin)["assets"] if a["name"].endswith(".apk")]'
+#
+arm64-v8a     arm64-v8a     simplex-aarch64.apk   6339d21c530ebbd6e8bbab34d29a7de874f1c579ee3df7a5d360ff56f7b0df42
+armeabi-v7a   armeabi-v7a   simplex-armv7a.apk    6423f820f5fe770361c67100aafde45b54bdc9965f3d6d77a71ac5eade11884d
