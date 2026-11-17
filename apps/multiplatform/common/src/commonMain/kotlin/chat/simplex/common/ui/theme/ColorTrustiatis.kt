@@ -13,6 +13,9 @@ import androidx.compose.ui.graphics.Color
 // affichée, c'est la marque que ReadableTextWithLink cherche pour la remplacer par
 // MaterialTheme.colors.primary. Changer l'une sans l'autre éteindrait les liens.
 
+// Encre des QR codes : l'amont 062D56 à notre teinte, contraste conservé
+val TrustiatisQrEncre = Color(0xFF00362B)  // amont #062D56, teinte de la marque
+
 // Thème Dark
 val TrustiatisDarkPrimary = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
 val TrustiatisDarkPrimaryVariant = Color(0xFF509482)  // palette, marque.primaire

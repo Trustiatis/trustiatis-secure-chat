@@ -44,6 +44,50 @@ ZONE_SURE = 72 / 108
 # adaptatives, qui est montrée telle quelle.
 DENSITES = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
 
+# L'icône de notification d'Android se dessine sur 24 unités de densité.
+DENSITES_NTF = {"mdpi": 24, "hdpi": 36, "xhdpi": 48, "xxhdpi": 72, "xxxhdpi": 96}
+
+# ---------------------------------------------------------------------------
+# Géométrie, relevée sur les ressources de l'amont et non choisie
+# ---------------------------------------------------------------------------
+# Le problème que ces quatre nombres règlent : le dessin de l'amont est un carré
+# (212 sur 212 dans une toile de 432), le nôtre est un rectangle large (1244 sur
+# 909, rapport 1,37). Caler la LARGEUR du nôtre sur celle du sien le rend plus
+# grand dans toutes les directions utiles, parce qu'un rectangle large déborde
+# du cercle qui contenait le carré. Et l'application se sert de ce cercle : dans
+# `addLogo`, le QR code reçoit un disque blanc de rayon `taille / 2` puis le
+# dessin par dessus, à `taille x 1,5`. Avec la largeur calée sur l'amont, les
+# coins de notre dessin sortaient du disque de 24 %, ce qui se voit sur le QR.
+#
+# La règle appliquée ici cale donc le CERCLE CIRCONSCRIT au dessin, et non sa
+# largeur. Quelle que soit la forme du monogramme, il occupe exactement la place
+# que l'amont avait prévue. Les valeurs viennent de la mesure des fichiers de
+# `upstream-v7.1.2`, pas du jugement :
+#
+#   mipmap-xxxhdpi/icon_foreground.png  dessin 212x212 sur 432  -> rayon 0,347
+#   mipmap-xxxhdpi/icon.png             plaque 152 sur 192      -> 0,792, coin 0,065
+#   mipmap-xxxhdpi/icon_round.png       plaque ronde            -> 0,927
+#   drawable-*/ntf_icon.png             dessin 88x88 sur 96     -> largeur 0,917
+#
+# Le rayon retenu n'est pas le 0,347 de l'amont mais 1/3, et ce tiers n'est pas
+# un arrondi : c'est la valeur que `addLogo` impose. Il met le dessin à l'échelle
+# 1,5 fois la taille du disque, dont le rayon vaut la moitié de cette taille ;
+# pour que le cercle circonscrit tienne dans le disque il faut donc
+# 1,5 x rayon <= 0,5, soit rayon <= 1/3. L'amont est 4 % au dessus et s'en tire
+# parce que son dessin est une croix, dont les coins sont vides ; le nôtre est
+# plein et ses angles sortaient du disque.
+#
+# Le tiers fait tenir le dessin dans le disque en le lui faisant toucher : ses
+# quatre angles tombent exactement sur le bord, ce qui se voit. On garde donc
+# une marge de 12 % à l'intérieur du disque. C'est le seul nombre de ce fichier
+# qui relève du jugement, et il ne porte que sur un blanc tournant.
+MARGE_DISQUE = 0.88
+RAYON_CIRCONSCRIT = MARGE_DISQUE / 3
+PLAQUE = 0.792
+PLAQUE_RAYON_COIN = 0.065
+PLAQUE_RONDE = 0.927
+NTF_LARGEUR = 0.917
+
 
 def palette() -> dict:
     return json.loads((BRANDING / "colors" / "palette.json").read_text())
@@ -70,6 +114,62 @@ def _pose(dessin: Image.Image, cote: int, part: float, fond=None) -> Image.Image
     reduit = dessin.resize((large, haut), Image.LANCZOS)
     toile.alpha_composite(reduit, ((cote - large) // 2, (cote - haut) // 2))
     return toile
+
+
+def _pose_cercle(dessin: Image.Image, cote: int, rayon: float, fond=None) -> Image.Image:
+    """Centre le dessin pour que son cercle circonscrit ait `rayon x cote`.
+
+    C'est la mesure qui compte, et non la largeur : voir le commentaire de
+    RAYON_CIRCONSCRIT. Un carré et un rectangle large posés par cette règle
+    tiennent dans le même disque, donc à la même place dans le QR code.
+    """
+    from math import hypot
+
+    toile = Image.new("RGBA", (cote, cote), fond or (0, 0, 0, 0))
+    diagonale = 2 * rayon * cote
+    facteur = diagonale / hypot(dessin.width, dessin.height)
+    large = max(1, round(dessin.width * facteur))
+    haut = max(1, round(dessin.height * facteur))
+    reduit = dessin.resize((large, haut), Image.LANCZOS)
+    toile.alpha_composite(reduit, ((cote - large) // 2, (cote - haut) // 2))
+    return toile
+
+
+def _pose_largeur(dessin: Image.Image, cote: int, part: float) -> Image.Image:
+    """Centre le dessin sur un carré de `cote`, sa largeur occupant `part`."""
+    toile = Image.new("RGBA", (cote, cote), (0, 0, 0, 0))
+    large = max(1, round(cote * part))
+    haut = max(1, round(dessin.height * large / dessin.width))
+    reduit = dessin.resize((large, haut), Image.LANCZOS)
+    toile.alpha_composite(reduit, ((cote - large) // 2, (cote - haut) // 2))
+    return toile
+
+
+def _plaque(cote: int, part: float, rayon_coin: float, couleur) -> Image.Image:
+    """La plaque de fond : un carré arrondi centré, le reste transparent.
+
+    L'amont ne pose pas son dessin sur un carré plein à bord perdu, il le pose
+    sur une plaque arrondie entourée de transparence. Un carré plein à bord
+    perdu est ce que le lanceur affiche tel quel, sans rognage ni ombre, et
+    c'est ce qui donnait une vignette noire dure.
+    """
+    im = Image.new("RGBA", (cote, cote), (0, 0, 0, 0))
+    marge = round(cote * (1 - part) / 2)
+    boite = (marge, marge, cote - marge - 1, cote - marge - 1)
+    rayon = max(1, round((boite[2] - boite[0]) * rayon_coin))
+    ImageDraw.Draw(im).rounded_rectangle(boite, radius=rayon, fill=couleur)
+    return im
+
+
+def _silhouette(dessin: Image.Image) -> Image.Image:
+    """Le dessin en blanc plein, ne gardant que sa transparence.
+
+    Android n'affiche d'une icône de notification que son canal alpha, qu'il
+    teinte lui même. Une icône en couleur y apparaît comme un carré plein.
+    """
+    sil = Image.new("RGBA", dessin.size, (255, 255, 255, 0))
+    sil.putalpha(dessin.getchannel("A"))
+    return sil
 
 
 def _rond(im: Image.Image) -> Image.Image:
@@ -267,6 +367,23 @@ def couleurs_kotlin() -> bytes:
         "// MaterialTheme.colors.primary. Changer l'une sans l'autre éteindrait les liens.",
         "",
     ]
+    # L'encre des QR codes. Elle était juste, et écrite à la main : les trois
+    # signatures de QRCode.kt la portaient en littéral. Elle est générée ici
+    # pour que la règle qui la produit soit visible et rejouable.
+    #
+    # Ce n'est pas une couleur de la palette et ce n'est pas non plus celle de
+    # l'amont : c'est le #062D56 de l'amont passé par `teinte_de`, donc sa
+    # clarté et sa saturation avec notre teinte. Cela compte ici plus
+    # qu'ailleurs, parce que la lecture d'un QR dépend du contraste : l'amont
+    # est à 13,8 contre 1 sur blanc, la dérivée à 13,4. Le sauge profond de la
+    # palette, lui, n'est qu'à 5,3, et serait un vrai recul.
+    QR_AMONT = "062D56"
+    lignes.append(f"// Encre des QR codes : l'amont {QR_AMONT} à notre teinte, contraste conservé")
+    lignes.append(
+        f"val TrustiatisQrEncre = Color(0xFF{teinte_de(QR_AMONT, marque)})  // amont #{QR_AMONT}, teinte de la marque"
+    )
+    lignes.append("")
+
     for theme, roles in THEMES_AMONT.items():
         lignes.append(f"// Thème {theme}")
         for role, (origine, cle) in roles.items():
@@ -288,8 +405,8 @@ def couleurs_kotlin() -> bytes:
 def cibles() -> dict[Path, bytes]:
     """Le contenu attendu de chaque fichier généré, sans rien écrire."""
     p = palette()
-    fond_principal = _hex(p["fond_icone"]["sombre"])
-    fond_second = _hex(p["fond_icone"]["clair"])
+    fond_clair = _hex(p["fond_icone"]["clair"])
+    fond_sombre = _hex(p["fond_icone"]["sombre"])
     dessin = _dessin()
     res = MULTI / "android" / "src" / "main" / "res"
     sortie: dict[Path, bytes] = {}
@@ -306,20 +423,42 @@ def cibles() -> dict[Path, bytes]:
     #    manifeste n'a pas à bouger. Elles diffèrent par le fond, pas par le
     #    dessin. Le second fond est la plaque blanche du favicon d'origine, et
     #    non le sauge : le I du monogramme est sauge et s'y effacerait.
-    for suffixe, fond in (("", fond_principal), ("_dark_blue", fond_second)):
+    # L'ordre des deux fonds est celui de l'amont, que la première propagation
+    # avait inversé : l'icône par défaut est sur plaque CLAIRE (l'amont pose
+    # #FFFFFF), la variante nommée « dark_blue » est celle sur fond sombre.
+    # C'est ce que le Membre a relevé : une vignette noire dure dans le lanceur.
+    for suffixe, fond in (("", fond_clair), ("_dark_blue", fond_sombre)):
         for densite, cote in DENSITES.items():
             d = res / f"mipmap-{densite}"
             # L'avant plan adaptatif se dessine sur 108 unités de densité.
-            avant = _pose(dessin, round(cote * 108 / 48), ZONE_SURE)
-            png(d / f"icon{suffixe}_foreground.png", avant)
-            pleine = _pose(dessin, cote, 0.72, fond)
-            png(d / f"icon{suffixe}.png", pleine)
-            png(d / f"icon{suffixe}_round.png", _rond(pleine))
+            png(
+                d / f"icon{suffixe}_foreground.png",
+                _pose_cercle(dessin, round(cote * 108 / 48), RAYON_CIRCONSCRIT),
+            )
+            glyphe = _pose_cercle(dessin, cote, RAYON_CIRCONSCRIT)
+            carre = _plaque(cote, PLAQUE, PLAQUE_RAYON_COIN, fond)
+            carre.alpha_composite(glyphe)
+            png(d / f"icon{suffixe}.png", carre)
+            # Un rayon d'un demi côté fait un disque : c'est l'icône ronde.
+            rond = _plaque(cote, PLAQUE_RONDE, 0.5, fond)
+            rond.alpha_composite(glyphe)
+            png(d / f"icon{suffixe}_round.png", rond)
+
+    # 1 bis. Icônes de notification. Elles manquaient, et c'est pour cela que
+    #        les notifications d'Android montraient encore le dessin de l'amont.
+    #        Android n'en garde que le canal alpha et le teinte lui même, donc
+    #        une silhouette blanche, et non le monogramme en couleur.
+    silhouette = _silhouette(dessin)
+    for densite, cote in DENSITES_NTF.items():
+        d = res / f"drawable-{densite}"
+        marque = _pose_largeur(silhouette, cote, NTF_LARGEUR)
+        png(d / "ntf_icon.png", marque)
+        png(d / "ntf_service_icon.png", marque)
 
     # 2. Couleurs de fond des icônes adaptatives, lues par mipmap-anydpi-v26/
     for nom, couleur in (
-        ("icon_background", p["fond_icone"]["sombre"]),
-        ("icon_dark_blue_background", p["fond_icone"]["clair"]),
+        ("icon_background", p["fond_icone"]["clair"]),
+        ("icon_dark_blue_background", p["fond_icone"]["sombre"]),
     ):
         sortie[res / "values" / f"{nom}.xml"] = (
             '<?xml version="1.0" encoding="utf-8"?>\n'
@@ -335,7 +474,7 @@ def cibles() -> dict[Path, bytes]:
 
     # 4. Le monogramme utilisé dans l'application elle même : notification de
     #    bureau, fenêtre, écran d'accueil.
-    commun = _pose(dessin, 432, ZONE_SURE)
+    commun = _pose_cercle(dessin, 432, RAYON_CIRCONSCRIT)
     png(MULTI / "common/src/commonMain/moko-resources/images/icon_foreground_common@4x.png", commun)
     png(MULTI / "common/src/androidMain/res/drawable/icon_foreground_android_common.png", commun)
 
@@ -355,21 +494,28 @@ def cibles() -> dict[Path, bytes]:
 
     # 5. Desktop. Le .icns est écrit à la main, voir _icns.
     dist = MULTI / "desktop" / "src" / "jvmMain" / "resources" / "distribute"
-    png(dist / "simplex.png", _pose(dessin, 512, 0.78, fond_principal))
+
+    def plaquee(cote: int) -> Image.Image:
+        """La plaque claire et le monogramme, comme l'icône d'Android."""
+        im = _plaque(cote, PLAQUE, PLAQUE_RAYON_COIN, fond_clair)
+        im.alpha_composite(_pose_cercle(dessin, cote, RAYON_CIRCONSCRIT))
+        return im
+
+    png(dist / "simplex.png", plaquee(512))
     from io import BytesIO
 
     tampon = BytesIO()
-    _pose(dessin, 256, 0.78, fond_principal).save(
+    plaquee(256).save(
         tampon, "ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
     )
     sortie[dist / "simplex.ico"] = tampon.getvalue()
     sortie[dist / "simplex.icns"] = _icns(
         {
-            "ic11": _pose(dessin, 32, 0.78, fond_principal),
-            "ic12": _pose(dessin, 64, 0.78, fond_principal),
-            "ic07": _pose(dessin, 128, 0.78, fond_principal),
-            "ic08": _pose(dessin, 256, 0.78, fond_principal),
-            "ic09": _pose(dessin, 512, 0.78, fond_principal),
+            "ic11": plaquee(32),
+            "ic12": plaquee(64),
+            "ic07": plaquee(128),
+            "ic08": plaquee(256),
+            "ic09": plaquee(512),
         }
     )
     return sortie

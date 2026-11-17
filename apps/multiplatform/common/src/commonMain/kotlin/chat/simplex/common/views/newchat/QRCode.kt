@@ -25,7 +25,7 @@ fun SimpleXCreatedLinkQRCode(
   short: Boolean,
   modifier: Modifier = Modifier,
   padding: PaddingValues = PaddingValues(horizontal = DEFAULT_PADDING * 2f, vertical = DEFAULT_PADDING_HALF),
-  tintColor: Color = Color(0xff00362B),
+  tintColor: Color = TrustiatisQrEncre,
   withLogo: Boolean = true,
   onShare: (() -> Unit)? = null,
 ) {
@@ -45,7 +45,7 @@ fun SimpleXLinkQRCode(
   connReq: String,
   modifier: Modifier = Modifier,
   padding: PaddingValues = PaddingValues(horizontal = DEFAULT_PADDING * 2f, vertical = DEFAULT_PADDING_HALF),
-  tintColor: Color = Color(0xff00362B),
+  tintColor: Color = TrustiatisQrEncre,
   withLogo: Boolean = true,
   onShare: (() -> Unit)? = null,
 ) {
@@ -68,7 +68,7 @@ fun QRCode(
   small: Boolean = false,
   modifier: Modifier = Modifier,
   padding: PaddingValues = PaddingValues(horizontal = DEFAULT_PADDING * 2f, vertical = DEFAULT_PADDING_HALF),
-  tintColor: Color = Color(0xff00362B),
+  tintColor: Color = TrustiatisQrEncre,
   withLogo: Boolean = true,
   onShare: (() -> Unit)? = null,
 ) {
