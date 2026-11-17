@@ -1033,6 +1033,18 @@ private val versionDescriptions: List<VersionDescription> = listOf(
 
 @Composable
 private fun SupporterBadgeWhatsNew(modalManager: ModalManager) {
+  // Septième porte de P-7 bis, ouverte par le report de la v7.1.4 et trouvée en lançant
+  // le paquet construit, pas en lisant le code : l'écran des nouveautés de cette version
+  // présente « Supporter badges » avec « Support SimpleX and get a badge », qui mène à
+  // l'achat. Les six portes fermées le 2026-11-15 ne couvraient pas celle ci, parce que
+  // la description de version qui l'appelle n'existait pas encore.
+  //
+  // Même méthode que les autres, et que `InvestInSimpleXChatView` juste en dessous : on
+  // ferme LA porte, pas ses appelants. La description de version, le composable et
+  // `BadgesView` restent en place, donc un report de l'amont ne conflicte que sur cette
+  // ligne. Le bloc disparaît en entier et non seulement son lien : annoncer une capacité
+  // que notre version ne permet pas d'obtenir tromperait l'utilisateur.
+  if (!badgePitchAvailable()) return
   Column(Modifier.padding(bottom = 12.dp)) {
     Row(
       verticalAlignment = Alignment.CenterVertically,
