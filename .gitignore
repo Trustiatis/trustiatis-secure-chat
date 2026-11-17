@@ -124,6 +124,10 @@ dist-*/
 apps/multiplatform/common/src/commonMain/cpp/android/libs/
 apps/multiplatform/common/src/commonMain/cpp/desktop/libs/
 
+# Sorties de construction : le fichier d'empreintes accompagne les paquets, il n'a pas
+# plus sa place au dépôt qu'eux.
+empreintes-*.txt
+
 # Outillage local
 .DS_Store
 __pycache__/

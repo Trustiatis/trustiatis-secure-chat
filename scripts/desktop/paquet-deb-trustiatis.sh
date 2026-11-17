@@ -146,6 +146,20 @@ grep -q '^Exec=.*%u' "$entree_livree" || {
 grep -q '^MimeType=.*x-scheme-handler/simplex;' "$entree_livree" || {  # marque-ok: reseau, decision D-3
   echo "ERREUR : l'entree de bureau du paquet fini n'enregistre pas les liens." >&2; exit 1; }
 
+# Le fichier d'empreintes, sous le nom que la chaine hebergee lui donne. Sans lui, le
+# paquet construit ici ne peut pas etre range par tools/nommer-livraison.py, qui exige
+# l'empreinte ecrite par la machine de construction : le chemin local et le chemin
+# heberge produisaient deux choses differentes, et seul le second etait livrable.
+# C'est la meme commande que l'etape « Empreintes » de .github/workflows/paquets-bureau.yml.
+# L'arbre decompresse a servi, il pese 864 Mo, et le script le recreait a chaque fois
+# sans jamais le reprendre. Laisse en place, il remplit le disque du poste et encombre
+# « git status » d'un repertoire non suivi.
+rm -rf extracted
+
+empreintes="$racine/empreintes-linux-${arch}.txt"
+( cd "$(dirname "$final")" && sha256sum "$(basename "$final")" ) > "$empreintes"
+
 echo
 ls -l "$final"
-sha256sum "$final"
+cat "$empreintes"
+echo "empreintes : ${empreintes#$racine/}"
