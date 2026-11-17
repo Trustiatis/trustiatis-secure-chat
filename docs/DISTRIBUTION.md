@@ -7,7 +7,8 @@ Comment les paquets arrivent chez l'utilisateur, et à quel coût.
 | Portail | **`downloads.trustiatis.com`** |
 | Dépôt du portail | `trustiatis-secure-downloads`, séparé de celui du produit |
 | Hébergement | Cloudflare, **plan gratuit**, compte Trustiatis |
-| Statut | portail écrit et vérifié localement, **non déployé**, aucune version publiée |
+| Statut | portail **en ligne depuis le 2026-11-16**, version 7.1.2-ts1 publiée, sept paquets servis depuis R2 |
+| Pages | `/` accueil à deux voies, `/trustiatis-secure/` les paquets, `/logiciels/` les adresses officielles de logiciels tiers |
 
 ## 1. Pourquoi un dépôt séparé pour le portail
 
@@ -146,10 +147,17 @@ trustiatis-secure-<version>-desktop-linux-x86_64.AppImage
 
 ## 8. Ce qui reste à faire
 
-- [ ] activer R2 sur le compte Cloudflare Trustiatis et créer le bucket
-- [ ] déployer le Worker et attacher `downloads.trustiatis.com`
+- [x] activer R2 sur le compte Cloudflare Trustiatis et créer le bucket, fait le 2026-11-16
+- [x] déployer le Worker et attacher `downloads.trustiatis.com`, fait le 2026-11-16
 - [x] neutraliser le vérificateur de mises à jour de l'amont (risque T-02), fait le 2026-11-15
+- [x] remplir le `MimeType` de l'entrée de bureau du paquet Debian, par post-traitement :
+      `scripts/desktop/paquet-deb-trustiatis.sh`, fait le 2026-11-16, après que le paquet
+      7.1.2-ts1 est sorti sans
+- [x] construire et publier une première version, 7.1.2-ts1 le 2026-11-16. **Signée pour
+      Android seulement** : les paquets de bureau ne le sont pas, faute de certificat Apple
+      et Windows, et la décision appartient au Membre
 - [ ] faire lire l'index du portail par le client Desktop, en remplacement
-- [ ] remplir le `MimeType` de l'entrée de bureau du paquet Debian, par post-traitement
 - [ ] ajouter la vérification du SHA-256 avant installation dans le client Desktop
-- [ ] construire, signer et publier la première version
+- [ ] trancher D-1, la mise à disposition sur l'App Store sous AGPLv3
+- [ ] publier les sources avant les binaires sur le portail : le dépôt du produit est privé,
+      et l'AGPL exige que la source accompagne l'exécutable
