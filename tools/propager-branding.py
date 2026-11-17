@@ -424,6 +424,70 @@ def couleurs_kotlin() -> bytes:
     )
     lignes.append("")
 
+    # Teinte rose de la marque : le terracotta, que la charte nomme « accent
+    # principal ». Sert au canevas ci dessous et au signal de l'incognito.
+    accent = p["marque"]["accent"]["hex"]
+
+    # Le canevas de la conversation, et ce n'est pas un detail de decor.
+    #
+    # L'amont pose un motif par defaut, SCHOOL, sur les quatre themes. Or dans
+    # `Theme.kt`, `presetWallpaperTheme` PRIME sur la palette de base : tant qu'un
+    # motif est actif, et il l'est par defaut, ce sont les couleurs du MOTIF qui
+    # donnent les bulles, pas celles des quatre themes. Teinter les themes sans
+    # teinter le motif ne se voyait donc nulle part dans la configuration par
+    # defaut, et le canevas restait franchement bleu : #E7F5FF en clair.
+    #
+    # Pourquoi la teinte de l'ACCENT et non celle du sauge. Le Membre l'a demande
+    # en rose, et la charte ne nomme aucun rose : sa couleur rose est le
+    # terracotta #BE7C7B, qu'elle appelle « accent principal ». La meme charte
+    # situe d'ailleurs la marque « en opposition au bleu tech generique ».
+    #
+    # Les gris restent gris : `teinte_de` ne touche pas une couleur sans chroma,
+    # donc les bulles RECUES de l'amont, qui sont des gris neutres dans trois
+    # themes sur quatre, traversent cette derivation intactes. C'est voulu : une
+    # conversation ou les deux cotes sont teintes ne se lit plus.
+    #
+    # Seul le motif par defaut est repris. Les autres, chats, fleurs, voyage, sont
+    # des choix explicites de l'utilisateur et gardent l'identite de leur image.
+    CANEVAS_AMONT = {
+        "FondClair": "E7F5FF",
+        "TeinteClair": "CEEBFF",
+        "TeinteSombre": "0F293B",
+        "TeinteSignature": "112F43",
+        "TeinteNoir": "0F293B",
+        "ClairEnvoye": "EEF9FF",
+        "ClairEnvoyeCitation": "D6EDFA",
+        "ClairRecu": "F3F5F9",
+        "ClairRecuCitation": "E4E8EE",
+        "SombreEnvoye": "172833",
+        "SombreEnvoyeCitation": "1C3E4F",
+        "SombreRecu": "26282C",
+        "SombreRecuCitation": "393C40",
+        "SignatureEnvoye": "1A3C5D",
+        "SignatureEnvoyeCitation": "235B80",
+        "SignatureRecu": "26282C",
+        "SignatureRecuCitation": "393C40",
+        "NoirEnvoye": "1A3C5D",
+        "NoirEnvoyeCitation": "235B80",
+        "NoirRecu": "1D1E22",
+        "NoirRecuCitation": "292B2F",
+        # Fond du canevas en theme Signature, partage par tous les motifs.
+        "FondSignature": "111528",
+    }
+    lignes.append("// Canevas de la conversation : le motif par defaut de l'amont a la teinte de")
+    lignes.append("// l'accent. Il PRIME sur les quatre themes tant qu'un motif est actif.")
+    for nom, source in CANEVAS_AMONT.items():
+        derive = teinte_de(source, accent)
+        inchange = " (gris de l'amont, laisse intact)" if derive == source else ""
+        # Toutes en chaines « #ffxxxxxx » : c'est la forme que l'amont ecrit dans
+        # ChatWallpaper.kt, pour les fonds, les teintes et les ThemeColors. La
+        # conversion reste la sienne, `colorFromReadableHex()`, donc le remplacement
+        # ne porte que sur le litteral.
+        lignes.append(
+            f'val TrustiatisCanevas{nom} = "#ff{derive.lower()}"  // amont #{source}{inchange}'
+        )
+    lignes.append("")
+
     for theme, roles in THEMES_AMONT.items():
         lignes.append(f"// Thème {theme}")
         for role, (origine, cle) in roles.items():

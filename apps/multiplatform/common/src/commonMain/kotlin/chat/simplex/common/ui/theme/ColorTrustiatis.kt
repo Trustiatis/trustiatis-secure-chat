@@ -22,6 +22,31 @@ val TrustiatisIncognito = Color(0xFFBE7C7B)  // palette, marque.accent
 // Surbrillance de selection : l'amont 0066FF a notre teinte, opacite 30 % conservee
 val TrustiatisSelectionHighlight = Color(0x4D008971)  // amont #0066FF, teinte de la marque
 
+// Canevas de la conversation : le motif par defaut de l'amont a la teinte de
+// l'accent. Il PRIME sur les quatre themes tant qu'un motif est actif.
+val TrustiatisCanevasFondClair = "#ffffeeed"  // amont #E7F5FF
+val TrustiatisCanevasTeinteClair = "#ffffdddc"  // amont #CEEBFF
+val TrustiatisCanevasTeinteSombre = "#ff3a1d1d"  // amont #0F293B
+val TrustiatisCanevasTeinteSignature = "#ff422121"  // amont #112F43
+val TrustiatisCanevasTeinteNoir = "#ff3a1d1d"  // amont #0F293B
+val TrustiatisCanevasClairEnvoye = "#fffff4f4"  // amont #EEF9FF
+val TrustiatisCanevasClairEnvoyeCitation = "#fffde2e0"  // amont #D6EDFA
+val TrustiatisCanevasClairRecu = "#fff9f4f3"  // amont #F3F5F9
+val TrustiatisCanevasClairRecuCitation = "#ffeee5e5"  // amont #E4E8EE
+val TrustiatisCanevasSombreEnvoye = "#ff33201f"  // amont #172833
+val TrustiatisCanevasSombreEnvoyeCitation = "#ff502f2f"  // amont #1C3E4F
+val TrustiatisCanevasSombreRecu = "#ff2c2726"  // amont #26282C
+val TrustiatisCanevasSombreRecuCitation = "#ff403a3a"  // amont #393C40
+val TrustiatisCanevasSignatureEnvoye = "#ff592a2a"  // amont #1A3C5D
+val TrustiatisCanevasSignatureEnvoyeCitation = "#ff7e4142"  // amont #235B80
+val TrustiatisCanevasSignatureRecu = "#ff2c2726"  // amont #26282C
+val TrustiatisCanevasSignatureRecuCitation = "#ff403a3a"  // amont #393C40
+val TrustiatisCanevasNoirEnvoye = "#ff592a2a"  // amont #1A3C5D
+val TrustiatisCanevasNoirEnvoyeCitation = "#ff7e4142"  // amont #235B80
+val TrustiatisCanevasNoirRecu = "#ff221d1d"  // amont #1D1E22
+val TrustiatisCanevasNoirRecuCitation = "#ff2f2a29"  // amont #292B2F
+val TrustiatisCanevasFondSignature = "#ff260f0f"  // amont #111528
+
 // Thème Dark
 val TrustiatisDarkPrimary = Color(0xFF6FB3A1)  // palette, marque.primaire_clair
 val TrustiatisDarkPrimaryVariant = Color(0xFF509482)  // palette, marque.primaire
