@@ -47,9 +47,23 @@ EXCLUS_PREFIXES = (
     ".github/",              # intégration continue de l'amont, remplacée par la nôtre : n'y figurent que
                              # des identifiants de construction et des noms de secrets GitHub, jamais
                              # de texte vu par un utilisateur
+    ".claude-plugin/",       # manifeste d'un greffon de developpement publie par l'amont en
+                             # v7.1.4 : il designe le paquet npm « @simplex-chat/mcp », qui vit
+                             # sous packages/, deja exclu, et n'entre dans aucune des deux
+                             # applications. Le JSON n'accepte pas de commentaire, donc la
+                             # derogation « marque-ok » ne peut pas s'y poser ligne a ligne.
     "plans/",
     "eth/",
     "fastlane/",
+)
+
+# Sorties de construction : non versionnees, presentes seulement sur un poste qui a
+# deja compile, et elles portent des chemins vers les sources de l'amont. Sans cette
+# ligne, le total du controle depend de l'etat du poste et n'est pas reproductible.
+EXCLUS_FRAGMENTS = (
+    "/.cxx/",
+    "/build/",
+    "/.gradle/",
 )
 
 EXCLUS_FICHIERS = {
@@ -282,6 +296,9 @@ def dans_perimetre(chemin: str) -> bool:
         return False
     if os.path.basename(chemin) in EXCLUS_FICHIERS:
         return False
+    for f in EXCLUS_FRAGMENTS:
+        if f in "/" + chemin:
+            return False
     for p in EXCLUS_PREFIXES:
         if chemin.startswith(p):
             return False

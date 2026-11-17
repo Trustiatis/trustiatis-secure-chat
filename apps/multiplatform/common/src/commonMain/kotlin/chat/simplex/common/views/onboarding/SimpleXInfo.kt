@@ -106,8 +106,10 @@ fun SimpleXInfoLayout(
   onboardingStage: SharedPreference<OnboardingStage>?
 ) {
   val topBar = onboardingStage == null && !appPrefs.oneHandUI.state.value
+  val bottomBar = onboardingStage == null && appPrefs.oneHandUI.state.value
+  val barHeight = AppBarHeight * fontSizeSqrtMultiplier
   val modifier = Modifier.fillMaxSize().systemBarsPadding().padding(horizontal = DEFAULT_ONBOARDING_HORIZONTAL_PADDING)
-  Column(if (topBar) modifier.padding(top = AppBarHeight * fontSizeSqrtMultiplier) else modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+  Column(modifier.padding(top = if (topBar) barHeight else 0.dp, bottom = if (bottomBar) barHeight else 0.dp), horizontalAlignment = Alignment.CenterHorizontally) {
     Box(Modifier.padding(top = DEFAULT_PADDING * 2).widthIn(max = if (appPlatform.isAndroid) 185.dp else 160.dp), contentAlignment = Alignment.Center) {
       SimpleXLogo()
     }
@@ -151,28 +153,27 @@ fun SimpleXInfoLayout(
       }
     },
     button = {
-      if (onboardingStage != null) {
-        Column(Modifier.widthIn(max = if (appPlatform.isAndroid) 450.dp else 1000.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+      Column(Modifier.widthIn(max = if (appPlatform.isAndroid) 450.dp else 1000.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        if (onboardingStage != null) {
           OnboardingActionButton(user, onboardingStage)
-          TextButtonBelowOnboardingButton(stringResource(MR.strings.why_simplex_is_built), icon = painterResource(MR.images.ic_info), onClick = {
-            ModalManager.fullscreen.showModal { HowItWorks(user, onboardingStage) }
-          })
+        } else {
+          // Contrepartie technique de la decision P-7 : garder l'appel au soutien de
+          // l'amont dans une application nommee autrement peut se lire comme une
+          // affiliation, que sa politique de marque interdit. Le texte est celui de
+          // NOTICE-AGPL.md. Pendant l'accueil, onboardingStage n'est jamais nul, donc
+          // la mention ne s'affiche que sur l'ecran « A propos » ouvert des reglages.
+          Text(
+            stringResource(MR.strings.trustiatis_non_affiliation),
+            style = MaterialTheme.typography.body2,
+            color = MaterialTheme.colors.secondary,
+            textAlign = TextAlign.Center,
+            lineHeight = 20.sp,
+            modifier = Modifier.widthIn(max = 600.dp).padding(vertical = DEFAULT_PADDING)
+          )
         }
-      } else {
-        // Contrepartie technique de la décision P-7 : garder l'appel au soutien de
-        // l'amont dans une application nommée autrement peut se lire comme une
-        // affiliation, que sa politique de marque interdit. Le texte est celui de
-        // NOTICE-AGPL.md, et cette branche est exactement l'écran « À propos »
-        // ouvert depuis les réglages : pendant l'accueil, onboardingStage n'est
-        // jamais nul, donc la mention n'encombre pas le premier démarrage.
-        Text(
-          stringResource(MR.strings.trustiatis_non_affiliation),
-          style = MaterialTheme.typography.body2,
-          color = MaterialTheme.colors.secondary,
-          textAlign = TextAlign.Center,
-          lineHeight = 20.sp,
-          modifier = Modifier.widthIn(max = 600.dp).padding(vertical = DEFAULT_PADDING)
-        )
+        TextButtonBelowOnboardingButton(stringResource(MR.strings.why_simplex_is_built), icon = painterResource(MR.images.ic_info), onClick = {
+          ModalManager.fullscreen.showModal { HowItWorks(user, onboardingStage) }
+        })
       }
     }
   )
