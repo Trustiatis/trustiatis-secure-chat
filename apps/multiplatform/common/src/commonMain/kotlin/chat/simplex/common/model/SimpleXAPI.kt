@@ -236,7 +236,13 @@ class AppPreferences {
   val shouldImportAppSettings = mkBoolPreference(SHARED_PREFS_SHOULD_IMPORT_APP_SETTINGS, false)
 
   val currentTheme = mkStrPreference(SHARED_PREFS_CURRENT_THEME, DefaultTheme.SYSTEM_THEME_NAME)
-  val systemDarkTheme = mkStrPreference(SHARED_PREFS_SYSTEM_DARK_THEME, DefaultTheme.DARK.themeName)
+  // Le thème sombre par défaut est SIMPLEX, que l'application nomme « Trustiatis » : c'est
+  // celui qui porte la charte, fond #070D18 et surface #0A1220 de branding/colors/palette.json.
+  // Avec DARK, l'application s'ouvrait sur le gris de l'amont sous notre logo, et la charte
+  // n'apparaissait que si l'utilisateur allait la chercher dans les réglages.
+  // Le mode clair n'est pas touché : LIGHT porte déjà la couleur primaire de la marque, et
+  // forcer le sombre contre le réglage du système se ferait contre l'utilisateur.
+  val systemDarkTheme = mkStrPreference(SHARED_PREFS_SYSTEM_DARK_THEME, DefaultTheme.SIMPLEX.themeName)
   val currentThemeIds = mkMapPreference(SHARED_PREFS_CURRENT_THEME_IDs, mapOf(), encode = {
     json.encodeToString(MapSerializer(String.serializer(), String.serializer()), it)
   }, decode = {

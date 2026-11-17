@@ -77,6 +77,40 @@ Première tâche de la Phase 2, **faite le 2026-11-15** :
       téléchargement et **ne sont pas propagés dans les applications** : Compose n'a
       pas de notion de surface translucide au dessus d'un arrière plan animé
 
+### 2026-11-17 : l'application s'ouvre enfin sur la charte
+
+La charte était dans l'application depuis le 2026-11-15, mais **elle ne se voyait pas**.
+Deux réglages la tenaient cachée, et aucun n'était une couleur :
+
+| Ce qui clochait | Ce que voyait l'utilisateur | Correction |
+|---|---|---|
+| `systemDarkTheme` valait `DARK` | en mode sombre, l'application s'ouvrait sur le gris de l'amont, sous notre logo. Le thème de la marque existait, nommé « Trustiatis » dans les réglages, mais il fallait aller le chercher | la valeur par défaut est `SIMPLEX`, le thème de la marque, fond `#070D18` et surface `#0A1220` |
+| `values/colors.xml` posait `window_background_dark` à `#121212` | un gris apparaissait le temps du lancement et des transitions, avant que Compose ne dessine | le fichier est généré depuis `theme_sombre.fond` de la palette |
+
+Le mode clair n'est pas touché. `LIGHT` porte déjà la couleur primaire de la marque sur
+fond blanc, ce qui est le thème clair de la palette, relevé sur `trustiatis.com`. Forcer
+le sombre contre le réglage du système se ferait contre l'utilisateur, et la décision lui
+appartient : les quatre thèmes restent dans les réglages.
+
+### Ce qui n'a pas été aligné, et pourquoi
+
+**La police.** La charte demande Roboto ; l'application utilise Inter, embarquée par
+l'amont en six graisses. Elle n'a pas été changée, pour trois raisons qui se cumulent.
+La palette dit elle même « rien n'est embarqué dans l'application », ce qui exclut
+d'ajouter Roboto au dépôt. « Demandée au système » donne bien Roboto sur Android, mais sur
+ordinateur donne Segoe UI, SF Pro ou DejaVu Sans selon la machine : trois polices, dont
+aucune n'est la charte, à la place d'une qui est au moins dessinée pour l'interface. Et
+changer de police change la largeur de **tous** les textes, c'est à dire rouvre le défaut
+de chevauchement de l'écran d'accueil d'Android que le Membre avait relevé. Le gain est
+sur Android seul, le risque est partout. À reprendre si le Membre tranche autrement : la
+bascule tient en deux lignes, dans `Type.android.kt` et `Type.desktop.kt`.
+
+**Le rayon de 22 px.** C'est le rayon des panneaux du web. Dans l'application, `Shapes`
+vaut 4 dp, et c'est une valeur de structure de l'amont : elle dessine les boutons, les
+champs, les menus et les fenêtres modales. L'imposer à 22 dp redessinerait toute
+l'interface de l'amont, bien au delà d'une question de marque, et sans pouvoir l'éprouver
+écran par écran.
+
 Deux défauts de `detramer.py` ont été corrigés au passage, et ils valaient d'être trouvés :
 son diagnostic plantait sur une cible absente au lieu de dire qu'elle était à construire, et
 surtout **il moyennait la couleur des pixels de bord avant de la comparer aux aplats**. Sur un

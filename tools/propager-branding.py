@@ -571,6 +571,24 @@ def cibles() -> dict[Path, bytes]:
             "</resources>\n"
         ).encode()
 
+    # 2 bis. Le fond de fenêtre d'Android, que le système peint avant que Compose
+    #        n'ait dessiné quoi que ce soit, et pendant les transitions. L'amont y
+    #        pose son gris #121212 ; depuis que le thème sombre par défaut est celui
+    #        de la marque, ce gris apparaissait un instant à chaque lancement, avant
+    #        de laisser place au #070D18 de la charte. Il vient donc de la palette.
+    #
+    #        Ce fichier est repris en entier parce qu'Android refuse deux ressources
+    #        de même nom : on ne peut pas poser la couleur à côté sans retirer celle
+    #        de l'amont. `black` et `white` sont celles de l'amont, inchangées.
+    sortie[res / "values" / "colors.xml"] = (
+        '<?xml version="1.0" encoding="utf-8"?>\n'
+        "<resources>\n"
+        '  <color name="black">#FF000000</color>\n'
+        '  <color name="white">#FFFFFFFF</color>\n'
+        f'  <color name="window_background_dark">{p["theme_sombre"]["fond"].upper()}</color>\n'
+        "</resources>\n"
+    ).encode()
+
     # 3. Couleurs de thème, le seul fichier Kotlin que cet outil produit. Il est
     #    à nous, donc il ne conflicte avec aucun report de l'amont : seules les
     #    affectations de Theme.kt le référencent.
