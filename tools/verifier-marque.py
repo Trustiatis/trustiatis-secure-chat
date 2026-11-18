@@ -75,6 +75,12 @@ EXCLUS_FICHIERS = {
     "CLAUDE.md",
     "PRIVACY.md",
     "flake.lock",
+    # Notre propre sortie. Le job « marque » écrit marque-complet.json dans l'arbre de
+    # travail avant de relancer le contrôle pour le résumé : le second passage lisait
+    # alors son propre artefact et comptait chaque signalement une seconde fois. Sur
+    # bec2a3e2d, le journal annonçait 5 449 signalements dont 2 677 venaient de ce seul
+    # fichier, pour 2 772 réels. Un contrôle qui se compte lui même ne mesure plus rien.
+    "marque-complet.json",
 }
 
 EXTENSIONS = {
