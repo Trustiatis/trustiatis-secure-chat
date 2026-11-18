@@ -7,7 +7,7 @@ Comment les paquets arrivent chez l'utilisateur, et à quel coût.
 | Portail | **`downloads.trustiatis.com`** |
 | Dépôt du portail | `trustiatis-secure-downloads`, séparé de celui du produit |
 | Hébergement | Cloudflare, **plan gratuit**, compte Trustiatis |
-| Statut | portail **en ligne depuis le 2026-11-16**, version 7.1.2-ts1 publiée, sept paquets servis depuis R2 |
+| Statut | portail **en ligne depuis le 2026-11-16**, version **7.1.4-ts1 publiée le 2026-11-18**, sept paquets servis depuis R2 pour les quatre plateformes |
 | Pages | `/` accueil à deux voies, `/trustiatis-secure/` les paquets, `/logiciels/` les adresses officielles de logiciels tiers |
 
 ## 1. Pourquoi un dépôt séparé pour le portail
@@ -159,5 +159,10 @@ trustiatis-secure-<version>-desktop-linux-x86_64.AppImage
 - [ ] faire lire l'index du portail par le client Desktop, en remplacement
 - [ ] ajouter la vérification du SHA-256 avant installation dans le client Desktop
 - [ ] trancher D-1, la mise à disposition sur l'App Store sous AGPLv3
-- [ ] publier les sources avant les binaires sur le portail : le dépôt du produit est privé,
-      et l'AGPL exige que la source accompagne l'exécutable
+- [x] publier la 7.1.4-ts1, le 2026-11-18, sept paquets et quatre plateformes. Les quatre
+      paquets de bureau viennent de la construction hébergée numéro 4 sur `bec2a3e2d`, les
+      trois autres du poste. Même réserve de signature que la 7.1.2-ts1
+- [x] rendre les sources disponibles avant les binaires, obligation AGPL : le miroir
+      `github.com/Trustiatis/trustiatis-secure-chat` est **public sous AGPL-3.0 depuis le
+      2026-11-16**, et c'est de là que la source accompagne l'exécutable. Le dépôt GitLab
+      reste privé, il n'est pas celui que l'obligation vise
