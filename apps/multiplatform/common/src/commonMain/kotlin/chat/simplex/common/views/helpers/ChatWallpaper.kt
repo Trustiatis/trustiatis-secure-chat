@@ -170,38 +170,45 @@ enum class PresetWallpaper(
       ),
     )
   ),
+  // Motif par defaut des quatre themes, donc le canevas que l'on voit sans rien
+  // regler. Ses couleurs PRIMENT sur celles des themes, `Theme.kt` les lit avant
+  // la palette de base : il fallait donc le teinter lui, sans quoi la conversation
+  // restait bleue quoi qu'on fasse aux quatre themes. Teinte de l'accent, le
+  // terracotta, et valeurs dans ColorTrustiatis.kt. Les bulles RECUES de l'amont
+  // sont des gris neutres : elles traversent la derivation intactes, et c'est
+  // voulu, une conversation dont les deux cotes sont teintes ne se lit plus.
   SCHOOL(MR.images.wallpaper_school, "school", 0.53f,
-    wallpaperBackgrounds(light = "#ffE7F5FF"),
+    wallpaperBackgrounds(light = TrustiatisCanevasFondClair),
     tint = mapOf(
-      DefaultTheme.LIGHT to "#ffCEEBFF".colorFromReadableHex(),
-      DefaultTheme.DARK to "#ff0F293B".colorFromReadableHex(),
-      DefaultTheme.SIMPLEX to "#ff112f43".colorFromReadableHex(),
-      DefaultTheme.BLACK to "#ff0F293B".colorFromReadableHex()
+      DefaultTheme.LIGHT to TrustiatisCanevasTeinteClair.colorFromReadableHex(),
+      DefaultTheme.DARK to TrustiatisCanevasTeinteSombre.colorFromReadableHex(),
+      DefaultTheme.SIMPLEX to TrustiatisCanevasTeinteSignature.colorFromReadableHex(),
+      DefaultTheme.BLACK to TrustiatisCanevasTeinteNoir.colorFromReadableHex()
     ),
     mapOf(
       DefaultTheme.LIGHT to ThemeColors(
-        sentMessage = "#ffeef9ff",
-        sentQuote = "#ffD6EDFA",
-        receivedMessage = "#ffF3F5F9",
-        receivedQuote = "#ffe4e8ee",
+        sentMessage = TrustiatisCanevasClairEnvoye,
+        sentQuote = TrustiatisCanevasClairEnvoyeCitation,
+        receivedMessage = TrustiatisCanevasClairRecu,
+        receivedQuote = TrustiatisCanevasClairRecuCitation,
       ),
       DefaultTheme.DARK to ThemeColors(
-        sentMessage = "#ff172833",
-        sentQuote = "#ff1C3E4F",
-        receivedMessage = "#ff26282c",
-        receivedQuote = "#ff393c40",
+        sentMessage = TrustiatisCanevasSombreEnvoye,
+        sentQuote = TrustiatisCanevasSombreEnvoyeCitation,
+        receivedMessage = TrustiatisCanevasSombreRecu,
+        receivedQuote = TrustiatisCanevasSombreRecuCitation,
       ),
       DefaultTheme.SIMPLEX to ThemeColors(
-        sentMessage = "#ff1A3C5D",
-        sentQuote = "#ff235b80",
-        receivedMessage = "#ff26282c",
-        receivedQuote = "#ff393c40",
+        sentMessage = TrustiatisCanevasSignatureEnvoye,
+        sentQuote = TrustiatisCanevasSignatureEnvoyeCitation,
+        receivedMessage = TrustiatisCanevasSignatureRecu,
+        receivedQuote = TrustiatisCanevasSignatureRecuCitation,
       ),
       DefaultTheme.BLACK to ThemeColors(
-        sentMessage = "#ff1A3C5D",
-        sentQuote = "#ff235b80",
-        receivedMessage = "#ff1d1e22",
-        receivedQuote = "#ff292b2f",
+        sentMessage = TrustiatisCanevasNoirEnvoye,
+        sentQuote = TrustiatisCanevasNoirEnvoyeCitation,
+        receivedMessage = TrustiatisCanevasNoirRecu,
+        receivedQuote = TrustiatisCanevasNoirRecuCitation,
       ),
     )
   ),
@@ -257,7 +264,10 @@ fun wallpaperBackgrounds(light: String): Map<DefaultTheme, Color> =
   mapOf(
     DefaultTheme.LIGHT to light.colorFromReadableHex(),
     DefaultTheme.DARK to "#ff121212".colorFromReadableHex(),
-    DefaultTheme.SIMPLEX to "#ff111528".colorFromReadableHex(),
+    // Partage par tous les motifs : c'est le fond du canevas en theme Signature,
+    // et l'amont l'ecrit en bleu tres sombre. Seule cette valeur est reprise ici,
+    // les deux autres sont des gris neutres que la derivation laisserait intacts.
+    DefaultTheme.SIMPLEX to TrustiatisCanevasFondSignature.colorFromReadableHex(),
     DefaultTheme.BLACK to "#ff070707".colorFromReadableHex()
   )
 

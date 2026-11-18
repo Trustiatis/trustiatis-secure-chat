@@ -733,8 +733,8 @@ val SimplexColorPaletteApp = AppColors(
   primaryVariant2 = TrustiatisSignaturePrimaryVariant2,
   sentMessage = TrustiatisSignatureSentMessage,
   sentQuote = TrustiatisSignatureSentQuote,
-  receivedMessage = Color(0xff25283a),
-  receivedQuote = Color(0xff36394a),
+  receivedMessage = TrustiatisSignatureReceivedMessage,
+  receivedQuote = TrustiatisSignatureReceivedQuote,
 )
 
 val BlackColorPalette = darkColors(

@@ -236,7 +236,13 @@ class AppPreferences {
   val shouldImportAppSettings = mkBoolPreference(SHARED_PREFS_SHOULD_IMPORT_APP_SETTINGS, false)
 
   val currentTheme = mkStrPreference(SHARED_PREFS_CURRENT_THEME, DefaultTheme.SYSTEM_THEME_NAME)
-  val systemDarkTheme = mkStrPreference(SHARED_PREFS_SYSTEM_DARK_THEME, DefaultTheme.DARK.themeName)
+  // Le thème sombre par défaut est SIMPLEX, que l'application nomme « Trustiatis » : c'est
+  // celui qui porte la charte, fond #070D18 et surface #0A1220 de branding/colors/palette.json.
+  // Avec DARK, l'application s'ouvrait sur le gris de l'amont sous notre logo, et la charte
+  // n'apparaissait que si l'utilisateur allait la chercher dans les réglages.
+  // Le mode clair n'est pas touché : LIGHT porte déjà la couleur primaire de la marque, et
+  // forcer le sombre contre le réglage du système se ferait contre l'utilisateur.
+  val systemDarkTheme = mkStrPreference(SHARED_PREFS_SYSTEM_DARK_THEME, DefaultTheme.SIMPLEX.themeName)
   val currentThemeIds = mkMapPreference(SHARED_PREFS_CURRENT_THEME_IDs, mapOf(), encode = {
     json.encodeToString(MapSerializer(String.serializer(), String.serializer()), it)
   }, decode = {
@@ -1780,6 +1786,14 @@ object ChatController {
         )
       }
       r is API.Error && r.err is ChatError.ChatErrorAgent
+          && r.err.agentError is AgentErrorType.CONN
+          && r.err.agentError.connErr is ConnectionErrorType.DUPLICATE -> {
+        AlertManager.shared.showAlertMsg(
+          generalGetString(MR.strings.connection_error_duplicate),
+          generalGetString(MR.strings.connection_error_duplicate_desc).format("CONN DUPLICATE")
+        )
+      }
+      r is API.Error && r.err is ChatError.ChatErrorAgent
           && r.err.agentError is AgentErrorType.SMP
           && r.err.agentError.smpErr is SMPErrorType.BLOCKED -> {
         showContentBlockedAlert(
@@ -2673,7 +2687,7 @@ object ChatController {
   }
 
   suspend fun allowFeatureToContact(rh: Long?, contact: Contact, feature: ChatFeature, param: Int? = null) {
-    val prefs = contact.mergedPreferences.toPreferences().setAllowed(feature, param = param)
+    val prefs = contact.userPreferences.setAllowed(feature, param = param)
     val toContact = apiSetContactPrefs(rh, contact.contactId, prefs)
     if (toContact != null) {
       withContext(Dispatchers.Main) {
@@ -5235,7 +5249,7 @@ data class ProtocolTestFailure(
       testError is AgentErrorType.BROKER && testError.brokerErr is BrokerErrorType.NETWORK && testError.brokerErr.networkError is NetworkError.UnknownCAError ->
         err + " " + generalGetString(MR.strings.error_smp_test_certificate)
       else ->
-        err + " " + String.format(generalGetString(MR.strings.error_with_info), testError.toString())
+        err + " " + String.format(generalGetString(MR.strings.error_with_info), testError.string)
     }
   }
 }
@@ -5931,16 +5945,6 @@ data class ContactUserPreferences(
   val calls: ContactUserPreference,
   val commands: List<ChatBotCommand>?,
 ) {
-  fun toPreferences(): ChatPreferences = ChatPreferences(
-    timedMessages = timedMessages.userPreference.pref,
-    fullDelete = fullDelete.userPreference.pref,
-    reactions = reactions.userPreference.pref,
-    voice = voice.userPreference.pref,
-    files = files.userPreference.pref,
-    calls = calls.userPreference.pref,
-    commands = commands,
-  )
-
   companion object {
     val sampleData = ContactUserPreferences(
       timedMessages = ContactUserPreferenceTimed(

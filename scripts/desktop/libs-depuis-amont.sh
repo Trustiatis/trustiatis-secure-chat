@@ -18,7 +18,8 @@
 # sous Windows et un .dmg que sous macOS, faute d'outil portable pour les ouvrir ailleurs.
 #
 # Variables :
-#   CACHE_AMONT   dossier où garder les paquets téléchargés (défaut : build/amont)
+#   CACHE_AMONT   dossier où garder les paquets téléchargés (défaut : build/amont).
+#                 Les paquets y sont rangés dans un sous dossier par tag d'amont.
 #   GARDER_CACHE  à 1, ne supprime pas le paquet après extraction
 #
 set -euo pipefail
@@ -53,6 +54,16 @@ fi
 read -r _ dossier lien actif attendu <<< "$ligne"
 
 cache="${CACHE_AMONT:-$racine/apps/multiplatform/build/amont}"
+# Le paquet est rangé sous le tag de l'amont, et non sous son seul nom de fichier.
+# L'amont nomme ses paquets sans version : « simplex-desktop-ubuntu-22_04-x86_64.deb »
+# désigne la 7.1.2 comme la 7.1.4. Rangés sous ce nom seul, ils se recouvrent, et au
+# changement de version le fichier de la précédente reste là. Le contrôle d'empreinte le
+# rattrape, mais il annonce « empreinte inattendue », ce qui envoie chercher une
+# republication ou une falsification là où il n'y a qu'un cache périmé. Le 17 novembre
+# 2026, le poste gardait encore le .deb de la 7.1.2 sous ce nom après le passage à la
+# 7.1.4 : il a fallu comparer les empreintes à la main pour s'assurer que les
+# bibliothèques posées n'étaient pas celles de la version précédente.
+cache="$cache/$tag"
 mkdir -p "$cache"
 paquet="$cache/$actif"
 url="https://github.com/simplex-chat/simplex-chat/releases/download/$tag/$actif"
@@ -82,6 +93,17 @@ if [ "$obtenu" != "$attendu" ]; then
 fi
 echo "sha256  : vérifiée"
 
+# Chemin à la forme Windows, pour les outils natifs appelés depuis MSYS2.
+en_windows() {
+  if command -v cygpath >/dev/null 2>&1; then
+    cygpath -w "$1"
+  else
+    local brut
+    brut="$(cd "$(dirname "$1")" && pwd -W)/$(basename "$1")"
+    printf '%s' "${brut//\//\\}"
+  fi
+}
+
 travail="$cache/extraction-$cible"
 rm -rf "$travail"
 mkdir -p "$travail"
@@ -103,9 +125,30 @@ case "$cible" in
     # réelle au lieu des noms opaques du CAB. C'est la seule façon simple d'ouvrir un
     # .msi, et elle n'existe que sous Windows.
     command -v msiexec >/dev/null 2>&1 || { echo "ERREUR : msiexec absent, ce script doit tourner sous Windows pour cette cible." >&2; exit 2; }
-    cible_win="$(cd "$travail" && pwd -W 2>/dev/null || echo "$travail")"
-    paquet_win="$(cd "$(dirname "$paquet")" && pwd -W 2>/dev/null || dirname "$paquet")/$(basename "$paquet")"
-    msiexec //a "$paquet_win" //qn TARGETDIR="$cible_win"
+    # msiexec n'ouvre un paquet que si son chemin est donné à la forme Windows, avec des
+    # barres obliques inverses. Le « C:/... » que rend « pwd -W » lui arrache « This
+    # installation package could not be opened » et le code 1619, vu par le shell comme 83.
+    # C'est ce qui a mis en échec la première construction Windows, le 2026-11-16.
+    paquet_win="$(en_windows "$paquet")"
+    cible_win="$(en_windows "$travail")"
+    # Pas d'option de journalisation ici, et c'est une leçon payée : « //l*v » a fait
+    # rester msiexec en vie sans fin sur la machine hébergée, sans une ligne de sortie,
+    # jusqu'à ce qu'on interrompe la construction. Devant une ligne de commande qu'il
+    # n'analyse pas, msiexec ouvre une fenêtre d'aide, que « /qn » ne supprime pas et que
+    # personne n'ira fermer sur une machine sans écran. On lui donne donc la ligne la plus
+    # courte qui fasse le travail.
+    #
+    # Le délai n'est pas là pour la beauté du geste : sans lui, un msiexec qui attend
+    # occupe la machine jusqu'au plafond de six heures de GitHub.
+    code=0
+    timeout 900 msiexec //a "$paquet_win" //qn TARGETDIR="$cible_win" || code=$?
+    if [ "$code" -ne 0 ]; then
+      echo "ERREUR : msiexec n'a pas ouvert $actif (code $code)." >&2
+      echo "  paquet : $paquet_win" >&2
+      echo "  cible  : $cible_win" >&2
+      [ "$code" = "124" ] && echo "  Le code 124 est celui du délai : msiexec n'a pas rendu la main." >&2
+      exit 1
+    fi
     arbre="$travail"
     ;;
   macos-*)
@@ -158,13 +201,24 @@ chmod -R u+w "$destination"
 liens="$racine/apps/multiplatform/build/links"
 mkdir -p "$liens"
 rm -rf "${liens:?}/$lien"
-if ln -s "../../common/src/commonMain/cpp/desktop/libs/$dossier" "$liens/$lien" 2>/dev/null; then
-  :
-else
-  # Windows sans droit de création de lien symbolique : on recopie, c'est équivalent pour
-  # la compilation, simplement plus lourd sur le disque.
-  cp -R "$destination" "$liens/$lien"
-fi
+case "$cible" in
+  windows-*)
+    # Sous Windows on ne pose pas un lien symbolique de MSYS2 : c'en est un pour les outils
+    # de MSYS2 et pas pour Windows, et c'est la JVM qui lira ce chemin. Une jonction de
+    # répertoire en est un pour tout le monde et ne demande aucun droit particulier.
+    #
+    # Une copie ferait un paquet sans VLC : prepare-vlc-windows.sh remplit le répertoire
+    # d'origine après ce script, et une copie ne verrait pas cet ajout.
+    if ! cmd //c mklink //J "$(en_windows "$liens/$lien")" "$(en_windows "$destination")" >/dev/null 2>&1; then
+      echo "AVERTISSEMENT : jonction impossible, repli sur une copie. VLC devra être posé" >&2
+      echo "avant ce script, ou la copie refaite après, sans quoi le paquet sortira muet." >&2
+      cp -R "$destination" "$liens/$lien"
+    fi
+    ;;
+  *)
+    ln -s "../../common/src/commonMain/cpp/desktop/libs/$dossier" "$liens/$lien"
+    ;;
+esac
 
 nettoyer
 trap - EXIT

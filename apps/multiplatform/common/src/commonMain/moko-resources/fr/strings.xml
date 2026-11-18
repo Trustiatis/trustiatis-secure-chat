@@ -2532,7 +2532,7 @@
     <string name="short_descr">Votre bio :</string>
     <string name="onboarding_be_free">Votre canal\nconfidentiel</string>
     <string name="onboarding_private_and_secure">Chiffré de bout en bout, sans compte.</string>
-    <string name="onboarding_first_network">Le canal que Trustiatis emploie pour tout ce qui est sensible,\net celui dont vous pouvez vous servir en interne.</string>
+    <string name="onboarding_first_network">Le canal que Trustiatis emploie\npour tout ce qui est sensible.</string>
     <string name="get_started">Commencer</string>
     <string name="why_simplex_is_built">Pourquoi cette application, et comment elle fonctionne.</string>
     <string name="onboarding_your_profile">Votre profil</string>
@@ -3060,5 +3060,5 @@
     <string name="v7_1_flat_layout_descr">À activer dans les paramètres d’apparence.</string>
   <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->
   <string name="trustiatis_non_affiliation">Trustiatis Secure est un produit indépendant édité par Trustiatis, dérivé du logiciel libre SimpleX Chat et compatible avec le réseau SimpleX. Il n\'est ni édité, ni soutenu, ni approuvé par SimpleX Chat Ltd. « SimpleX » est une marque de SimpleX Chat Ltd.</string>  <!-- marque-ok: mention obligatoire de non affiliation, NOTICE-AGPL.md -->
-  <string name="trustiatis_updates_from_portal">Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com. L\'application ne les cherche pas d\'elle même.</string>
+  <string name="trustiatis_updates_from_portal">Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com/trustiatis-secure. L\'application ne les cherche pas d\'elle même.</string>
 </resources>

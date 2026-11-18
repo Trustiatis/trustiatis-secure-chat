@@ -992,9 +992,15 @@ private val versionDescriptions: List<VersionDescription> = listOf(
     )
   ),
   VersionDescription(
-    version = "v7.1",
+    version = "v7.1.4",
     post = null,
     features = listOf(
+      VersionFeature.FeatureDescription(
+        icon = MR.images.ic_verified_user,
+        titleId = MR.strings.v7_1_4_security_audit,
+        descrId = MR.strings.v7_1_4_security_audit_descr,
+        learnMoreLink = "https://simplex.chat/blog/20261121-simplex-chat-security-audit-trail-of-bits-security-process.html"
+      ),
       VersionFeature.FeatureView(
         icon = null,
         titleId = MR.strings.v7_1_invest,
@@ -1027,6 +1033,18 @@ private val versionDescriptions: List<VersionDescription> = listOf(
 
 @Composable
 private fun SupporterBadgeWhatsNew(modalManager: ModalManager) {
+  // Septième porte de P-7 bis, ouverte par le report de la v7.1.4 et trouvée en lançant
+  // le paquet construit, pas en lisant le code : l'écran des nouveautés de cette version
+  // présente « Supporter badges » avec « Support SimpleX and get a badge », qui mène à
+  // l'achat. Les six portes fermées le 2026-11-15 ne couvraient pas celle ci, parce que
+  // la description de version qui l'appelle n'existait pas encore.
+  //
+  // Même méthode que les autres, et que `InvestInSimpleXChatView` juste en dessous : on
+  // ferme LA porte, pas ses appelants. La description de version, le composable et
+  // `BadgesView` restent en place, donc un report de l'amont ne conflicte que sur cette
+  // ligne. Le bloc disparaît en entier et non seulement son lien : annoncer une capacité
+  // que notre version ne permet pas d'obtenir tromperait l'utilisateur.
+  if (!badgePitchAvailable()) return
   Column(Modifier.padding(bottom = 12.dp)) {
     Row(
       verticalAlignment = Alignment.CenterVertically,
@@ -1115,6 +1133,29 @@ private val crowdfundingLayout = if (appPlatform.isDesktop)
   }, ModalManager.center)
 else
   CrowdfundingLayout(Dp.Unspecified, RoundedCornerShape(CROWDFUNDING_IMAGE_CORNER_RADIUS), null)
+
+// Second volet de la même décision, posé ici pour que les deux portes se lisent ensemble.
+//
+// Le retrait de l'entrée des badges dans les réglages ne suffisait pas : la liste de
+// discussions pose d'elle même une bannière « Support SimpleX » dès que l'utilisateur
+// passe trois conversations, et elle mène au même achat. C'est un appel à financer
+// l'amont, affiché sans que personne l'ait demandé, dans une application qui porte un
+// autre nom. Le Membre l'a vu dans la version 7.1.2-ts1.
+//
+// Même méthode que P-5 et que P-7 bis : on neutralise la porte, pas ses appelants. La
+// bannière, son texte et BadgesView restent en place, donc un report de l'amont ne
+// conflicte que sur cette ligne.
+//
+// Ce qui n'est PAS neutralisé, et c'est voulu : les alertes qui informent un utilisateur
+// d'un badge qu'il a réellement payé, par exemple après l'import d'une base venue de
+// l'application officielle. Elles renseignent, elles ne sollicitent pas : chacune des
+// trois portes ci dessous a déjà, chez l'amont, une branche qui dit la même chose sans
+// le bouton d'achat, et c'est dans cette branche que l'on retombe.
+//
+// Contrairement à `crowdfundingAvailable()`, cette fonction n'est PAS composable : elle
+// rend une constante, et deux de ses trois appelants, les alertes de ComposeView.kt et
+// de ChatInfoImage.kt, sont des fonctions ordinaires.
+fun badgePitchAvailable(): Boolean = false
 
 // Décision du Membre du 2026-11-15 au soir, qui renverse P-7 : l'appel au soutien de
 // l'amont ne doit pas apparaître dans Trustiatis Secure.
@@ -1262,7 +1303,7 @@ fun GetStakeView(showFirstImage: Boolean, inCenterOfWindow: Boolean = false, clo
 
   ColumnWithScrollBar(Modifier.pinchZoom().padding(horizontal = DEFAULT_PADDING)) {
     // in the center of the window the page is wide enough for the title to fit on one line
-    val title = "Invest in\nSimpleX Chat"
+    val title = "Own a part of\nSimpleX Chat"
     AppBarTitle(if (inCenterOfWindow) title.replace("\n", " ") else title, withPadding = false)
     if (showFirstImage) {
       slideImage(getStakeSlides[0])

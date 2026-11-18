@@ -42,8 +42,29 @@ adresse publique documentée, et les bibliothèques ne figurent pas parmi les ac
 versions publiées sur GitHub.
 
 Elles figurent en revanche **dans les APK officiels**, qui sont eux publiés. Les deux
-bibliothèques ont donc été extraites de l'APK officiel de la version greffée, ce qui garantit
+bibliothèques sont donc extraites de l'APK officiel de la version greffée, ce qui garantit
 qu'elles proviennent de la compilation de l'amont pour ce commit précis.
+
+**Depuis le 2026-11-17, cela se fait par un script**, `scripts/android/libs-depuis-amont.sh`,
+et non plus à la main :
+
+```bash
+scripts/android/libs-depuis-amont.sh              # les deux architectures
+scripts/android/libs-depuis-amont.sh arm64-v8a    # une seule
+```
+
+Il lit le tag dans `tools/amont-courant.txt`, les empreintes dans `tools/apk-amont.txt`, et
+refuse d'extraire quoi que ce soit d'un APK dont l'empreinte ne correspond pas. Les
+empreintes de ce manifeste sont celles que **l'API de GitHub publie** pour les actifs de la
+version, pas des sommes calculées sur le poste : elles valent donc contrôle de provenance.
+
+Pourquoi ce script a manqué si longtemps, et ce que cela a coûté : il n'y en avait pas,
+alors que le bureau avait le sien depuis le début. Rien ne rafraîchissait donc ces fichiers
+au report d'une version, **et rien ne le signalait**. Le 17 novembre 2026, le poste portait
+encore les `.so` de la v7.1.2 alors que la base était passée à la v7.1.4 depuis le report.
+Une compilation signée aurait produit des APK estampillés « 7.1.4-ts1 » portant le coeur de
+la version précédente, sans un mot. Les empreintes le disent : `libsimplex.so` arm64 est
+passée de `e6371efc…` à `84fb5ddc…` au premier passage du script.
 
 | Fichier | Empreinte SHA-256 de l'APK d'origine |
 |---|---|
@@ -322,10 +343,14 @@ export TRUSTIATIS_KEYSTORE="$HOME/trustiatis-secure.jks"
 export TRUSTIATIS_KEY_ALIAS=trustiatis
 read -rsp "Mot de passe du magasin : " TRUSTIATIS_KEYSTORE_PASSWORD && echo
 export TRUSTIATIS_KEYSTORE_PASSWORD
-./gradlew assembleFossRelease --no-daemon --console=plain \
-  -Dorg.gradle.jvmargs="-Xmx2200m -Dfile.encoding=UTF-8" \
-  -Pkotlin.compiler.execution.strategy=in-process
+./gradlew assembleFossRelease --no-daemon --console=plain
 ```
+
+**Ne plus passer `-Dorg.gradle.jvmargs` ici.** Depuis le 2026-11-17 le réglage de mémoire du
+poste vit dans `~/.gradle/gradle.properties`, hors du dépôt, et il donne 3,8 Gio avec la
+compilation en processus unique. Une valeur passée en ligne de commande **prime** sur ce
+fichier : reprendre l'ancien `-Xmx2200m` rognerait le tas au lieu de l'assurer. Voir le
+chapitre 15.
 
 Contrôle d'après construction, qui ne demande aucun secret :
 
@@ -337,6 +362,24 @@ $ANDROID_HOME/build-tools/36.0.0/apksigner verify -v --print-certs \
 Attendu : `Signer #1 certificate SHA-256 digest:`
 `502cbc06654a134d536bf496ac44f1013a50c3dcfcd5beba5d61dd70f7c9c82f`, v2 et v3 vraies.
 **v1 fausse est normal** à `minSdk 26`, ce n'est pas un défaut à corriger.
+
+`apksigner` est un script shell qui appelle `java` par son nom, sans chemin : lancé dans un
+shell où `env-build.sh` n'a pas été chargé, il échoue sur « exec: java: not found », ce qui
+n'a rien à voir avec l'APK. Et sans `ANDROID_HOME`, la ligne ci dessus pointe sur
+`/build-tools/...`, qui n'existe pas. Charger l'environnement d'abord, dans ce shell là.
+
+Ranger ensuite les deux APK sous leur nom de publication. La compilation d'Android n'écrit
+pas de fichier d'empreintes, contrairement à celle du bureau : il se fait ici, et il
+s'appelle `empreintes.txt`, **sans cible**, parce que ces paquets n'arrivent pas dans un
+dossier `paquets-<cible>` et que leur nom porte déjà l'architecture.
+
+```bash
+cd ~/Documents/claude/trustiatis-secure
+D=apps/multiplatform/android/build/outputs/apk/foss/release
+( cd "$D" && sha256sum ./*.apk ) > "$D/empreintes.txt"
+tools/nommer-livraison.py --version <version> --artefacts "$D" --simuler
+tools/nommer-livraison.py --version <version> --artefacts "$D"
+```
 
 **Piège de `/tmp` sur cette VM.** `jpackage` assemble l'image du paquet dans
 `/tmp/jdk.jpackage*`, or `/tmp` est un **tmpfs de 3,4 Gio** pris sur la mémoire. Un dossier
@@ -466,3 +509,239 @@ dans Git. Ordre à respecter, faute de quoi la première poussée les déclenche
 4. réactiver les actions du dépôt, puis vérifier que seul « Paquets de bureau » est actif.
 
 À refaire pour tout fichier que l'amont ajouterait lors d'un report.
+
+### Ce que les trois premières constructions ont appris, le 2026-11-16
+
+Les paquets Windows et macOS de 7.1.2-ts1 sont sortis ce jour là, et il a fallu trois
+constructions. Ce qu'elles ont révélé est consigné ici parce que rien n'en était connu.
+
+| Construction | Branche | Résultat |
+|---|---|---|
+| #1 | `main` | macOS Apple Silicon et macOS Intel **réussies** en 16 min ; Windows en échec au bout de 1 min 56 |
+| #2 | `feature/branding` | Windows **bloquée** 27 min sans une ligne de sortie, interrompue |
+| #3 | `feature/branding` | Windows **réussie** en 11 min 14 |
+
+**Les deux systèmes macOS n'ont rien demandé.** `libs-depuis-amont.sh` a ouvert les `.dmg`
+de l'amont, posé les bibliothèques et rendu la main ; `prepare-vlc-mac.sh` a suivi ; Gradle
+a produit le `.dmg`. Aucun `install_name_tool` n'a été nécessaire, comme prévu : les
+bibliothèques du paquet d'amont portent déjà leurs chemins corrigés.
+
+**Windows a coûté deux échecs, de deux natures différentes.**
+
+Le premier : `msiexec` répond « This installation package could not be opened » et sort en
+1619, que le shell voit comme 83. L'empreinte du paquet venait d'être vérifiée, donc le
+fichier était intact : seul son chemin était en cause. `pwd -W` rend `C:/a/...` et `msiexec`
+n'ouvre un paquet qu'à la forme `C:\a\...`. Les deux chemins passent désormais par
+`cygpath -w`.
+
+Le second, et c'est le plus coûteux : l'option de journalisation `//l*v` ajoutée pour
+diagnostiquer le premier a fait **rester `msiexec` en vie sans fin**, sans une ligne de
+sortie. Devant une ligne de commande qu'il n'analyse pas, `msiexec` ouvre une fenêtre
+d'aide, que `/qn` ne supprime pas et que personne ne fermera sur une machine sans écran.
+L'option est retirée et l'appel est borné par `timeout 900`, sans quoi un `msiexec` qui
+attend occupe la machine jusqu'au plafond de six heures de GitHub.
+
+**Le lien vers les bibliothèques n'en est pas un sous Windows.** `ln -s` sous MSYS2 produit
+un lien que seuls les outils de MSYS2 savent suivre, et c'est la JVM qui lit ce chemin. Le
+script pose donc une **jonction de répertoire** (`cmd /c mklink /J`), qui en est un pour
+tout le monde et ne demande aucun droit particulier. Une copie ne conviendrait pas :
+`prepare-vlc-windows.sh` remplit le répertoire d'origine **après** ce script, et une copie
+ne verrait pas cet ajout, donc le paquet sortirait sans VLC.
+
+### Ce que contiennent les paquets, vérifié sans les installer
+
+| Paquet | Taille | SHA-256 |
+|---|---|---|
+| `trustiatis-secure-7.1.2-ts1-windows-x86_64.msi` | 257 089 536 o | `56857e6a138b84b560358312e3ebfe2bf8516c3c7e2dbf2c372697112d6746fb` |
+| `trustiatis-secure-7.1.2-ts1-windows-x86_64.exe` | 257 662 976 o | `b16775f8ff6e3c0ab844e996b4709319b7798b25c19056cb862aa15e6dae6ea0` |
+| `trustiatis-secure-7.1.2-ts1-macos-aarch64.dmg` | 269 843 829 o | `7eb852261f6454bbfeb687453f9354de38592d7dbb8817de26d31a55e5a39ece` |
+| `trustiatis-secure-7.1.2-ts1-macos-x86_64.dmg` | 283 114 289 o | `c5e969bc8a5533d4fb4bce10179574916bf5fb85184d33fdc6a8cc14d50be014` |
+
+Chaque empreinte a été recalculée sur le fichier reçu et comparée à celle que la machine de
+construction avait inscrite dans son artefact : les quatre correspondent.
+
+Le `.msi` a été inspecté depuis le poste Linux, sans l'installer : il porte `libsimplex.dll`,
+`libapp-lib.dll` et **363 greffons VLC** nommés, ce qui prouve que la jonction a tenu et que
+VLC est bien embarqué. Le nom de l'amont n'y apparaît **pas une fois**, le nôtre deux. Aucune
+bibliothèque `libHS*.dll` n'y figure, et c'est normal : sous Windows le runtime Haskell est
+lié dans `libsimplex.dll`, là où la chaîne Linux pose 166 bibliothèques séparées.
+
+Le contenu des deux `.dmg` n'a **pas** été inspecté : il n'y a pas de machine macOS ici, et
+une image disque HFS+ ne s'ouvre pas honnêtement autrement. Le nom que jpackage leur a donné,
+`Trustiatis Secure-7.1.2.dmg`, atteste au moins que la configuration de marque s'est
+appliquée.
+
+**Aucun de ces quatre paquets n'est signé.** Le groupe n'a de certificat de signature de code
+ni chez Apple ni pour Windows, et la décision appartient au Membre. Conséquence pour qui
+télécharge : macOS refuse le premier lancement, SmartScreen avertit. Le portail de
+téléchargement l'explique et donne la manoeuvre pour les deux systèmes.
+
+## 13. Ce que le paquet Linux 7.1.2-ts1 avait de faux, et pourquoi rien ne l'a vu
+
+Le Membre a rapporté, le 2026-11-17, que l'application plante sous Linux au moment d'un
+appel, les messages continuant de passer. La trace qu'il a jointe nomme la cause sans
+détour :
+
+```
+libvlccore.so.9: cannot open shared object file: No such file or directory
+```
+
+### Le défaut, et sa preuve
+
+L'arbre VLC livré dans `trustiatis-secure-7.1.2-ts1-amd64.deb` porte `libvlccore.so`, et
+**pas** `libvlccore.so.9`. Or `libvlc.so` déclare :
+
+```
+RUNPATH              $ORIGIN
+NEEDED               libvlccore.so.9
+```
+
+L'éditeur de liens dynamique cherche donc un nom qui n'existe pas, dans un répertoire qui
+contient pourtant la bibliothèque, sous un autre nom. C'est la signature d'une copie qui a
+suivi les liens symboliques : les trois noms `libvlccore.so`, `libvlccore.so.9` et
+`libvlccore.so.9.0.1` s'effondrent sur celui du lien, et la version disparaît. Le paquet
+livré compte 424 entrées VLC ; l'arbre que `prepare-vlc-linux.sh` dépose en compte 1 035,
+dont les six liens symboliques qui portent les noms versionnés.
+
+### Pourquoi la chaîne ne s'en est pas aperçue
+
+Trois raisons, et aucune ne fait de bruit.
+
+1. **L'ordre des deux scripts ne se devine pas.** `libs-depuis-amont.sh` commence par un
+   `rm -rf` sur le répertoire de destination, donc il efface aussi `vlc/`. Il doit passer
+   avant `prepare-vlc-linux.sh`, jamais après.
+2. **`prepare-vlc-linux.sh` échoue en silence.** Sa première ligne utile est
+   `mkdir $vlc_dir || exit 0` : si le répertoire existe déjà, même incomplet, le script
+   rend la main avec un code 0 sans rien faire.
+3. **La construction réussit quand même.** Le manque ne se voit qu'à l'exécution, et
+   seulement si l'on passe un appel. Un contrôle de compilation ne pouvait pas le trouver.
+
+L'horodatage le confirme : le `.deb` est daté du 2026-11-16 à 07:05, l'arbre VLC correct
+du même jour à 08:52. Le paquet a été fabriqué avant que l'arbre ne soit posé.
+
+### Deux autres défauts, trouvés en ouvrant le même paquet
+
+L'entrée de bureau livrée portait :
+
+```
+Exec=/opt/trustiatis-secure/bin/trustiatis-secure
+MimeType=
+```
+
+Sans `%u` et sans type MIME, **les liens `simplex:` et `simplexchat:` ne sont enregistrés
+nulle part** : un lien d'invitation cliqué sous Linux n'ouvre rien. La décision D-3 dit de
+garder ces schémas ; elle n'était pas tenue. La bibliothèque `skiko` était en outre
+présente deux fois, dans son `.jar` et extraite à côté.
+
+Ces deux défauts ont la même origine que le premier : le paquet est sorti d'un
+`./gradlew packageDeb` nu. L'amont, lui, repasse derrière jpackage avec
+`scripts/desktop/make-deb-linux.sh`. Ce script ne pouvait pas servir ici, pour deux
+raisons dont aucune n'est un oubli de notre part :
+
+- il commence par `scripts/desktop/build-lib-linux.sh`, qui recompile le coeur Haskell,
+  ce que la décision D-2 interdit ;
+- toutes ses recherches de fichiers portent le nom de l'amont, `simplex*.deb`,
+  `/opt/*imple*/`, `simplex.cfg`, et il renomme en `simplex_<arch>.deb`. Aucun de ces
+  motifs ne rencontre `trustiatis-secure`.
+
+### Ce qui a été mis en place
+
+| Pièce | Rôle |
+|---|---|
+| `scripts/desktop/verifier-vlc-linux.sh` | lit les `NEEDED` de chaque ELF du premier niveau de l'arbre et refuse tout nom absent dont l'arbre fournit pourtant la racine sous un autre nom. Vérifie en plus, nommément, `libvlc.so` et `libvlccore.so.9` |
+| `scripts/desktop/paquet-deb-trustiatis.sh` | transpose à notre nom les étapes d'après empaquetage de l'amont, et refuse de rendre la main si l'une d'elles n'a pas pris. Vérifie le paquet fini sans l'installer |
+| travail `linux` de `.github/workflows/paquets-bureau.yml` | part d'un arbre vide à chaque fois, sur `ubuntu-22.04`, et fixe l'ordre des étapes une bonne fois |
+
+Le garde-fou a été éprouvé **dans les deux sens** : il passe sur l'arbre courant (1 035
+fichiers, les deux noms présents, aucune dépendance interne perdue) et il refuse l'arbre
+extrait du paquet réellement livré, en nommant `libvlccore.so.9`.
+
+### La leçon
+
+Elle vaut d'être écrite, parce qu'elle s'est produite deux fois dans ce projet. Une étape
+de préparation qui se saute elle même en silence, avec un code de sortie 0, est plus
+dangereuse qu'une étape absente : elle laisse la chaîne réussir et le défaut partir chez
+l'utilisateur. Le `mkdir || exit 0` de l'amont et le `|| true` d'un journal de CI sont la
+même faute. Partout où une étape peut ne pas avoir lieu, le contrôle doit porter sur son
+**résultat**, pas sur son code de retour.
+
+## 14. Le dernier pas manquait : du nom de la chaîne au nom publié
+
+Les paquets ne sortent pas de la chaîne sous le nom qu'ils portent sur le portail.
+`jpackage` les nomme d'après le produit et la version qu'il connaît, sans notre suffixe :
+
+| Nom à la sortie de la chaîne | Nom attendu par le portail |
+|---|---|
+| `trustiatis-secure_x86_64.deb` | `trustiatis-secure-7.1.4-ts1-amd64.deb` |
+| `Trustiatis Secure-7.1.4.msi` | `trustiatis-secure-7.1.4-ts1-windows-x86_64.msi` |
+| `Trustiatis Secure-7.1.4.exe` | `trustiatis-secure-7.1.4-ts1-windows-x86_64.exe` |
+| `Trustiatis Secure-7.1.4.dmg` | `trustiatis-secure-7.1.4-ts1-macos-aarch64.dmg` |
+| `Trustiatis Secure-7.1.4.dmg` | `trustiatis-secure-7.1.4-ts1-macos-x86_64.dmg` |
+
+Les deux dernières lignes disent tout : **les deux `.dmg` sortent sous exactement le même
+nom**, et rien, dans le fichier lui même, ne dit lequel vient d'Apple Silicon. Seul le nom
+du dossier d'artefact le dit. Pour 7.1.2-ts1, ce renommage a été fait à la main, et il
+s'est trouvé juste. C'est une chance qu'on ne reconduit pas.
+
+`tools/nommer-livraison.py` fait ce pas, et vérifie avant de ranger :
+
+```bash
+tools/nommer-livraison.py --version 7.1.4-ts1 --artefacts ~/telechargements/artefacts --simuler
+tools/nommer-livraison.py --version 7.1.4-ts1 --artefacts ~/telechargements/artefacts
+```
+
+Il refuse de deviner : un fichier qu'aucune règle ne reconnaît n'est pas rangé au hasard,
+il est signalé. Et il recalcule l'empreinte de chaque paquet pour la comparer à celle que
+la machine de construction a inscrite dans `empreintes-<cible>.txt` : un paquet de 250 Mio
+qui a mal voyagé est écarté ici, et non chez l'utilisateur. À la première anomalie, rien
+n'est rangé du tout.
+
+### Le premier essai de cet outil est tombé dans le piège qu'il devait fermer
+
+Sa table d'empreintes était indexée sur le seul nom de fichier. Les deux `.dmg` portant le
+même nom, le second écrasait le premier, et l'outil comparait le paquet d'Apple Silicon à
+l'empreinte de celui d'Intel : il annonçait un écart sur un fichier intact. La clé est
+maintenant la paire (cible, nom), la cible étant lue dans le nom du fichier d'empreintes.
+Éprouvé dans les deux sens : cinq paquets rangés sous leur bon nom, puis un `.dmg` abîmé et
+un fichier inconnu, tous deux refusés, sans que rien ne soit rangé.
+
+## 15. Deux pièges du poste, rencontrés au report de la 7.1.4
+
+### Le cache d'amont ne portait pas la version
+
+`libs-depuis-amont.sh` garde les paquets téléchargés sous `build/amont/`, et il les y
+range sous le nom que l'amont leur donne. Or l'amont ne versionne pas ses noms de
+fichiers : `simplex-desktop-ubuntu-22_04-x86_64.deb` désigne la 7.1.2 comme la 7.1.4. Le
+fichier de la version précédente reste donc en place, et le script, qui ne télécharge que
+si le fichier manque, se contente de ce qu'il trouve.
+
+Le contrôle d'empreinte rattrape le cas : le script s'arrête. Mais son message dit
+« empreinte inattendue » et invite à relever l'empreinte publiée par l'API de GitHub, ce
+qui envoie chercher une republication ou une falsification là où il n'y a qu'un cache
+périmé. Le 17 novembre 2026, le poste gardait encore le `.deb` de la 7.1.2 sous ce nom
+après le passage à la 7.1.4 ; il a fallu comparer les empreintes à la main pour s'assurer
+que les bibliothèques posées n'étaient pas celles de la version précédente.
+
+Les paquets sont maintenant rangés dans un sous dossier par tag, `build/amont/v7.1.4/`.
+Deux versions coexistent sans se recouvrir, et un retour en arrière ne retélécharge rien.
+
+### L'ordre des deux scripts se paie comptant
+
+C'était déjà écrit en tête de `verifier-vlc-linux.sh`, et cela s'est reproduit le même
+jour : `libs-depuis-amont.sh` commence par un `rm -rf` sur le répertoire de destination,
+donc il efface `vlc/`. Relancé après `prepare-vlc-linux.sh`, ne serait ce que pour
+éprouver une correction du cache, il défait le travail du second, qui rendra ensuite la
+main en silence si on le relance sans supprimer le répertoire.
+
+La seule défense qui tienne est celle qui est déjà en place : `paquet-deb-trustiatis.sh`
+appelle `verifier-vlc-linux.sh` avant d'empaqueter, et refuse de construire sur un arbre
+incomplet. Elle a fonctionné : l'arbre a été refait, et vérifié, avant l'empaquetage.
+
+### Le tas de la compilation ne se rogne pas
+
+La section 8 donne `-Xmx2200m`. Ce n'est pas une valeur de confort. Essayée à 1,6 Gio, la
+compilation du module `common` échoue sur un `OutOfMemoryError` pendant l'abaissement IR
+du compilateur Kotlin, et elle y met douze minutes : l'échec arrive à la fin, pas au
+début. Le réglage vit désormais dans `~/.gradle/gradle.properties`, hors du dépôt, pour
+qu'il s'applique aussi aux lancements qui ne passent pas par une ligne de commande à nous,
+`paquet-deb-trustiatis.sh` en premier.

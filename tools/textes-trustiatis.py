@@ -29,12 +29,24 @@ CATALOGUES = RACINE / "apps/multiplatform/common/src/commonMain/moko-resources"
 # Les textes. Une clé par ligne, une langue par dictionnaire. L'apostrophe
 # s'échappe en \\' comme partout dans ces fichiers, c'est la convention
 # d'Android et l'amont la suit.
+# Longueur des trois textes du premier écran, et ce n'est pas du zèle. Le Membre a vu,
+# dans la version 7.1.2-ts1 sur Android, les textes et les icônes de l'écran d'accueil se
+# chevaucher. La cause n'est pas la mise en page, qui est celle de l'amont et n'a pas été
+# touchée : ce sont nos textes. `SimpleXInfoLayout` pose des interlignes FIXES, 42, 25 et
+# 20 sp, alors que le corps des caractères suit le réglage de taille du système ; et
+# `OnboardingShrinkingLayout` rétrécit l'image pour faire tenir le reste, jusqu'à un
+# point. Notre « onboarding_first_network » faisait 101 caractères contre 58 à l'amont,
+# soit deux lignes de plus sur un téléphone.
+#
+# Budget de l'amont en v7.1.4, à ne pas dépasser : onboarding_be_free 24, base 29 et
+# fr 31 pour onboarding_private_and_secure, base 58 et fr 64 pour onboarding_first_network.
+# Toute reformulation de ces trois clés se vérifie contre ces nombres.
 TEXTES: dict[str, dict[str, str]] = {
     "base": {
         "app_name": "Trustiatis Secure",
         "onboarding_be_free": "Your confidential\\nchannel",
-        "onboarding_private_and_secure": "Encrypted end to end, with no account.",
-        "onboarding_first_network": "The channel Trustiatis uses for anything sensitive,\\nand the one you can use inside your own company.",
+        "onboarding_private_and_secure": "Encrypted end to end, no account.",
+        "onboarding_first_network": "The channel Trustiatis uses\\nfor anything sensitive.",
         "why_simplex_is_built": "Why this application, and how it works.",
         "badges_why_simplex_is_built": "Why this application, and how it works.",
         "why_built_heading": "A channel that cannot be read in transit.",
@@ -91,7 +103,7 @@ TEXTES: dict[str, dict[str, str]] = {
         "app_name": "Trustiatis Secure",
         "onboarding_be_free": "Votre canal\\nconfidentiel",
         "onboarding_private_and_secure": "Chiffré de bout en bout, sans compte.",
-        "onboarding_first_network": "Le canal que Trustiatis emploie pour tout ce qui est sensible,\\net celui dont vous pouvez vous servir en interne.",
+        "onboarding_first_network": "Le canal que Trustiatis emploie\\npour tout ce qui est sensible.",
         "why_simplex_is_built": "Pourquoi cette application, et comment elle fonctionne.",
         "badges_why_simplex_is_built": "Pourquoi cette application, et comment elle fonctionne.",
         "why_built_heading": "Un canal qu\\'on ne peut pas lire en route.",
@@ -146,11 +158,11 @@ TEXTES: dict[str, dict[str, str]] = {
 # catalogue de référence pour une clé absente.
 AJOUTS: dict[str, dict[str, str]] = {
     "base": {
-        "trustiatis_updates_from_portal": "Updates are published on the Trustiatis portal, downloads.trustiatis.com. The application does not check for them by itself.",
+        "trustiatis_updates_from_portal": "Updates are published on the Trustiatis portal, downloads.trustiatis.com/trustiatis-secure. The application does not check for them by itself.",
         "trustiatis_non_affiliation": "Trustiatis Secure is an independent product published by Trustiatis, derived from the free software SimpleX Chat and compatible with the SimpleX network. It is not published, supported or endorsed by SimpleX Chat Ltd. SimpleX is a trademark of SimpleX Chat Ltd.",
     },
     "fr": {
-        "trustiatis_updates_from_portal": "Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com. L\\'application ne les cherche pas d\\'elle même.",
+        "trustiatis_updates_from_portal": "Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com/trustiatis-secure. L\\'application ne les cherche pas d\\'elle même.",
         "trustiatis_non_affiliation": "Trustiatis Secure est un produit indépendant édité par Trustiatis, dérivé du logiciel libre SimpleX Chat et compatible avec le réseau SimpleX. Il n\\'est ni édité, ni soutenu, ni approuvé par SimpleX Chat Ltd. « SimpleX » est une marque de SimpleX Chat Ltd.",
     },
 }
@@ -178,8 +190,16 @@ def ajouter(langue: str, ecrire: bool) -> int:
         for cle, valeur in AJOUTS.get(langue, {}).items()
         if f'<string name="{cle}"' not in texte
     }
+    # Celles qui sont déjà là suivent la table, comme toutes les autres chaînes.
+    deja = {
+        cle: valeur
+        for cle, valeur in AJOUTS.get(langue, {}).items()
+        if cle not in manquantes
+    }
+    corrigees = appliquer(langue, ecrire, deja)[0] if deja else 0
     if not manquantes:
-        return 0
+        return corrigees
+    texte = fichier(langue).read_text(encoding="utf-8")
     bloc = "".join(
         f'  <string name="{cle}">{valeur}</string>'
         + (f"  <!-- marque-ok: {DEROGATIONS[cle]} -->" if cle in DEROGATIONS else "")
@@ -192,14 +212,20 @@ def ajouter(langue: str, ecrire: bool) -> int:
         texte = texte.replace("</resources>", MARQUEUR_AJOUTS + "\n" + bloc + "</resources>", 1)
     if ecrire:
         chemin.write_text(texte, encoding="utf-8")
-    return len(manquantes)
+    return corrigees + len(manquantes)
 
 
-def appliquer(langue: str, ecrire: bool) -> tuple[int, list[str]]:
+def appliquer(langue: str, ecrire: bool, table: dict[str, str] | None = None) -> tuple[int, list[str]]:
+    """Met le catalogue en accord avec la table. `table` vaut TEXTES par défaut.
+
+    Le paramètre sert à `ajouter` : une chaîne propre à Trustiatis déjà posée doit suivre
+    la table comme n'importe quelle autre. Sans cela, corriger une de ces chaînes dans
+    l'outil ne corrigeait rien, puisque `ajouter` ne regardait que sa présence.
+    """
     chemin = fichier(langue)
     texte = chemin.read_text(encoding="utf-8")
     changes, absents = 0, []
-    for cle, valeur in TEXTES[langue].items():
+    for cle, valeur in (TEXTES[langue] if table is None else table).items():
         motif = re.compile(
             r'(<string name="' + re.escape(cle) + r'"[^>]*>)(.*?)(</string>)', re.DOTALL
         )

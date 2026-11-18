@@ -29,11 +29,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
+import chat.simplex.common.views.onboarding.badgePitchAvailable
 import chat.simplex.common.model.BadgeStatus
 import chat.simplex.common.model.BadgeType
 import chat.simplex.common.model.ChatInfo
 import chat.simplex.common.model.LocalBadge
 import chat.simplex.common.model.localDate
+import chat.simplex.common.model.peerTypeIcon
 import chat.simplex.common.platform.*
 import chat.simplex.common.ui.theme.*
 import chat.simplex.common.views.badges.openBadgesView
@@ -50,6 +52,7 @@ fun ChatInfoImage(chatInfo: ChatInfo, size: Dp, iconColor: Color = MaterialTheme
       is ChatInfo.Group -> chatInfo.groupInfo.chatIconName
       is ChatInfo.Local -> MR.images.ic_folder_filled
       is ChatInfo.Direct -> chatInfo.contact.chatIconName
+      is ChatInfo.ContactRequest -> peerTypeIcon(chatInfo.contactRequest.profile.peerType)
       else -> MR.images.ic_account_circle_filled
     }
   ProfileImage(size, chatInfo.image, icon, if (chatInfo is ChatInfo.Local) NoteFolderIconColor else iconColor)
@@ -246,7 +249,9 @@ fun showBadgeInfoAlert(name: String, badge: LocalBadge, uriHandler: UriHandler) 
           String.format(generalGetString(MR.strings.badge_supported_simplex), name, localDate(badge.badge.badgeExpiry))
         else
           String.format(generalGetString(MR.strings.badge_supports_simplex), name)
-      if (noShownBadge()) {
+      // P-7 ter : le badge d'un correspondant reste affiché et reste expliqué, mais le
+      // bouton qui menait à l'achat ne paraît plus. La branche `else` dit le même texte.
+      if (badgePitchAvailable() && noShownBadge()) {
         AlertManager.shared.showAlertDialog(
           title = title,
           text = supports,
@@ -309,17 +314,27 @@ fun ProfileIconModifier(size: Dp, padding: Boolean = true, blurred: Boolean = fa
 fun ProfileImageForActiveCall(
   size: Dp,
   image: String? = null,
+  icon: ImageResource = MR.images.ic_account_circle_filled,
   color: Color = MaterialTheme.colors.secondaryVariant,
   backgroundColor: Color? = null,
   ) {
   if (image == null) {
     Box(Modifier.requiredSize(size).clip(CircleShape).then(if (backgroundColor != null) Modifier.background(backgroundColor) else Modifier)) {
-      Icon(
-        AccountCircleFilled,
-        contentDescription = stringResource(MR.strings.icon_descr_profile_image_placeholder),
-        tint = color,
-        modifier = Modifier.requiredSize(size + 14.dp)
-      )
+      if (icon == MR.images.ic_account_circle_filled) {
+        Icon(
+          AccountCircleFilled,
+          contentDescription = stringResource(MR.strings.icon_descr_profile_image_placeholder),
+          tint = color,
+          modifier = Modifier.requiredSize(size + 14.dp)
+        )
+      } else {
+        Icon(
+          painterResource(icon),
+          contentDescription = stringResource(MR.strings.icon_descr_profile_image_placeholder),
+          tint = color,
+          modifier = Modifier.requiredSize(size)
+        )
+      }
     }
   } else {
     val imageBitmap = base64ToBitmap(image)

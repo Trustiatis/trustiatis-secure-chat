@@ -1,4 +1,4 @@
-# Paquets de bureau pour Windows et macOS.
+# Paquets de bureau pour Linux, Windows et macOS.
 #
 # Pourquoi ce fichier existe : le poste qui construit Trustiatis Secure est une machine
 # Linux. Les paquets .msi, .exe et .dmg ne se fabriquent que sur leur propre système, et il
@@ -20,6 +20,10 @@ name: Paquets de bureau
 on:
   workflow_dispatch:
     inputs:
+      linux:
+        description: Construire le paquet Linux (.deb)
+        type: boolean
+        default: true
       windows:
         description: Construire le paquet Windows (.msi et .exe)
         type: boolean
@@ -41,6 +45,65 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Pourquoi un travail Linux alors que le poste du groupe EST une machine Linux : parce
+  # que le paquet 7.1.2-ts1 est sorti faux depuis ce poste, et de facon silencieuse. Son
+  # arbre VLC n'avait pas « libvlccore.so.9 », et son entree de bureau n'enregistrait
+  # aucun schema d'URL. Les deux viennent du meme defaut : des etapes lancees a la main,
+  # dans un ordre qui ne se devine pas, sur un repertoire de travail deja garni.
+  #
+  # Une machine hebergee part d'un arbre vide a chaque fois. L'ordre y est ecrit une bonne
+  # fois, et le garde-fou refuse de livrer un arbre incoherent.
+  #
+  # ubuntu-22.04 et non ubuntu-latest : les bibliotheques du coeur viennent du paquet
+  # Ubuntu 22.04 de l'amont, et c'est la glibc la plus ancienne des deux. Construire sur
+  # une distribution plus recente produirait un paquet qui ne s'installe pas sur 22.04.
+  linux:
+    name: Linux x86_64
+    if: inputs.linux
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Outils d'empaquetage
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            binutils dpkg-dev fakeroot patchelf strip-nondeterminism
+
+      # Cet ordre n'est pas interchangeable, et c'est tout le propos de ce travail :
+      # libs-depuis-amont.sh efface le repertoire de destination, vlc/ compris.
+      - name: Bibliothèques du coeur, depuis le paquet d'amont
+        run: scripts/desktop/libs-depuis-amont.sh linux-x86_64
+
+      - name: VLC
+        run: scripts/desktop/prepare-vlc-linux.sh
+
+      - name: Arbre VLC cohérent
+        run: scripts/desktop/verifier-vlc-linux.sh
+
+      - name: Construire le .deb
+        run: scripts/desktop/paquet-deb-trustiatis.sh
+
+      - name: Empreintes
+        run: |
+          cd apps/multiplatform/release/main/deb
+          sha256sum *.deb | tee "$GITHUB_WORKSPACE/empreintes-linux-x86_64.txt"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paquets-linux-x86_64
+          path: |
+            apps/multiplatform/release/main/deb/*.deb
+            empreintes-linux-x86_64.txt
+          if-no-files-found: error
+
   windows:
     name: Windows x86_64
     if: inputs.windows

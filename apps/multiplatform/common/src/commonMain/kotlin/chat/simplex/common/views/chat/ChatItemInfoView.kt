@@ -30,6 +30,7 @@ import chat.simplex.common.ui.theme.*
 import chat.simplex.common.views.chat.group.MemberProfileImage
 import chat.simplex.common.views.chat.item.*
 import chat.simplex.common.views.badges.openBadgesView
+import chat.simplex.common.views.onboarding.badgePitchAvailable
 import chat.simplex.common.views.chatlist.*
 import chat.simplex.common.views.newchat.noShownBadge
 import chat.simplex.common.views.usersettings.networkAndServers.serverHostname
@@ -281,7 +282,12 @@ fun ChatItemInfoView(chatRh: Long?, ci: ChatItem, ciInfo: ChatItemInfo, devTools
       if (file?.fileExpires != null) {
         val expiresRes = if (file.expired) MR.strings.info_row_file_expired else MR.strings.info_row_file_expires
         InfoRow(stringResource(expiresRes), localTimestamp(file.fileExpires))
-        if (noShownBadge()) {
+        // P-7 bis. Cette ligne propose le badge au moment precis ou un fichier expire,
+        // a quelqu'un qui n'en a pas : c'est une sollicitation, pas une information, et
+        // elle mene au meme achat que les portes deja fermees. C'est le seul appelant de
+        // noShownBadge() qui n'avait pas le verrou. L'information qui reste, la date
+        // d'expiration juste au dessus, ne depend pas de lui.
+        if (badgePitchAvailable() && noShownBadge()) {
           SectionItemView(::openBadgesView) {
             Text(stringResource(MR.strings.badges_larger_files_longer), color = MaterialTheme.colors.primary)
           }

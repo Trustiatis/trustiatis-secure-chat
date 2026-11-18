@@ -21,6 +21,7 @@ import chat.simplex.common.ui.theme.*
 import chat.simplex.common.views.*
 import chat.simplex.common.views.chat.item.openBrowserAlert
 import chat.simplex.common.views.helpers.*
+import chat.simplex.common.views.onboarding.crowdfundingAvailable
 import chat.simplex.res.*
 import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
@@ -211,15 +212,25 @@ fun SetSimplexDomainView(
           }
         }
       }
-      SectionTextFooter(buildAnnotatedString {
-        append(generalGetString(MR.strings.simplex_name_sales_footer))
-        append(" ")
-        withLink(LinkAnnotation.Url(SIMPLEX_DOMAINS_URL) { uriHandler.openUriCatching(SIMPLEX_DOMAINS_URL) }) {
-          withStyle(SpanStyle(color = MaterialTheme.colors.primary)) {
-            append("simplex.domains")
+      // P-7 bis, huitième porte, trouvée en remontant depuis l'écran des nouveautés de la
+      // v7.1.4. Ce pied de section dit « Crowdfunding investors can reserve names before
+      // the sale starts », c'est à dire exactement l'offre Wefunder que la décision du
+      // Membre interdit de relayer : une offre de titres, et non un appel aux dons.
+      //
+      // Seul le renvoi aux investisseurs est fermé. Le reste de l'écran, le nom lui même
+      // et le compte à rebours de la vente, reste en place : ce sont des objets du réseau
+      // (décision D-4) et leur sort appartient au Membre, pas à cette correction.
+      if (crowdfundingAvailable()) {
+        SectionTextFooter(buildAnnotatedString {
+          append(generalGetString(MR.strings.simplex_name_sales_footer))
+          append(" ")
+          withLink(LinkAnnotation.Url(SIMPLEX_DOMAINS_URL) { uriHandler.openUriCatching(SIMPLEX_DOMAINS_URL) }) {
+            withStyle(SpanStyle(color = MaterialTheme.colors.primary)) {
+              append("simplex.domains")
+            }
           }
-        }
-      })
+        })
+      }
       SectionBottomSpacer()
     }
   }

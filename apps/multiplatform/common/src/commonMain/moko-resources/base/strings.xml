@@ -214,6 +214,8 @@
   <string name="group_link_requires_newer_version">This group requires a newer version of the app. Please update the app to join.</string>
   <string name="connection_error_auth">Connection link removed</string>
   <string name="connection_error_auth_desc">Your contact removed this link, or it was a one-time link that was already used.\nTo connect, ask your contact to create a new link.</string>
+  <string name="connection_error_duplicate">Already connected?</string>
+  <string name="connection_error_duplicate_desc">It seems like you are already connected via this link. If it is not the case, there was an error (%1$s).</string>
   <string name="connection_error_blocked">Connection blocked</string>
   <string name="connection_error_blocked_desc">Connection is blocked by server operator:\n%1$s.</string>
   <string name="connection_error_quota">Undelivered messages</string>
@@ -1333,8 +1335,8 @@
   <string name="migrate_from_another_device">Migrate from another device</string>
   <string name="how_it_works">How it works</string>
   <string name="onboarding_be_free">Your confidential\nchannel</string>
-  <string name="onboarding_private_and_secure">Encrypted end to end, with no account.</string>
-  <string name="onboarding_first_network">The channel Trustiatis uses for anything sensitive,\nand the one you can use inside your own company.</string>
+  <string name="onboarding_private_and_secure">Encrypted end to end, no account.</string>
+  <string name="onboarding_first_network">The channel Trustiatis uses\nfor anything sensitive.</string>
   <string name="get_started">Get started</string>
   <string name="why_simplex_is_built">Why this application, and how it works.</string>
   <string name="onboarding_your_profile">Your profile</string>
@@ -3369,7 +3371,9 @@
   <string name="v7_1_channels_descr">Add moderators and sign every message.</string>
   <string name="v7_1_flat_layout">Flat layout and markdown</string>
   <string name="v7_1_flat_layout_descr">Enable in Appearance settings.</string>
+  <string name="v7_1_4_security_audit">New security audit by Trail of Bits</string>
+  <string name="v7_1_4_security_audit_descr">Please ask your contacts to upgrade.\nReport will be public soon.</string>
   <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->
   <string name="trustiatis_non_affiliation">Trustiatis Secure is an independent product published by Trustiatis, derived from the free software SimpleX Chat and compatible with the SimpleX network. It is not published, supported or endorsed by SimpleX Chat Ltd. SimpleX is a trademark of SimpleX Chat Ltd.</string>  <!-- marque-ok: mention obligatoire de non affiliation, NOTICE-AGPL.md -->
-  <string name="trustiatis_updates_from_portal">Updates are published on the Trustiatis portal, downloads.trustiatis.com. The application does not check for them by itself.</string>
+  <string name="trustiatis_updates_from_portal">Updates are published on the Trustiatis portal, downloads.trustiatis.com/trustiatis-secure. The application does not check for them by itself.</string>
 </resources>

@@ -33,6 +33,16 @@
     "texte_sur_cta":   "#FFFFFF"
   },
 
+  "surfaces": {
+    "_source": "charte fournie par le Membre (page « Entretien Collaborateur »), variables --panel, --panel2, --line, --line2. Du blanc posé en translucide sur le fond sombre : un panneau laisse voir l'arrière plan au lieu de le masquer. Le voile est l'opacité de --orange-soft et --green-soft de la même charte, qui posent la couleur de marque à 15 % pour teinter un bloc sans l'aplatir.",
+    "_usage": "Portail de téléchargement. Rien n'est propagé dans les applications : Compose n'a pas de notion de surface translucide au dessus d'un arrière plan animé.",
+    "panneau":   "rgba(255, 255, 255, 0.045)",
+    "panneau_2": "rgba(255, 255, 255, 0.075)",
+    "ligne":     "rgba(255, 255, 255, 0.11)",
+    "ligne_2":   "rgba(255, 255, 255, 0.06)",
+    "voile":     0.15
+  },
+
   "formes": {
     "_source": "brand.ts radius et ctaRadius",
     "rayon":     "22px",
