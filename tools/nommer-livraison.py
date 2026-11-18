@@ -79,10 +79,18 @@ def annoncees(dossier: Path) -> dict[tuple[str | None, str], str]:
 
     La cible est lue dans le nom du fichier d'empreintes, `empreintes-<cible>.txt`,
     qui la porte où qu'il se trouve.
+
+    `empreintes.txt`, sans cible, est le fichier des paquets qui n'en ont pas : les APK,
+    que la compilation continue ne produit pas et qui arrivent dans un dossier libre.
+    Leur nom porte déjà l'architecture, il n'y a donc rien à départager. Sans cette
+    forme, un APK signé sur le poste n'était rangeable par aucun nom de fichier
+    raisonnable, et c'était le même défaut d'asymétrie que celui du paquet Debian :
+    le chemin hébergé produisait de quoi ranger, le chemin local non.
     """
     vues: dict[tuple[str | None, str], str] = {}
-    for f in dossier.rglob("empreintes-*.txt"):
-        cible = f.stem[len("empreintes-"):] or None
+    for f in dossier.rglob("empreintes*.txt"):
+        reste = f.stem[len("empreintes"):]
+        cible = reste[1:] if reste.startswith("-") else None
         for ligne in f.read_text(encoding="utf-8").splitlines():
             m = re.match(r"([0-9a-f]{64})\s+\*?\.?/?(.+)", ligne.strip())
             if m:

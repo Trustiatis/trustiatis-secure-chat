@@ -363,6 +363,24 @@ Attendu : `Signer #1 certificate SHA-256 digest:`
 `502cbc06654a134d536bf496ac44f1013a50c3dcfcd5beba5d61dd70f7c9c82f`, v2 et v3 vraies.
 **v1 fausse est normal** à `minSdk 26`, ce n'est pas un défaut à corriger.
 
+`apksigner` est un script shell qui appelle `java` par son nom, sans chemin : lancé dans un
+shell où `env-build.sh` n'a pas été chargé, il échoue sur « exec: java: not found », ce qui
+n'a rien à voir avec l'APK. Et sans `ANDROID_HOME`, la ligne ci dessus pointe sur
+`/build-tools/...`, qui n'existe pas. Charger l'environnement d'abord, dans ce shell là.
+
+Ranger ensuite les deux APK sous leur nom de publication. La compilation d'Android n'écrit
+pas de fichier d'empreintes, contrairement à celle du bureau : il se fait ici, et il
+s'appelle `empreintes.txt`, **sans cible**, parce que ces paquets n'arrivent pas dans un
+dossier `paquets-<cible>` et que leur nom porte déjà l'architecture.
+
+```bash
+cd ~/Documents/claude/trustiatis-secure
+D=apps/multiplatform/android/build/outputs/apk/foss/release
+( cd "$D" && sha256sum ./*.apk ) > "$D/empreintes.txt"
+tools/nommer-livraison.py --version <version> --artefacts "$D" --simuler
+tools/nommer-livraison.py --version <version> --artefacts "$D"
+```
+
 **Piège de `/tmp` sur cette VM.** `jpackage` assemble l'image du paquet dans
 `/tmp/jdk.jpackage*`, or `/tmp` est un **tmpfs de 3,4 Gio** pris sur la mémoire. Un dossier
 de travail volumineux laissé là, par exemple un `.deb` de 600 Mo décompressé pour vérifier
