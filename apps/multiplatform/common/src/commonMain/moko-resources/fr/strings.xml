@@ -3061,4 +3061,24 @@
   <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->
   <string name="trustiatis_non_affiliation">Trustiatis Secure est un produit indépendant édité par Trustiatis, dérivé du logiciel libre SimpleX Chat et compatible avec le réseau SimpleX. Il n\'est ni édité, ni soutenu, ni approuvé par SimpleX Chat Ltd. « SimpleX » est une marque de SimpleX Chat Ltd.</string>  <!-- marque-ok: mention obligatoire de non affiliation, NOTICE-AGPL.md -->
   <string name="trustiatis_updates_from_portal">Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com/trustiatis-secure. L\'application ne les cherche pas d\'elle même.</string>
+
+  <!-- Trustiatis : passerelle TrustiVPN -->
+  <string name="ts_vpn_titre">Passerelle TrustiVPN</string>
+  <string name="ts_vpn_menu">Passerelle TrustiVPN</string>
+  <string name="ts_vpn_section_passerelle">La passerelle de votre client</string>
+  <string name="ts_vpn_hote">Adresse ou nom d\'hôte</string>
+  <string name="ts_vpn_port">Port UDP WireGuard</string>
+  <string name="ts_vpn_endpoint">Point d\'entrée du plan de contrôle</string>
+  <string name="ts_vpn_pied_passerelle">Ces trois valeurs vous sont données par l\'administrateur de votre client. Le plan de contrôle n\'est joignable que dans le tunnel : son adresse est une adresse interne, et il n\'est jamais servi en clair.</string>
+  <string name="ts_vpn_enregistrer">Enregistrer</string>
+  <string name="ts_vpn_enregistree">Configuration enregistrée sur cet appareil.</string>
+  <string name="ts_vpn_section_appareil">Cet appareil</string>
+  <string name="ts_vpn_etat">Enrôlement</string>
+  <string name="ts_vpn_etat_non_enrole">Non enrôlé</string>
+  <string name="ts_vpn_etat_enrole">Enrôlé</string>
+  <string name="ts_vpn_etat_revoque">Révoqué</string>
+  <string name="ts_vpn_appareil">Identifiant de l\'appareil</string>
+  <string name="ts_vpn_pied_appareil">L\'enrôlement crée une paire de clés sur cet appareil. La clé privée n\'en sort jamais, et aucun jeton permanent n\'est rangé ici. L\'utilisateur est créé par l\'administrateur de votre client, avec une adresse fixe ; cet appareil ne demande qu\'une clé de session.</string>
+  <string name="ts_vpn_oublier">Oublier cette passerelle</string>
+  <string name="ts_vpn_pied_oublier">Cela efface la configuration sur cet appareil, et rien d\'autre. Cela ne révoque rien sur la passerelle : l\'utilisateur y reste autorisé jusqu\'à ce qu\'un administrateur de votre client le révoque.</string>
 </resources>

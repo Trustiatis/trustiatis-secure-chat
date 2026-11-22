@@ -206,6 +206,44 @@ Deux conséquences d'outillage, tirées le jour même.
 un contournement d'un défaut de publication, pas un choix technique. La v7.1.4 existe déjà,
 mais en **préversion**, ce que la règle de P-4 interdit de suivre.
 
+### 2026-11-22, P-8 rendue : la passerelle se configure, et aucun secret permanent n'est rangé
+
+Le Membre demande que l'adresse du TrustiGateway et son point d'entrée, « avec token ou autre
+sécurité maximale », soient configurables dans l'application, et que les canaux de service
+ajoutés ensuite soient préservés des personnes qui utilisent l'application sans être clientes.
+
+**Ce qui est rangé sur l'appareil : trois valeurs, et rien d'autre.** L'hôte de la passerelle,
+le port UDP de WireGuard, le point d'entrée du plan de contrôle. Pas de mot de passe, pas de
+jeton permanent, pas de secret partagé.
+
+La raison n'est pas une préférence de style. ADR-0010 du programme TrustiGateway pose que
+l'identité est **générée sur l'appareil**, et ADR-0025 D6 que la clé privée n'en sort jamais et
+que le champ qui la porterait **ne doit pas exister**. Un jeton permanent rangé dans les
+réglages serait exactement ce champ sous un autre nom : lisible par qui tient l'appareil,
+rejouable, et copiable d'un appareil à l'autre. Le jeton d'enrôlement est donc **à usage
+unique** : il sert une fois, il n'est pas conservé, et l'application n'en garde que l'identifiant
+d'appareil que la passerelle lui rend, qui n'est pas un secret.
+
+**Deux refus codés dans la validation**, parce qu'une règle qu'on ne peut pas enfreindre vaut
+mieux qu'une consigne :
+
+- le point d'entrée en clair est refusé. « http:// » n'est pas accepté, quelle que soit
+  l'adresse ;
+- un point d'entrée **public** est refusé. ADR-0021 dit que le portail n'est jamais public ;
+  l'application n'accepte donc qu'une adresse d'espace privé, ou exactement l'hôte configuré.
+  Accepter une adresse publique ici apprendrait à l'exploitant qu'un portail public est une
+  configuration normale.
+
+**Le cloisonnement des non clients.** L'application ne montre les écrans de service qu'à un
+appareil enrôlé, et c'est du **confort, pas une sécurité**. Ce qui arrête un non client est la
+passerelle, qui n'accepte que les pairs qu'un administrateur du client a créés (ADR-0025 D5).
+L'avertissement est écrit en tête de `HabilitationTrustiatis.kt` : un écran masqué n'est pas un
+contrôle d'accès, et toute lecture de `estClient` qui déciderait autre chose qu'un affichage est
+un défaut.
+
+Posé dans le paquet `chat.simplex.common.trustiatis`, qui n'entre en conflit avec aucun report de
+l'amont. Une seule ligne est ajoutée à un écran de l'amont, l'entrée de menu. 12 cas de test.
+
 ### Décisions devenues sans objet pour la version 1
 
 `S-3` à `S-16` portent toutes sur l'exploitation de serveurs Trustiatis. Elles sont **gelées**,
@@ -218,6 +256,7 @@ l'audit des serveurs reste la référence à ce moment là.
 
 | N° | Décision | Ce qu'elle bloque | Recommandation |
 |---|---|---|---|
+| **P-9** | **Comment l'application obtient une paire de clés X25519.** Le tunnel TrustiVPN en a besoin, et il n'y a aucun chemin propre aujourd'hui : le dépôt n'embarque **aucune bibliothèque de cryptographie** ; `KeyPairGenerator("XDH")` de Java n'existe sur Android qu'à partir de l'API 33, alors que `minSdk` vaut 26 ; et faire produire la clé par le coeur Haskell supposerait de le recompiler, ce que **D-2 interdit**. Les trois voies restantes sont une dépendance vérifiée (`bcprov`, ou la bibliothèque `tunnel` de WireGuard qui apporte aussi le backend), une implémentation écrite ici (**à écarter** : on n'écrit pas sa propre courbe elliptique), ou relever `minSdk` à 33 et perdre les appareils antérieurs | **tout le client TrustiVPN** : sans clé, pas de pair, donc pas de tunnel. La configuration de la passerelle (P-8) n'en dépend pas et fonctionne déjà | **ajouter `com.wireguard.android:tunnel`** pour Android, qui apporte à la fois une implémentation Curve25519 éprouvée et le backend `GoBackend` du tunnel, et traiter le Desktop séparément. C'est une dépendance tierce dans une application de sécurité : la décision est au Membre, et elle conditionne le calendrier de l'essai TrustiVPN |
 | **D-1** | **Publication App Store d'une oeuvre AGPLv3 dont Trustiatis n'est pas titulaire** (risque J-02). À soumettre à un conseil juridique | la **publication** iOS, et elle seule. Depuis P-1, le développement de `feature/ios` n'est plus bloqué | faire examiner **avant** d'engager les frais de compte éditeur et de matériel Apple, puisque c'est cette réponse qui dit si ces frais servent à quelque chose. Replis possibles : TestFlight interne, distribution d'entreprise, ou publication iOS abandonnée pendant que le reste sort |
 
 ---

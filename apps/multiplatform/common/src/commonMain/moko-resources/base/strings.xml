@@ -3376,4 +3376,24 @@
   <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->
   <string name="trustiatis_non_affiliation">Trustiatis Secure is an independent product published by Trustiatis, derived from the free software SimpleX Chat and compatible with the SimpleX network. It is not published, supported or endorsed by SimpleX Chat Ltd. SimpleX is a trademark of SimpleX Chat Ltd.</string>  <!-- marque-ok: mention obligatoire de non affiliation, NOTICE-AGPL.md -->
   <string name="trustiatis_updates_from_portal">Updates are published on the Trustiatis portal, downloads.trustiatis.com/trustiatis-secure. The application does not check for them by itself.</string>
+
+  <!-- Trustiatis : passerelle TrustiVPN -->
+  <string name="ts_vpn_titre">TrustiVPN gateway</string>
+  <string name="ts_vpn_menu">TrustiVPN gateway</string>
+  <string name="ts_vpn_section_passerelle">Your client gateway</string>
+  <string name="ts_vpn_hote">Address or host name</string>
+  <string name="ts_vpn_port">WireGuard UDP port</string>
+  <string name="ts_vpn_endpoint">Control plane entry point</string>
+  <string name="ts_vpn_pied_passerelle">Your client administrator gives you these three values. The control plane is only reachable inside the tunnel: its address is an internal one, and it is never served in the clear.</string>
+  <string name="ts_vpn_enregistrer">Save</string>
+  <string name="ts_vpn_enregistree">Configuration saved on this device.</string>
+  <string name="ts_vpn_section_appareil">This device</string>
+  <string name="ts_vpn_etat">Enrolment</string>
+  <string name="ts_vpn_etat_non_enrole">Not enrolled</string>
+  <string name="ts_vpn_etat_enrole">Enrolled</string>
+  <string name="ts_vpn_etat_revoque">Revoked</string>
+  <string name="ts_vpn_appareil">Device identifier</string>
+  <string name="ts_vpn_pied_appareil">Enrolment creates a key pair on this device. The private key never leaves it, and no permanent token is stored here. A user is created by your client administrator, with a fixed address; this device only asks for a session key.</string>
+  <string name="ts_vpn_oublier">Forget this gateway</string>
+  <string name="ts_vpn_pied_oublier">This erases the configuration on this device only. It does not revoke anything on the gateway: the user stays authorised there until a client administrator revokes it.</string>
 </resources>

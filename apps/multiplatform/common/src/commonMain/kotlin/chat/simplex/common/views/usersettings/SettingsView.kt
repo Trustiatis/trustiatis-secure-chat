@@ -30,6 +30,7 @@ import chat.simplex.common.ui.theme.*
 import chat.simplex.common.views.badges.BadgesView
 import chat.simplex.common.views.badges.currentShownBadge
 import chat.simplex.common.views.database.DatabaseView
+import chat.simplex.common.trustiatis.EcranTrustiVPN
 import chat.simplex.common.views.helpers.*
 import chat.simplex.common.views.migration.MigrateFromDeviceView
 import chat.simplex.common.views.onboarding.GetStakeView
@@ -124,6 +125,10 @@ fun SettingsLayout(
 
     SectionView(stringResource(MR.strings.advanced_settings)) {
       SettingsActionItem(painterResource(MR.images.ic_wifi_tethering), stringResource(MR.strings.network_and_servers), showCustomModal { _, close -> NetworkAndServersView(close) }, disabled = stopped)
+      // Trustiatis : la passerelle TrustiVPN du client. Une seule ligne ajoutée à un
+      // écran de l'amont, l'écran lui même vit dans le paquet `trustiatis`, qui ne
+      // conflicte avec aucun report.
+      SettingsActionItem(painterResource(MR.images.ic_vpn_key_filled), stringResource(MR.strings.ts_vpn_menu), showSettingsModal { EcranTrustiVPN() }, disabled = stopped)
       if (appPlatform == AppPlatform.ANDROID) {
         SettingsActionItem(painterResource(if (notificationsMode.value == NotificationsMode.OFF) MR.images.ic_bolt_off else MR.images.ic_bolt), stringResource(MR.strings.notifications), showSettingsModal { NotificationsSettingsView(it) }, disabled = stopped)
       }
