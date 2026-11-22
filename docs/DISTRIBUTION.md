@@ -159,6 +159,14 @@ trustiatis-secure-<version>-desktop-linux-x86_64.AppImage
 - [ ] faire lire l'index du portail par le client Desktop, en remplacement
 - [ ] ajouter la vérification du SHA-256 avant installation dans le client Desktop
 - [ ] trancher D-1, la mise à disposition sur l'App Store sous AGPLv3
+- [ ] **notice d'utilisation simplifiée**, demandée par le Membre le 2026-11-22 pour la prochaine
+      version : à quoi sert l'application et ce qu'elle sait faire, fonction par fonction, en
+      français, pour quelqu'un qui ne l'a jamais ouverte. Le guide de l'amont (`docs/guide/`,
+      17 fichiers) ne tient pas ce rôle : il est en anglais, il décrit SimpleX Chat et il décrit
+      des fonctions que nous avons neutralisées, les modes de notification iOS en premier (P-5).
+      À servir par le portail à côté des paquets, et à garder cohérente avec les 45 clés de
+      textes déjà réécrites par `tools/textes-trustiatis.py`, sans quoi la notice et
+      l'application se contrediront
 - [x] publier la 7.1.4-ts1, le 2026-11-18, sept paquets et quatre plateformes. Les quatre
       paquets de bureau viennent de la construction hébergée numéro 4 sur `bec2a3e2d`, les
       trois autres du poste. Même réserve de signature que la 7.1.2-ts1

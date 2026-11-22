@@ -37,6 +37,7 @@ Relevé au chapitre 7 de `docs/INITIAL_AUDIT.md`. À produire depuis le SVG sour
 | Windows | `.ico` | consommé par jpackage |
 | macOS | `.icns` | consommé par jpackage |
 | Linux | `.png` | consommé par jpackage, AppImage et Flatpak |
+| **Dans l'application** (toutes plateformes) | `ic_simplex.svg`, `ic_simplex_{light,dark}@4x.png`, `ic_simplex_tray_light.svg`, `ic_simplex_tray_dot{,_light}.svg` | **manquait à ce tableau, et donc n'a jamais été propagé.** Ce ne sont pas des icônes de lanceur : ce sont l'icône de la fenêtre, celle de la zone de notification du Desktop, et l'image de profil par défaut. Relevé par le Membre le 2026-11-22 |
 | iOS | jeu de tailles du catalogue d'actifs | hors périmètre tant que la décision D-1 n'est pas prise |
 
 ## Ce qui ne va pas ici
