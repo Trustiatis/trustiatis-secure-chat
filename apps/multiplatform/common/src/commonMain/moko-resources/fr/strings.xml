@@ -3081,4 +3081,15 @@
   <string name="ts_vpn_pied_appareil">L\'enrôlement crée une paire de clés sur cet appareil. La clé privée n\'en sort jamais, et aucun jeton permanent n\'est rangé ici. L\'utilisateur est créé par l\'administrateur de votre client, avec une adresse fixe ; cet appareil ne demande qu\'une clé de session.</string>
   <string name="ts_vpn_oublier">Oublier cette passerelle</string>
   <string name="ts_vpn_pied_oublier">Cela efface la configuration sur cet appareil, et rien d\'autre. Cela ne révoque rien sur la passerelle : l\'utilisateur y reste autorisé jusqu\'à ce qu\'un administrateur de votre client le révoque.</string>
+
+  <!-- Trustiatis : mises à jour -->
+  <string name="ts_maj_titre">Mises à jour</string>
+  <string name="ts_maj_menu">Rechercher une mise à jour</string>
+  <string name="ts_maj_dispo_titre">Une nouvelle version est disponible</string>
+  <string name="ts_maj_dispo_texte">Version %1$s, publiée le %2$s, environ %3$s à télécharger.\n\nLe portail donne chaque paquet avec son empreinte SHA-256. Vérifiez la avant d\'installer : cette application ne se remplace jamais toute seule.</string>
+  <string name="ts_maj_ouvrir_portail">Ouvrir le portail</string>
+  <string name="ts_maj_plus_tard">Plus tard</string>
+  <string name="ts_maj_a_jour">Vous avez la version %s, et c\'est la dernière.</string>
+  <string name="ts_maj_injoignable">Le portail n\'a pas pu être joint. Cela ne dit pas que vous êtes en retard, seulement que la vérification n\'a pas eu lieu.</string>
+  <string name="ts_maj_illisible">Le portail a répondu quelque chose que cette version ne sait pas lire. Regardez la page de téléchargement vous même.</string>
 </resources>

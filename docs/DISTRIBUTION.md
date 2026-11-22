@@ -156,8 +156,17 @@ trustiatis-secure-<version>-desktop-linux-x86_64.AppImage
 - [x] construire et publier une première version, 7.1.2-ts1 le 2026-11-16. **Signée pour
       Android seulement** : les paquets de bureau ne le sont pas, faute de certificat Apple
       et Windows, et la décision appartient au Membre
-- [ ] faire lire l'index du portail par le client Desktop, en remplacement
-- [ ] ajouter la vérification du SHA-256 avant installation dans le client Desktop
+- [x] faire lire le manifeste du portail par l'application, fait le 2026-11-22, et **sur
+      Android comme sur ordinateur** et non sur le seul Desktop comme prévu au départ. La
+      recherche a lieu au plus une fois par jour, elle se tait quand il n'y a rien, elle
+      passe par le mandataire SOCKS si l'application en utilise un, et elle **invite** sans
+      jamais installer : l'utilisateur est renvoyé au portail, où l'empreinte est affichée
+- [ ] vérification automatique du SHA-256 avant installation. **Volontairement non faite**,
+      et la raison tient en une phrase : elle suppose que l'application télécharge et
+      remplace son propre binaire, ce qui est exactement le mécanisme qu'un attaquant
+      cherche à détourner dans une application de sécurité. À reprendre seulement avec une
+      signature de code sur les quatre plateformes, c'est à dire après les certificats
+      Windows et Apple
 - [ ] trancher D-1, la mise à disposition sur l'App Store sous AGPLv3
 - [x] **notice d'utilisation simplifiée**, demandée par le Membre le 2026-11-22 et écrite le
       même jour dans [`NOTICE-UTILISATION.md`](NOTICE-UTILISATION.md), en dix huit sections

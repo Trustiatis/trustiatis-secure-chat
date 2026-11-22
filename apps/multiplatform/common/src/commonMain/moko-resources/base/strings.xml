@@ -3396,4 +3396,15 @@
   <string name="ts_vpn_pied_appareil">Enrolment creates a key pair on this device. The private key never leaves it, and no permanent token is stored here. A user is created by your client administrator, with a fixed address; this device only asks for a session key.</string>
   <string name="ts_vpn_oublier">Forget this gateway</string>
   <string name="ts_vpn_pied_oublier">This erases the configuration on this device only. It does not revoke anything on the gateway: the user stays authorised there until a client administrator revokes it.</string>
+
+  <!-- Trustiatis : mises à jour -->
+  <string name="ts_maj_titre">Updates</string>
+  <string name="ts_maj_menu">Check for updates</string>
+  <string name="ts_maj_dispo_titre">A new version is available</string>
+  <string name="ts_maj_dispo_texte">Version %1$s, published on %2$s, about %3$s to download.\n\nThe portal lists every package with its SHA-256 fingerprint. Check it before installing: this application never replaces itself on its own.</string>
+  <string name="ts_maj_ouvrir_portail">Open the portal</string>
+  <string name="ts_maj_plus_tard">Later</string>
+  <string name="ts_maj_a_jour">You have version %s, which is the latest one.</string>
+  <string name="ts_maj_injoignable">The portal could not be reached. Nothing says you are out of date, only that the check did not happen.</string>
+  <string name="ts_maj_illisible">The portal answered something this version does not understand. Check the download page yourself.</string>
 </resources>

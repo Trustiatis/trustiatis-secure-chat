@@ -31,6 +31,7 @@ import chat.simplex.common.views.badges.BadgesView
 import chat.simplex.common.views.badges.currentShownBadge
 import chat.simplex.common.views.database.DatabaseView
 import chat.simplex.common.trustiatis.EcranTrustiVPN
+import chat.simplex.common.trustiatis.chercherMiseAJourManuellement
 import chat.simplex.common.views.helpers.*
 import chat.simplex.common.views.migration.MigrateFromDeviceView
 import chat.simplex.common.views.onboarding.GetStakeView
@@ -129,6 +130,9 @@ fun SettingsLayout(
       // écran de l'amont, l'écran lui même vit dans le paquet `trustiatis`, qui ne
       // conflicte avec aucun report.
       SettingsActionItem(painterResource(MR.images.ic_vpn_key_filled), stringResource(MR.strings.ts_vpn_menu), showSettingsModal { EcranTrustiVPN() }, disabled = stopped)
+      // Trustiatis : recherche de mise à jour sur notre portail. Le vérificateur de
+      // l'amont, qui interroge les versions de l'éditeur amont, reste neutralisé.
+      SettingsActionItem(painterResource(MR.images.ic_download), stringResource(MR.strings.ts_maj_menu), ::chercherMiseAJourManuellement, disabled = stopped)
       if (appPlatform == AppPlatform.ANDROID) {
         SettingsActionItem(painterResource(if (notificationsMode.value == NotificationsMode.OFF) MR.images.ic_bolt_off else MR.images.ic_bolt), stringResource(MR.strings.notifications), showSettingsModal { NotificationsSettingsView(it) }, disabled = stopped)
       }

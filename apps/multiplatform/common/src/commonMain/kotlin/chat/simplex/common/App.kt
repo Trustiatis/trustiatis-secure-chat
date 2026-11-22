@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import chat.simplex.common.views.usersettings.SetDeliveryReceiptsView
+import chat.simplex.common.trustiatis.chercherMiseAJourAuDemarrage
 import chat.simplex.common.model.*
 import chat.simplex.common.model.ChatController.appPrefs
 import chat.simplex.common.platform.*
@@ -109,6 +110,10 @@ fun MainScreen() {
     }
   }
   platform.desktopShowAppUpdateNotice()
+  // Trustiatis : recherche sur NOTRE portail, au plus une fois par jour, et muette sauf
+  // s'il y a une version. La ligne au dessus reste celle de l'amont, et elle est inerte :
+  // son vérificateur est neutralisé (risque T-02).
+  LaunchedEffect(Unit) { chercherMiseAJourAuDemarrage() }
   LaunchedEffect(chatModel.clearOverlays.value) {
     if (chatModel.clearOverlays.value) {
       ModalManager.closeAllModalsEverywhere()
