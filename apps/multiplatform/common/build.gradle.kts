@@ -118,6 +118,15 @@ kotlin {
 
         implementation("com.jakewharton:process-phoenix:3.0.0")
 
+        // TrustiVPN : la Curve25519 et le tunnel WireGuard en espace utilisateur
+        // (wireguard-go), sous Apache 2.0, donc intégrable dans une oeuvre AGPLv3.
+        // Decision P-9 : KeyPairGenerator("XDH") n'existe qu'a partir de l'API 33 et
+        // minSdk vaut 26. Cette bibliotheque apporte la courbe ET le backend, donc une
+        // seule implementation de courbe dans l'appareil au lieu de deux.
+        // Elle ne lit aucun fichier .conf : la configuration passe par une socket de
+        // controle en memoire, ce qui est aussi ce que nous voulons.
+        implementation("com.wireguard.android:tunnel:1.0.20260102")
+
         // https://issuetracker.google.com/issues/351313880
         val cameraXVersion = "1.5.1"
         implementation("androidx.camera:camera-core:${cameraXVersion}")

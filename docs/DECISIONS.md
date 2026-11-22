@@ -250,13 +250,53 @@ l'amont. Une seule ligne est ajoutée à un écran de l'amont, l'entrée de menu
 pas annulées : elles redeviendront actives le jour où l'hébergement sera repris, et
 l'audit des serveurs reste la référence à ce moment là.
 
+### 2026-11-22, le client TrustiVPN dans l'application (P-9 et P-10)
+
+Décidé par le Membre, en réponse au relevé d'état de la 7.1.4-ts2.
+
+**P-9, comment l'application obtient une paire de clés X25519 : par `com.wireguard.android:tunnel`.**
+La bibliothèque est sous Apache 2.0, licence vérifiée sur le POM publié de la version
+1.0.20260102, donc intégrable dans une oeuvre AGPLv3. Elle apporte la Curve25519 **et**
+`libwg-go.so`, c'est à dire `wireguard-go` lui même : une seule implémentation de courbe
+dans l'appareil au lieu de deux, et le tunnel par la même voie. C'est la première
+dépendance que **nous** ajoutons depuis la greffe, et elle ne porte que sur Android.
+
+Le Desktop n'en a pas besoin : `KeyPairGenerator("XDH")` est dans le JVM 17 embarqué.
+Les deux chemins sont derrière un `expect`/`actual`, et la conversion d'octets du
+Desktop, de la coordonnée u de Java vers les 32 octets de poids faible en tête de
+WireGuard, est prouvée par un échange Diffie-Hellman dans les deux sens.
+
+La clé privée naît sur l'appareil, est recopiée dans un tableau effaçable, et ne quitte
+jamais `PaireClesVpn` autrement que vers le tunnel local. Aucune fonction ne la
+sérialise ailleurs, conformément à ADR-0025 D6 du programme TrustiGateway, qui pose que
+le serveur ne reçoit jamais de clé privée, et que le refus tient à l'**absence du champ**
+et non à une inspection : une clé privée et une clé publique X25519 font toutes deux 32
+octets et sont indiscernables par leur forme.
+
+**P-10, l'interrupteur du tunnel : il existe.** Le client peut avoir besoin de couper le
+tunnel pour retrouver son réseau local, et c'est une raison légitime. Deux conséquences
+qui ne sont pas négociables, et qui doivent être écrites dans la vue :
+
+- **la messagerie fonctionne tunnel éteint.** Le tunnel ne porte que la passerelle du
+  client, pas les serveurs de messagerie. Couper le tunnel ne doit jamais couper les
+  conversations ;
+- **tunnel allumé, tout passe dedans.** Aucune application exclue, aucun partage de
+  route. L'étanchéité réelle, sous Android, ne vient pas de l'application : ce sont
+  « VPN permanent » et « Bloquer les connexions sans VPN », que seuls l'utilisateur ou
+  une politique d'administration d'appareil peuvent activer. L'application doit le dire
+  au lieu de laisser croire qu'elle s'en charge.
+
+**Ce qui reste à faire** après cette décision, et qui n'est pas fait : le service de
+tunnel Android, l'enrôlement auprès du plan de contrôle, la prise en compte de la
+révocation d'un pair par le TrustiVPN, le scellement de la clé privée par le magasin
+matériel, et le composant privilégié du Desktop.
+
 ---
 
 ## 2. Décisions ouvertes, bloquantes
 
 | N° | Décision | Ce qu'elle bloque | Recommandation |
 |---|---|---|---|
-| **P-9** | **Comment l'application obtient une paire de clés X25519.** Le tunnel TrustiVPN en a besoin, et il n'y a aucun chemin propre aujourd'hui : le dépôt n'embarque **aucune bibliothèque de cryptographie** ; `KeyPairGenerator("XDH")` de Java n'existe sur Android qu'à partir de l'API 33, alors que `minSdk` vaut 26 ; et faire produire la clé par le coeur Haskell supposerait de le recompiler, ce que **D-2 interdit**. Les trois voies restantes sont une dépendance vérifiée (`bcprov`, ou la bibliothèque `tunnel` de WireGuard qui apporte aussi le backend), une implémentation écrite ici (**à écarter** : on n'écrit pas sa propre courbe elliptique), ou relever `minSdk` à 33 et perdre les appareils antérieurs | **tout le client TrustiVPN** : sans clé, pas de pair, donc pas de tunnel. La configuration de la passerelle (P-8) n'en dépend pas et fonctionne déjà | **ajouter `com.wireguard.android:tunnel`** pour Android, qui apporte à la fois une implémentation Curve25519 éprouvée et le backend `GoBackend` du tunnel, et traiter le Desktop séparément. C'est une dépendance tierce dans une application de sécurité : la décision est au Membre, et elle conditionne le calendrier de l'essai TrustiVPN |
 | **D-1** | **Publication App Store d'une oeuvre AGPLv3 dont Trustiatis n'est pas titulaire** (risque J-02). À soumettre à un conseil juridique | la **publication** iOS, et elle seule. Depuis P-1, le développement de `feature/ios` n'est plus bloqué | faire examiner **avant** d'engager les frais de compte éditeur et de matériel Apple, puisque c'est cette réponse qui dit si ces frais servent à quelque chose. Replis possibles : TestFlight interne, distribution d'entreprise, ou publication iOS abandonnée pendant que le reste sort |
 
 ---
