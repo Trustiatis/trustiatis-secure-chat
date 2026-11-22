@@ -3407,4 +3407,36 @@
   <string name="ts_maj_a_jour">You have version %s, which is the latest one.</string>
   <string name="ts_maj_injoignable">The portal could not be reached. Nothing says you are out of date, only that the check did not happen.</string>
   <string name="ts_maj_illisible">The portal answered something this version does not understand. Check the download page yourself.</string>
+  <!-- Trustiatis : canaux de service -->
+  <string name="ts_canaux_titre">Service channels</string>
+  <string name="ts_canaux_menu">Service channels</string>
+  <string name="ts_canaux_intro">A service channel is an ordinary contact, operated by Trustiatis or by your client, confined to one job. Three classes exist, and none can do another one\'s work. Files are refused on all of them, in both directions.</string>
+  <string name="ts_canaux_correspondant">Contact</string>
+  <string name="ts_canaux_aucun">None</string>
+  <string name="ts_canaux_verification">Security code</string>
+  <string name="ts_canaux_verifie">Verified</string>
+  <string name="ts_canaux_non_verifie">Not verified</string>
+  <string name="ts_canaux_fichiers">Files</string>
+  <string name="ts_canaux_fichiers_interdits">Refused on this device</string>
+  <string name="ts_canaux_fichiers_permis">Still allowed</string>
+  <string name="ts_canaux_choisir">Choose a contact</string>
+  <string name="ts_canaux_fermer">Close the list</string>
+  <string name="ts_canaux_retirer">Remove this designation</string>
+  <string name="ts_canaux_refus">Nothing was designated. Either this contact already holds another class, or the file ban could not be set. A channel labelled as a service while still accepting files would be a lie, so no label was applied.</string>
+  <string name="ts_canaux_aucun_correspondant">No direct contact on this profile yet.</string>
+  <string name="ts_canaux_support">Trustiatis support</string>
+  <string name="ts_canaux_2fa">Two-factor codes</string>
+  <string name="ts_canaux_acces">TrustiVPN access</string>
+  <string name="ts_canaux_pied_support">Operated by Trustiatis. It can do nothing on your infrastructure: it carries questions and answers, and no file. Logs and screenshots go through your client portal, inside the tunnel, where they stay on your own machines.</string>
+  <string name="ts_canaux_pied_2fa">Operated by your client, on its own server. It delivers a code and never validates one: it holds no shared secret and can never answer that a user is authenticated. A code delivered on the device that asked for it is not a second factor, and is never enough to open a session.</string>
+  <string name="ts_canaux_pied_acces">Operated by your client, reachable from inside the tunnel only. It can ask for a session to be opened for a user that already exists; it can never create a user, change an address or change what a tunnel may reach.</string>
+  <string name="ts_canaux_pied_non_verifie">This contact is designated but not verified, so it gets no service label anywhere in the application. Compare the security code with your administrator first: without that, the service label is itself the thing worth impersonating.</string>
+
+  <!-- Trustiatis : rendu d\'un code à deux facteurs -->
+  <string name="ts_code_titre">Two-factor code</string>
+  <string name="ts_code_application">Application</string>
+  <string name="ts_code_action">Action</string>
+  <string name="ts_code_heure">Requested at</string>
+  <string name="ts_code_origine">Seen from</string>
+  <string name="ts_code_avertissement">If you did not ask for this, do not use the code and tell your administrator.</string>
 </resources>

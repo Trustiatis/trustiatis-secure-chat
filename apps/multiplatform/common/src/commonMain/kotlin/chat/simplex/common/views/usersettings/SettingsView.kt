@@ -30,7 +30,9 @@ import chat.simplex.common.ui.theme.*
 import chat.simplex.common.views.badges.BadgesView
 import chat.simplex.common.views.badges.currentShownBadge
 import chat.simplex.common.views.database.DatabaseView
+import chat.simplex.common.trustiatis.EcranCanaux
 import chat.simplex.common.trustiatis.EcranTrustiVPN
+import chat.simplex.common.trustiatis.afficherCanauxService
 import chat.simplex.common.trustiatis.chercherMiseAJourManuellement
 import chat.simplex.common.views.helpers.*
 import chat.simplex.common.views.migration.MigrateFromDeviceView
@@ -130,6 +132,11 @@ fun SettingsLayout(
       // écran de l'amont, l'écran lui même vit dans le paquet `trustiatis`, qui ne
       // conflicte avec aucun report.
       SettingsActionItem(painterResource(MR.images.ic_vpn_key_filled), stringResource(MR.strings.ts_vpn_menu), showSettingsModal { EcranTrustiVPN() }, disabled = stopped)
+      // Trustiatis : les canaux de service, cachés tant que cet appareil n'a pas été préparé
+      // pour un client. Le cloisonnement réel est ailleurs, voir HabilitationTrustiatis.kt.
+      if (afficherCanauxService) {
+        SettingsActionItem(painterResource(MR.images.ic_verified_user), stringResource(MR.strings.ts_canaux_menu), showSettingsModal { EcranCanaux() }, disabled = stopped)
+      }
       // Trustiatis : recherche de mise à jour sur notre portail. Le vérificateur de
       // l'amont, qui interroge les versions de l'éditeur amont, reste neutralisé.
       SettingsActionItem(painterResource(MR.images.ic_download), stringResource(MR.strings.ts_maj_menu), ::chercherMiseAJourManuellement, disabled = stopped)

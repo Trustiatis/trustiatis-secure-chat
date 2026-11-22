@@ -81,8 +81,26 @@ object MagasinTrustiatis {
    */
   fun oublier() {
     listOf(CLE_HOTE, CLE_PORT, CLE_ENDPOINT, CLE_ETAT, CLE_APPAREIL).forEach { settings.remove(it) }
+    MagasinCanaux.oublierTout()
   }
 }
 
 /** Confort d'affichage seulement. Voir l'avertissement en tête de fichier. */
 val estClient: Boolean get() = MagasinTrustiatis.etat() == EtatEnrolement.ENROLE
+
+/**
+ * Faut il montrer les écrans de canaux de service sur cet appareil.
+ *
+ * L'enrôlement seul ne peut pas servir de condition, et c'est une erreur qu'il valait mieux
+ * voir tout de suite : le support Trustiatis est tenu par Trustiatis, pas par la passerelle du
+ * client. Un client qui a du support sans TrustiVPN n'est jamais enrôlé, et serait écarté de
+ * son propre canal de support.
+ *
+ * La condition est donc : cet appareil a été préparé pour un client, soit parce qu'il est
+ * enrôlé, soit parce qu'une passerelle complète y a été rangée. Comme `estClient`, c'est du
+ * confort : ce qui arrête un non client est la passerelle, qui n'accepte que les pairs créés
+ * par un administrateur client, et le correspondant de service lui même, qui n'existe que
+ * pour les locataires.
+ */
+val afficherCanauxService: Boolean
+  get() = estClient || MagasinTrustiatis.configuration().complete

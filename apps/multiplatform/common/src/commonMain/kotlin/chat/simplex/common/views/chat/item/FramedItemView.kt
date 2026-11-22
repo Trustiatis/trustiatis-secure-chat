@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import chat.simplex.common.model.*
+import chat.simplex.common.trustiatis.*
 import chat.simplex.common.platform.*
 import chat.simplex.common.ui.theme.*
 import chat.simplex.common.views.chat.*
@@ -504,6 +505,9 @@ fun CIMarkdownText(
   val bases = remember(ci, linkMode) { itemDisplay(ci, linkMode)?.bases ?: listOf(0) }
   val selection = setupItemSelection(LocalSelectionManager.current, LocalItemContext.current.selectionIndex, ci.meta.isLive == true, bases)
   val terminal = LocalTerminalLayout.current
+  // Trustiatis : un code livre sur un canal 2FA verifie est rendu avec son contexte, ADR-0026 D5.
+  // Les trois conditions sont reunies par codeDeServiceAffichable ; sinon le texte reste ordinaire.
+  val codeDeService = codeDeServiceAffichable(chatInfo, ci)
 
   Box(
     Modifier
@@ -512,7 +516,8 @@ fun CIMarkdownText(
         else bubbleTextBoxPadding()
       )
   ) {
-    MarkdownText(
+    if (codeDeService != null) VueCodeDeuxFacteurs(codeDeService)
+    else MarkdownText(
       text, if (text.isEmpty()) emptyList() else ci.formattedText, if (text.isEmpty()) null else ci.markdownBlocks, toggleSecrets = true,
       sendCommandMsg = if (chatInfo.useCommands && chat.chatInfo.sndReady) { { msg -> sendCommandMsg(chatsCtx, chat, msg) } } else null,
       meta = ci.meta, chatTTL = chatTTL, encrypted = ci.encryptedFile, signedFileVerified = ci.file?.loaded, linkMode = linkMode,

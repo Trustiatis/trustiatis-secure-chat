@@ -3092,4 +3092,36 @@
   <string name="ts_maj_a_jour">Vous avez la version %s, et c\'est la dernière.</string>
   <string name="ts_maj_injoignable">Le portail n\'a pas pu être joint. Cela ne dit pas que vous êtes en retard, seulement que la vérification n\'a pas eu lieu.</string>
   <string name="ts_maj_illisible">Le portail a répondu quelque chose que cette version ne sait pas lire. Regardez la page de téléchargement vous même.</string>
+  <!-- Trustiatis : canaux de service -->
+  <string name="ts_canaux_titre">Canaux de service</string>
+  <string name="ts_canaux_menu">Canaux de service</string>
+  <string name="ts_canaux_intro">Un canal de service est un correspondant ordinaire, tenu par Trustiatis ou par votre client, confiné à une seule tâche. Il en existe trois classes, et aucune ne peut faire le travail d\'une autre. Les fichiers sont refusés sur toutes, dans les deux sens.</string>
+  <string name="ts_canaux_correspondant">Correspondant</string>
+  <string name="ts_canaux_aucun">Aucun</string>
+  <string name="ts_canaux_verification">Code de sécurité</string>
+  <string name="ts_canaux_verifie">Vérifié</string>
+  <string name="ts_canaux_non_verifie">Non vérifié</string>
+  <string name="ts_canaux_fichiers">Fichiers</string>
+  <string name="ts_canaux_fichiers_interdits">Refusés sur cet appareil</string>
+  <string name="ts_canaux_fichiers_permis">Encore permis</string>
+  <string name="ts_canaux_choisir">Choisir un correspondant</string>
+  <string name="ts_canaux_fermer">Fermer la liste</string>
+  <string name="ts_canaux_retirer">Retirer cette désignation</string>
+  <string name="ts_canaux_refus">Rien n\'a été désigné. Soit ce correspondant tient déjà une autre classe, soit l\'interdiction des fichiers n\'a pas pu être posée. Un canal marqué « service » qui accepterait encore les fichiers serait un mensonge, donc aucune marque n\'a été posée.</string>
+  <string name="ts_canaux_aucun_correspondant">Aucun correspondant direct sur ce profil pour l\'instant.</string>
+  <string name="ts_canaux_support">Support Trustiatis</string>
+  <string name="ts_canaux_2fa">Codes à deux facteurs</string>
+  <string name="ts_canaux_acces">Accès TrustiVPN</string>
+  <string name="ts_canaux_pied_support">Tenu par Trustiatis. Il ne peut rien sur votre infrastructure : il porte des questions et des réponses, et aucun fichier. Les journaux et les captures passent par le portail de votre client, dans le tunnel, où ils restent sur vos machines.</string>
+  <string name="ts_canaux_pied_2fa">Tenu par votre client, sur son serveur. Il livre un code et n\'en valide jamais : il ne détient aucun secret partagé et ne peut jamais répondre qu\'un utilisateur est authentifié. Un code livré sur l\'appareil qui l\'a demandé n\'est pas un second facteur, et ne suffit jamais à ouvrir une session.</string>
+  <string name="ts_canaux_pied_acces">Tenu par votre client, joignable depuis le tunnel seulement. Il peut demander l\'ouverture d\'une session pour un utilisateur qui existe déjà ; il ne peut jamais créer un utilisateur, changer une adresse ni changer ce qu\'un tunnel peut atteindre.</string>
+  <string name="ts_canaux_pied_non_verifie">Ce correspondant est désigné mais non vérifié : il n\'obtient donc aucun libellé de service, nulle part dans l\'application. Comparez d\'abord le code de sécurité avec votre administrateur, sans quoi le libellé « service » devient lui même l\'objet à usurper.</string>
+
+  <!-- Trustiatis : rendu d\'un code à deux facteurs -->
+  <string name="ts_code_titre">Code à deux facteurs</string>
+  <string name="ts_code_application">Application</string>
+  <string name="ts_code_action">Action demandée</string>
+  <string name="ts_code_heure">Demandé à</string>
+  <string name="ts_code_origine">Vu depuis</string>
+  <string name="ts_code_avertissement">Si vous n\'avez rien demandé, n\'utilisez pas ce code et avertissez votre administrateur.</string>
 </resources>
