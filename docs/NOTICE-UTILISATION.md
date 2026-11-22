@@ -150,7 +150,7 @@ du paquet, et ouvre le portail sur demande. Quand il n'y en a pas, **elle ne dit
 application qui annonce « vous êtes à jour » à chaque lancement apprend surtout à fermer ses
 fenêtres sans les lire.
 
-Vous pouvez aussi demander la recherche vous même, par **Réglages → Rechercher des mises à jour**.
+Vous pouvez aussi demander la recherche vous même, par **Réglages → Rechercher une mise à jour**.
 Là, elle répond toujours quelque chose, y compris que le portail n'a pas pu être joint, ce qui ne
 veut pas dire que vous êtes à jour mais que la vérification n'a pas eu lieu.
 
@@ -175,6 +175,11 @@ Ce qu'il faut savoir, et que l'écran répète :
 
 - **votre clé privée ne sort jamais de l'appareil**, et aucun jeton permanent n'y est rangé. Cet
   appareil ne demande qu'une clé de session ;
+- le **jeton d'enrôlement**, que votre administrateur vous remet une seule fois, se colle dans le
+  champ du même nom. C'est le seul secret que l'application conserve, et elle le conserve pour un
+  temps dont la fin est définie : l'enrôlement s'en sert et l'efface. « Effacer ce jeton » le
+  retire tout de suite si vous changez d'avis. L'application n'en juge jamais la validité, elle en
+  contrôle la forme pour attraper un collage de travers ;
 - **votre adresse dans le tunnel est fixe.** Elle est créée par votre administrateur, et elle ne
   se libère pas parce qu'une session a expiré ;
 - **« Oublier cette passerelle » n'efface que cet appareil.** Vous restez autorisé sur la
