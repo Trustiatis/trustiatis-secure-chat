@@ -3072,6 +3072,14 @@
   <string name="ts_vpn_pied_passerelle">Ces trois valeurs vous sont données par l\'administrateur de votre client. Le plan de contrôle n\'est joignable que dans le tunnel : son adresse est une adresse interne, et il n\'est jamais servi en clair.</string>
   <string name="ts_vpn_enregistrer">Enregistrer</string>
   <string name="ts_vpn_enregistree">Configuration enregistrée sur cet appareil.</string>
+  <string name="ts_vpn_section_jeton">Jeton d\'enrôlement</string>
+  <string name="ts_vpn_jeton">Jeton d\'enrôlement</string>
+  <string name="ts_vpn_jeton_etat">Jeton conservé</string>
+  <string name="ts_vpn_jeton_present">Oui, en attente d\'usage</string>
+  <string name="ts_vpn_jeton_absent">Aucun</string>
+  <string name="ts_vpn_jeton_enregistrer">Conserver ce jeton</string>
+  <string name="ts_vpn_jeton_effacer">Effacer ce jeton</string>
+  <string name="ts_vpn_pied_jeton">Votre administrateur vous remet ce jeton une seule fois. C\'est le seul secret que cet appareil conserve, et il l\'est pour un temps dont la fin est définie : l\'enrôlement s\'en sert et l\'efface. L\'application ne juge jamais un jeton elle même, elle en contrôle la forme pour écarter un collage de travers. L\'enrôlement réclame aussi une paire de clés sur cet appareil, que cette version ne crée pas encore.</string>
   <string name="ts_vpn_section_appareil">Cet appareil</string>
   <string name="ts_vpn_etat">Enrôlement</string>
   <string name="ts_vpn_etat_non_enrole">Non enrôlé</string>

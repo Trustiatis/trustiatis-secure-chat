@@ -25,6 +25,7 @@ private const val CLE_PORT = "TrustiatisPasserellePortVpn"
 private const val CLE_ENDPOINT = "TrustiatisPasserelleEndpoint"
 private const val CLE_ETAT = "TrustiatisEnrolementEtat"
 private const val CLE_APPAREIL = "TrustiatisEnrolementAppareil"
+private const val CLE_JETON = "TrustiatisJetonEnAttente"
 
 enum class EtatEnrolement {
   /** Aucun jeton n'a jamais abouti sur cet appareil. */
@@ -58,6 +59,29 @@ object MagasinTrustiatis {
     return emptyList()
   }
 
+  /**
+   * Le jeton d'enrôlement en attente, s'il y en a un.
+   *
+   * C'est le seul secret que cet appareil range, et il est rangé pour un temps borné, dont la
+   * fin est définie : l'enrôlement le consomme. P-8 refuse un secret **permanent**, et c'est la
+   * bonne frontière. Le jeton doit survivre à la fermeture de l'écran, parce qu'il est collé
+   * depuis un courriel ou un portail avant que la passerelle ne soit joignable, et qu'exiger de
+   * le recoller au bon moment pousserait l'utilisateur à le garder quelque part de moins sûr.
+   *
+   * Ce qui est refusé, en revanche : le garder après l'enrôlement. Un jeton consommé qui reste
+   * là est un secret qui ne sert plus à rien et se vole encore.
+   */
+  fun jetonEnAttente(): String? = settings.getStringOrNull(CLE_JETON)
+
+  fun poserJeton(jeton: String): Anomalie? {
+    val anomalie = validerJeton(jeton)
+    if (anomalie != null) return anomalie
+    settings.putString(CLE_JETON, jeton)
+    return null
+  }
+
+  fun consommerJeton() = settings.remove(CLE_JETON)
+
   fun etat(): EtatEnrolement = EtatEnrolement.depuis(settings.getStringOrNull(CLE_ETAT))
 
   /** L'identifiant que la passerelle a donné à cet appareil. Jamais un secret. */
@@ -66,6 +90,10 @@ object MagasinTrustiatis {
   fun poserEnrolement(idAppareil: String) {
     settings.putString(CLE_APPAREIL, idAppareil)
     settings.putString(CLE_ETAT, EtatEnrolement.ENROLE.name)
+    // L'enrôlement consomme le jeton. Il n'y a aucun cas où il faudrait le resservir : une
+    // seconde demande avec le même jeton est soit un rejeu, soit un enrôlement qui recommence
+    // et réclame alors un jeton neuf.
+    consommerJeton()
   }
 
   fun marquerRevoque() {
@@ -80,7 +108,7 @@ object MagasinTrustiatis {
    * administrateur client le révoque. L'écran doit le dire.
    */
   fun oublier() {
-    listOf(CLE_HOTE, CLE_PORT, CLE_ENDPOINT, CLE_ETAT, CLE_APPAREIL).forEach { settings.remove(it) }
+    listOf(CLE_HOTE, CLE_PORT, CLE_ENDPOINT, CLE_ETAT, CLE_APPAREIL, CLE_JETON).forEach { settings.remove(it) }
     MagasinCanaux.oublierTout()
   }
 }

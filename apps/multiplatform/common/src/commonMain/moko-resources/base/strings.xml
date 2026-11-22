@@ -3387,6 +3387,14 @@
   <string name="ts_vpn_pied_passerelle">Your client administrator gives you these three values. The control plane is only reachable inside the tunnel: its address is an internal one, and it is never served in the clear.</string>
   <string name="ts_vpn_enregistrer">Save</string>
   <string name="ts_vpn_enregistree">Configuration saved on this device.</string>
+  <string name="ts_vpn_section_jeton">Enrolment token</string>
+  <string name="ts_vpn_jeton">Enrolment token</string>
+  <string name="ts_vpn_jeton_etat">Token held</string>
+  <string name="ts_vpn_jeton_present">Yes, waiting to be used</string>
+  <string name="ts_vpn_jeton_absent">None</string>
+  <string name="ts_vpn_jeton_enregistrer">Keep this token</string>
+  <string name="ts_vpn_jeton_effacer">Erase this token</string>
+  <string name="ts_vpn_pied_jeton">Your administrator gives you this token once. It is the only secret this device keeps, and it is kept for a time with a defined end: enrolment uses it and erases it. The application never judges a token itself, it only checks its shape so a bad paste is caught early. Enrolment also needs a key pair on this device, which this version does not create yet.</string>
   <string name="ts_vpn_section_appareil">This device</string>
   <string name="ts_vpn_etat">Enrolment</string>
   <string name="ts_vpn_etat_non_enrole">Not enrolled</string>

@@ -33,6 +33,9 @@ fun EcranTrustiVPN() {
   val anomalies = remember { mutableStateOf(emptyList<Anomalie>()) }
   val enregistree = remember { mutableStateOf(false) }
   val etat = remember { mutableStateOf(MagasinTrustiatis.etat()) }
+  val jeton = rememberSaveable { mutableStateOf("") }
+  val jetonEnAttente = remember { mutableStateOf(MagasinTrustiatis.jetonEnAttente() != null) }
+  val anomalieJeton = remember { mutableStateOf<Anomalie?>(null) }
 
   fun courante() = ConfigurationPasserelle(
     hote = hote.value.trim(),
@@ -74,6 +77,47 @@ fun EcranTrustiVPN() {
 
     SectionDividerSpaced()
 
+    SectionView(stringResource(MR.strings.ts_vpn_section_jeton)) {
+      Champ(stringResource(MR.strings.ts_vpn_jeton), jeton, anomalieJeton.value?.raison)
+      Ligne(
+        stringResource(MR.strings.ts_vpn_jeton_etat),
+        if (jetonEnAttente.value) stringResource(MR.strings.ts_vpn_jeton_present) else stringResource(MR.strings.ts_vpn_jeton_absent),
+      )
+      Row(Modifier.fillMaxWidth().padding(horizontal = DEFAULT_PADDING, vertical = 8.dp)) {
+        Button(
+          onClick = {
+            val a = MagasinTrustiatis.poserJeton(jeton.value)
+            anomalieJeton.value = a
+            if (a == null) {
+              jeton.value = ""
+              jetonEnAttente.value = true
+            }
+          },
+          modifier = Modifier.fillMaxWidth(),
+        ) {
+          Text(stringResource(MR.strings.ts_vpn_jeton_enregistrer))
+        }
+      }
+      if (jetonEnAttente.value) {
+        Row(Modifier.fillMaxWidth().padding(horizontal = DEFAULT_PADDING, vertical = 8.dp)) {
+          Button(
+            onClick = {
+              MagasinTrustiatis.consommerJeton()
+              jetonEnAttente.value = false
+              anomalieJeton.value = null
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.error),
+          ) {
+            Text(stringResource(MR.strings.ts_vpn_jeton_effacer))
+          }
+        }
+      }
+    }
+    SectionTextFooter(stringResource(MR.strings.ts_vpn_pied_jeton))
+
+    SectionDividerSpaced()
+
     SectionView(stringResource(MR.strings.ts_vpn_section_appareil)) {
       Ligne(
         stringResource(MR.strings.ts_vpn_etat),
@@ -94,6 +138,9 @@ fun EcranTrustiVPN() {
         Button(
           onClick = {
             MagasinTrustiatis.oublier()
+            jeton.value = ""
+            jetonEnAttente.value = false
+            anomalieJeton.value = null
             hote.value = ""
             port.value = PORT_VPN_DEFAUT.toString()
             endpoint.value = ""
