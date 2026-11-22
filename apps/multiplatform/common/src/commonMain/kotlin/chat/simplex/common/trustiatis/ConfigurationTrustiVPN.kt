@@ -86,7 +86,7 @@ fun estAdressePrivee(hote: String): Boolean {
 }
 
 /** Découpe « hôte » ou « hôte:port » en tenant compte des crochets d'IPv6. */
-private fun hoteEtPort(autorite: String): Pair<String, Int?> {
+internal fun hoteEtPort(autorite: String): Pair<String, Int?> {
   if (autorite.startsWith("[")) {
     val fin = autorite.indexOf(']')
     if (fin < 0) return autorite to null

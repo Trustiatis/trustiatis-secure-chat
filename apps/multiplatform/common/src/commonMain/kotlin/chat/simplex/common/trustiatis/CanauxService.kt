@@ -67,21 +67,36 @@ private fun estCodeAcceptable(code: String): Boolean =
  * l'apparence d'un code livré par le service à un message qui n'en est pas un, et c'est
  * exactement cette apparence qu'un attaquant cherche.
  */
-fun lireCodeDeuxFacteurs(texte: String): CodeDeuxFacteurs? {
+/**
+ * Le découpage commun aux contrats de canal : une marque, puis des couples `clé=valeur`.
+ *
+ * Partagé par le contrat 2FA et le contrat d'accès, qui ont la même forme de message et les
+ * mêmes refus de forme. Les deux contrats diffèrent par leurs champs, pas par leur syntaxe,
+ * et tenir deux découpages aurait fait diverger leurs refus.
+ *
+ * Rend `null` dès qu'une ligne n'est pas interprétable, et jamais une table partielle : une
+ * table partielle se lit comme un message valide auquel il manque un champ.
+ */
+internal fun lireChamps(texte: String, marque: String): Map<String, String>? {
   val lignes = texte.trimEnd().lines()
-  if (lignes.firstOrNull() != MARQUE_2FA) return null
+  if (lignes.firstOrNull() != marque) return null
   val champs = mutableMapOf<String, String>()
   for (ligne in lignes.drop(1)) {
     if (ligne.isBlank()) continue
     val coupe = ligne.indexOf('=')
     if (coupe <= 0) return null
     val cle = ligne.substring(0, coupe).trim()
-    if (cle.isEmpty() || cle.any { it !in 'a'..'z' }) return null
+    if (cle.isEmpty() || cle.any { it !in 'a'..'z' && it != '_' }) return null
     // Une clé répétée est refusée : départager deux valeurs serait un choix arbitraire, et
     // un émetteur qui en envoie deux a un défaut qu'il vaut mieux voir.
     if (champs.containsKey(cle)) return null
     champs[cle] = ligne.substring(coupe + 1).trim()
   }
+  return champs
+}
+
+fun lireCodeDeuxFacteurs(texte: String): CodeDeuxFacteurs? {
+  val champs = lireChamps(texte, MARQUE_2FA) ?: return null
   val code = champs["code"]?.filterNot { it == ' ' }
   val app = champs["app"]
   val action = champs["action"]
