@@ -25,3 +25,4 @@ docs/DISTRIBUTION.md
 .gitlab/issue_templates/Default.md
 docs/CHAINE-DE-CONSTRUCTION.md
 docs/MIROIR-GITHUB.md
+docs/NOTICE-UTILISATION.md

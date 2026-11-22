@@ -88,6 +88,12 @@ PLAQUE_RAYON_COIN = 0.065
 PLAQUE_RONDE = 0.927
 NTF_LARGEUR = 0.917
 
+# Pastille de message non lu de la zone de notification. Relevé sur les SVG de
+# l'amont : centre en (155, 34) dans une boîte « 121 0 40 40 », rayon 6, donc
+# 85 % du côté sur les deux axes et un rayon de 15 %.
+PASTILLE_CENTRE = 0.85
+PASTILLE_RAYON = 0.15
+
 
 def palette() -> dict:
     return json.loads((BRANDING / "colors" / "palette.json").read_text())
@@ -170,6 +176,25 @@ def _silhouette(dessin: Image.Image) -> Image.Image:
     sil = Image.new("RGBA", dessin.size, (255, 255, 255, 0))
     sil.putalpha(dessin.getchannel("A"))
     return sil
+
+
+def _pastille(im: Image.Image, p: dict) -> Image.Image:
+    """Ajoute la pastille de message non lu, en bas à droite.
+
+    L'amont la pose au même endroit, d'un rayon de 15 % du côté. L'encre est
+    `marque.alerte_vive` de la palette et non le rouge de l'amont : c'est la
+    seule du référentiel dont le métier est d'être vue, et une pastille rendue
+    à 22 px dans une barre système n'a que sa saturation pour exister.
+    """
+    sortie = im.copy()
+    cote = im.width
+    rayon = PASTILLE_RAYON * cote
+    centre = (cote * PASTILLE_CENTRE, cote * PASTILLE_CENTRE)
+    ImageDraw.Draw(sortie).ellipse(
+        (centre[0] - rayon, centre[1] - rayon, centre[0] + rayon, centre[1] + rayon),
+        fill=_hex(p["marque"]["alerte_vive"]["hex"]),
+    )
+    return sortie
 
 
 def _rond(im: Image.Image) -> Image.Image:
@@ -617,11 +642,47 @@ def cibles() -> dict[Path, bytes]:
     # 5. Desktop. Le .icns est écrit à la main, voir _icns.
     dist = MULTI / "desktop" / "src" / "jvmMain" / "resources" / "distribute"
 
-    def plaquee(cote: int) -> Image.Image:
-        """La plaque claire et le monogramme, comme l'icône d'Android."""
-        im = _plaque(cote, PLAQUE, PLAQUE_RAYON_COIN, fond_clair)
+    def plaquee(cote: int, fond=None) -> Image.Image:
+        """La plaque et le monogramme, comme l'icône d'Android.
+
+        Le fond vaut la plaque claire par défaut, qui est celle de l'icône de
+        lanceur par défaut. Les aperçus du sélecteur d'icône ont besoin des deux.
+        """
+        im = _plaque(cote, PLAQUE, PLAQUE_RAYON_COIN, fond or fond_clair)
         im.alpha_composite(_pose_cercle(dessin, cote, RAYON_CIRCONSCRIT))
         return im
+
+    # 4 ter. La famille `ic_simplex`, restée celle de l'amont jusqu'au 2026-11-22.
+    #        Elle est posée ici parce qu'elle réutilise `plaquee`. Ce ne sont pas
+    #        des icônes de lanceur, et c'est pour cela qu'elles avaient échappé à
+    #        la propagation, alors qu'elles sont parmi les plus vues :
+    #        `DesktopApp.kt` en fait l'icône de la FENÊTRE, donc celle de l'angle
+    #        et de la barre des tâches, `DesktopTray.kt` celle de la zone de
+    #        notification, et `Appearance.kt` l'image de profil par défaut et les
+    #        deux aperçus du sélecteur d'icône.
+    #
+    #        Changement de format assumé : l'amont livre quatre SVG, le
+    #        référentiel ne contient aucun tracé vectoriel du monogramme, et il
+    #        n'est pas question d'en inventer un. Ces quatre ressources passent
+    #        donc en PNG @4x, comme `logo@4x.png` et le monogramme commun, déjà
+    #        générés ainsi. Le nom de la ressource ne change pas, donc aucun
+    #        appelant Kotlin ne bouge. Le jour où le référentiel reçoit un SVG,
+    #        le retour au vectoriel se fait ici et nulle part ailleurs.
+    images = MULTI / "common" / "src" / "commonMain" / "moko-resources" / "images"
+
+    # Les deux aperçus du sélecteur, qui servent aussi d'image de profil par
+    # défaut. Ils montrent les deux icônes de lanceur, donc les deux plaques.
+    # Les tailles en pixels sont celles de l'amont, pour ne rien déplacer.
+    png(images / "ic_simplex_light@4x.png", plaquee(300, fond_clair))
+    png(images / "ic_simplex_dark@4x.png", plaquee(180, fond_sombre))
+
+    # 480 = 4 x 120, la taille logique que déclaraient les SVG de l'amont.
+    marque = _pose_cercle(dessin, 480, RAYON_CIRCONSCRIT)
+    blanche = _pose_cercle(_silhouette(dessin), 480, RAYON_CIRCONSCRIT)
+    png(images / "ic_simplex@4x.png", marque)
+    png(images / "ic_simplex_tray_light@4x.png", blanche)
+    png(images / "ic_simplex_tray_dot@4x.png", _pastille(marque, p))
+    png(images / "ic_simplex_tray_dot_light@4x.png", _pastille(blanche, p))
 
     png(dist / "simplex.png", plaquee(512))
     from io import BytesIO
