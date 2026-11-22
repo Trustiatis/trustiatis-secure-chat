@@ -3375,7 +3375,7 @@
   <string name="v7_1_4_security_audit_descr">Please ask your contacts to upgrade.\nReport will be public soon.</string>
   <!-- Chaînes propres à Trustiatis Secure, absentes de l'amont -->
   <string name="trustiatis_non_affiliation">Trustiatis Secure is an independent product published by Trustiatis, derived from the free software SimpleX Chat and compatible with the SimpleX network. It is not published, supported or endorsed by SimpleX Chat Ltd. SimpleX is a trademark of SimpleX Chat Ltd.</string>  <!-- marque-ok: mention obligatoire de non affiliation, NOTICE-AGPL.md -->
-  <string name="trustiatis_updates_from_portal">Updates are published on the Trustiatis portal, downloads.trustiatis.com/trustiatis-secure. The application does not check for them by itself.</string>
+  <string name="trustiatis_updates_from_portal">Updates are published on the Trustiatis portal, downloads.trustiatis.com/trustiatis-secure. The application checks that portal, at most once a day, and invites you to update. It never installs anything by itself.</string>
 
   <!-- Trustiatis : passerelle TrustiVPN -->
   <string name="ts_vpn_titre">TrustiVPN gateway</string>

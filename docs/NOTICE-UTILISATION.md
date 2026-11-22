@@ -141,14 +141,82 @@ Tout est sur votre appareil, dans une base chiffrée. Depuis « Base de données
 
 ## 15. Mettre à jour
 
-Cette application ne vient d'aucun magasin et **ne se met pas à jour toute seule** : le
-vérificateur de mises à jour de l'amont a été retiré, pour qu'elle n'interroge pas un serveur
-tiers.
+Cette application ne vient d'aucun magasin et **ne se remplace jamais toute seule**. Elle vous
+invite, vous décidez, vous installez.
 
-Les versions sont publiées sur **`downloads.trustiatis.com`**, avec pour chaque paquet son
-empreinte SHA-256. Comparez l'empreinte du fichier téléchargé à celle du portail avant d'installer.
+Au démarrage, au plus une fois par jour, elle demande à **`downloads.trustiatis.com`** quelle est
+la dernière version. Quand il y en a une plus récente, elle vous le dit, avec la date et la taille
+du paquet, et ouvre le portail sur demande. Quand il n'y en a pas, **elle ne dit rien** : une
+application qui annonce « vous êtes à jour » à chaque lancement apprend surtout à fermer ses
+fenêtres sans les lire.
 
-## 16. Ce que Trustiatis ne vous demandera jamais
+Vous pouvez aussi demander la recherche vous même, par **Réglages → Rechercher des mises à jour**.
+Là, elle répond toujours quelque chose, y compris que le portail n'a pas pu être joint, ce qui ne
+veut pas dire que vous êtes à jour mais que la vérification n'a pas eu lieu.
+
+Si vous faites passer tout votre trafic par Tor, la vérification l'emprunte aussi. Elle ne sort
+jamais en direct.
+
+Le portail donne pour chaque paquet son empreinte SHA-256. **Comparez la avant d'installer.** C'est
+le seul contrôle qui vous appartient, et c'est pour cela que le téléchargement n'est pas
+automatique : une application de sécurité qui remplacerait son propre exécutable sans que personne
+ne regarde serait exactement le mécanisme qu'un attaquant chercherait à détourner.
+
+## 16. La passerelle TrustiVPN de votre client
+
+Cette section ne concerne que les appareils préparés pour un client qui a une passerelle.
+
+Dans **Réglages → Passerelle TrustiVPN**, trois valeurs, que votre administrateur vous donne :
+l'adresse ou le nom de la passerelle, le port UDP de WireGuard, et l'entrée du plan de contrôle.
+L'écran refuse d'enregistrer une configuration à demi fausse, parce qu'un réglage incomplet est
+pire qu'absent.
+
+Ce qu'il faut savoir, et que l'écran répète :
+
+- **votre clé privée ne sort jamais de l'appareil**, et aucun jeton permanent n'y est rangé. Cet
+  appareil ne demande qu'une clé de session ;
+- **votre adresse dans le tunnel est fixe.** Elle est créée par votre administrateur, et elle ne
+  se libère pas parce qu'une session a expiré ;
+- **« Oublier cette passerelle » n'efface que cet appareil.** Vous restez autorisé sur la
+  passerelle jusqu'à ce qu'un administrateur vous révoque. Un appareil perdu se traite là bas, pas
+  ici.
+
+## 17. Les canaux de service
+
+Un canal de service est un correspondant ordinaire, confiné à une seule tâche. Il y en a trois
+classes, et **aucune ne peut faire le travail d'une autre**. Les fichiers sont refusés sur toutes,
+dans les deux sens : une pièce jointe arrivant d'un canal de service serait un fichier exécutable
+à portée d'un clic.
+
+| | Qui le tient | Ce qu'il porte | Ce qu'il ne peut jamais faire |
+|---|---|---|---|
+| Support Trustiatis | Trustiatis | des questions et des réponses | rien sur votre infrastructure |
+| Codes à deux facteurs | votre client | un code et son contexte | valider un code |
+| Accès TrustiVPN | votre client | une clé publique et une échéance | créer un utilisateur, changer une adresse |
+
+Vous les désignez dans **Réglages → Canaux de service**, un correspondant par classe. La
+désignation pose en même temps l'interdiction des fichiers ; si celle ci échoue, rien n'est
+désigné, parce qu'un canal marqué « service » qui accepterait encore les fichiers serait un
+mensonge.
+
+**Vérifiez le code de sécurité de chaque canal** (étape 4). Tant qu'un canal n'est pas vérifié, il
+n'obtient aucun libellé de service, et c'est volontaire : sans ce contrôle, le libellé deviendrait
+lui même l'objet à usurper.
+
+Quand un code arrive sur un canal 2FA vérifié, l'application l'affiche avec **l'application qui le
+demande, l'action, l'heure de la demande et l'origine vue par le service**. Un code qui arrive
+sans ces quatre éléments reste du texte ordinaire, sans mise en forme : c'est le signe qu'il ne
+vient pas du service.
+
+Deux règles à retenir, parce qu'elles sauvent des comptes :
+
+- **si vous n'avez rien demandé, n'utilisez pas le code** et avertissez votre administrateur. Un
+  code que vous n'attendiez pas est une demande déclenchée par quelqu'un d'autre ;
+- **un code reçu sur l'appareil qui demande n'est pas un second facteur.** L'ouverture d'une
+  session VPN ne sera jamais autorisée par un code livré sur ce même appareil, et personne ne
+  devrait vous le proposer.
+
+## 18. Ce que Trustiatis ne vous demandera jamais
 
 Ni mot de passe, ni clé, ni code d'accès, **par courriel, par téléphone ou par une autre
 messagerie**. Une demande qui vous parvient par une autre route ne vient pas de nous.
@@ -157,7 +225,7 @@ Certains seconds facteurs vous seront livrés ici. Un code reçu dans cette appl
 ni par votre boîte aux lettres, ni par le réseau mobile, qui sont les deux endroits où ces codes
 se volent.
 
-## 17. Ce que cette application ne fait pas, et qu'il vaut mieux savoir
+## 19. Ce que cette application ne fait pas, et qu'il vaut mieux savoir
 
 - elle ne protège pas un appareil déverrouillé entre les mains de quelqu'un d'autre. Le
   verrouillage de l'étape 10 est ce qui s'en approche le plus ;
@@ -166,9 +234,13 @@ se volent.
 - elle ne cache pas à votre réseau d'entreprise le fait que vous l'utilisez. Elle cache le
   contenu, les correspondants et les horaires d'une conversation, pas l'existence d'un trafic ;
 - elle ne sauvegarde rien dans un nuage. La seule sauvegarde est celle que vous exportez ;
-- elle ne vérifie pas l'identité à votre place. C'est l'étape 4, et elle est à vous.
+- elle ne vérifie pas l'identité à votre place. C'est l'étape 4, et elle est à vous ;
+- elle n'ouvre aucun tunnel VPN par elle même. L'écran de l'étape 16 range une configuration, il ne
+  connecte rien ;
+- elle ne valide aucun code à deux facteurs. Elle le reçoit et l'affiche avec son contexte, et le
+  secret qui le vérifie reste chez l'application qui vous le demande.
 
-## 18. En cas de doute
+## 20. En cas de doute
 
 Écrivez au département concerné **dans cette application**. Si quelque chose vous paraît anormal,
 un correspondant qui ne présente pas sa carte, un code de sécurité qui ne correspond pas, une
