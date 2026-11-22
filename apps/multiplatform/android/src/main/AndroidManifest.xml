@@ -26,6 +26,10 @@
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+  <!-- Trustiatis, TrustiVPN : Android 14 exige un type de service de premier plan, et un
+       service de VPN relève de l'exemption système. Sans cette permission et le type
+       déclaré plus bas, le tunnel ne peut pas rester actif écran éteint. -->
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SYSTEM_EXEMPTED" />
 
   <!-- Allows to query app name and icon that can open specific file type -->
   <queries>
@@ -235,6 +239,15 @@
         <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
       </intent-filter>
     </receiver>
+
+    <!-- Trustiatis, TrustiVPN : le service est déclaré par le manifeste de
+         com.wireguard.android:tunnel, qui lui donne déjà BIND_VPN_SERVICE et son filtre
+         d'intention. On ne le redéclare pas, on fusionne le seul attribut qui lui manque,
+         le type de service de premier plan, qu'Android exige depuis la version 14. -->
+    <service
+        android:name="com.wireguard.android.backend.GoBackend$VpnService"
+        android:foregroundServiceType="systemExempted"
+        tools:node="merge" />
 
   </application>
 </manifest>

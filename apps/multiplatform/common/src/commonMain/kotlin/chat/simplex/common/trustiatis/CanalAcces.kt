@@ -176,6 +176,10 @@ private fun lireSession(champs: Map<String, String>, maintenant: Instant): Sessi
   // Pas de port par défaut deviné ici : le contrat l'exige, et un port absent est le genre
   // d'oubli qui ferait monter un tunnel vers la mauvaise extrémité.
   if (port == null || port !in 1..65535) return null
+  // Sans crochets, « fd00::1:51820 » est ambigu : le dernier groupe peut être un port ou
+  // une partie de l'adresse. On refuse plutôt que de deviner, et le service privilégié du
+  // Desktop refuse la même chose, pour que les deux bouts ne divergent pas.
+  if (!autorite.startsWith("[") && hote.contains(':')) return null
   if (hote.isEmpty() || !(estIPv4(hote) || estIPv6(hote) || estNomDns(hote))) return null
   val cleServeur = champs["cle_serveur"]?.let(::decoderClePublique) ?: return null
   val echeance = instantStrict(champs["echeance"]) ?: return null

@@ -161,6 +161,13 @@ class CanalAccesTest {
   }
 
   @Test
+  fun `une adresse IPv6 sans crochets est refusée plutôt que devinée`() {
+    // Le dernier groupe peut être un port ou une partie de l'adresse. Le service
+    // privilégié du Desktop refuse la même écriture, et wg l'exige aussi.
+    assertNull(lireMessageVpn(session(passerelle = "fd00::1:51820"), maintenant))
+  }
+
+  @Test
   fun `résolveur qui n'est pas une adresse`() {
     assertNull(lireMessageVpn(session(dns = "resolveur.interne"), maintenant))
   }

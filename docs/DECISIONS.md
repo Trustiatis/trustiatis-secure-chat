@@ -286,10 +286,29 @@ qui ne sont pas négociables, et qui doivent être écrites dans la vue :
   une politique d'administration d'appareil peuvent activer. L'application doit le dire
   au lieu de laisser croire qu'elle s'en charge.
 
-**Ce qui reste à faire** après cette décision, et qui n'est pas fait : le service de
-tunnel Android, l'enrôlement auprès du plan de contrôle, la prise en compte de la
-révocation d'un pair par le TrustiVPN, le scellement de la clé privée par le magasin
-matériel, et le composant privilégié du Desktop.
+**La clé privée n'est jamais écrite**, et cela remplace le scellement par un magasin
+matériel qui était envisagé. ADR-0025 D4 dit qu'une session dure 24 heures, que renouveler
+n'est pas prolonger mais produire une clé **neuve**, et qu'un geste local est obligatoire à
+chaque ouverture : il n'y a donc aucune raison de conserver la clé entre deux lancements.
+Elle vit en mémoire le temps de la session, et l'extinction l'efface en place.
+
+Ce choix évite un piège trouvé en chemin : le `cryptor` du Desktop, chez l'amont, est un
+leurre. Son `decryptData` rend `String(data)`, c'est à dire le texte en clair, avec un
+commentaire « LALAL ». S'en servir pour sceller la clé aurait écrit un secret en clair tout
+en affichant le contraire, ce qui est pire que de ne rien sceller.
+
+**Ce qui est fait**, au 22 novembre 2026 : la génération de la paire, le contrat du canal
+d'accès dans les deux sens, le cycle de vie de la session avec expiration, fenêtre de
+renouvellement et révocation, le tunnel Android par `wireguard-go`, le service privilégié
+du Desktop avec sa table de routage dédiée, sa marque de pare feu et son coupe circuit,
+l'interrupteur et l'état dans l'écran TrustiVPN. 66 cas de test dans l'application, 28
+pour le service privilégié.
+
+**Ce qui reste à faire**, et qui n'appartient pas à l'application : le producteur des
+messages du canal d'accès, côté passerelle, dont `CONTRAT-ACCES.md` est la spécification.
+Et un essai sur appareil réel : le tunnel Android et le service du Desktop compilent et
+sont éprouvés jusqu'à la frontière du privilège, mais aucun tunnel n'a encore été monté
+contre un TrustiVPN en service.
 
 ---
 

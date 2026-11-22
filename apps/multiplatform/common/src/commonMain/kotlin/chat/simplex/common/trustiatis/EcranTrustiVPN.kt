@@ -7,6 +7,7 @@ import SectionView
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -20,9 +21,9 @@ import dev.icerock.moko.resources.compose.stringResource
 /**
  * L'écran de configuration de la passerelle TrustiVPN du client.
  *
- * Il ne fait qu'une chose : saisir, valider, ranger. Il n'ouvre aucun tunnel et ne
- * contacte rien. Tant que l'enrôlement n'existe pas, il le dit au lieu de proposer un
- * bouton qui ne mènerait nulle part.
+ * Il porte l'interrupteur du tunnel, la session en cours, et la configuration de la
+ * passerelle. Chaque refus est affiché tel quel plutôt que traduit en « une erreur est
+ * survenue » : l'utilisateur ne peut agir que sur ce qu'on lui nomme.
  */
 @Composable
 fun EcranTrustiVPN() {
@@ -47,6 +48,10 @@ fun EcranTrustiVPN() {
 
   ColumnWithScrollBar {
     AppBarTitle(stringResource(MR.strings.ts_vpn_titre))
+
+    SectionTunnel()
+
+    SectionDividerSpaced()
 
     SectionView(stringResource(MR.strings.ts_vpn_section_passerelle)) {
       Champ(stringResource(MR.strings.ts_vpn_hote), hote, raison(ChampConfig.HOTE))
@@ -159,6 +164,111 @@ fun EcranTrustiVPN() {
 
     SectionBottomSpacer()
   }
+}
+
+/**
+ * L'interrupteur du tunnel, et ce que la session en cours permet d'en dire.
+ *
+ * Décision P-10 du Membre, et les deux moitiés sont inséparables : l'interrupteur existe,
+ * parce que couper le tunnel pour retrouver son réseau local est une raison légitime ; et
+ * tunnel allumé, tout passe dedans. Le pied de section dit aussi ce que l'application **ne
+ * peut pas** garantir, parce que le laisser croire serait pire que de ne rien promettre.
+ */
+@Composable
+private fun SectionTunnel() {
+  val portee = rememberCoroutineScope()
+  val gestion = remember { GestionTunnel(tunnel, DepotSessionReglages) }
+  val session = remember { mutableStateOf(gestion.session()) }
+  val revocation = remember { mutableStateOf(gestion.revocation()) }
+  val bloc = rememberSaveable { mutableStateOf("") }
+  val refus = remember { mutableStateOf<String?>(null) }
+  val etat = EtatTunnelCourant.etat
+
+  SectionView(stringResource(MR.strings.ts_tunnel_section)) {
+    Row(
+      Modifier.fillMaxWidth().padding(horizontal = DEFAULT_PADDING, vertical = 8.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+      Text(stringResource(MR.strings.ts_tunnel_interrupteur))
+      Switch(
+        checked = etat.value == EtatTunnel.ALLUME || etat.value == EtatTunnel.DEMARRAGE,
+        onCheckedChange = { allumer ->
+          refus.value = null
+          portee.launch {
+            if (allumer) {
+              // La plateforme peut exiger une autorisation, et sous Android c'est une
+              // fenêtre du système : on la demande avant d'essayer, sinon l'utilisateur
+              // verrait un échec là où il n'y a qu'une permission à accorder.
+              val aPreparer = tunnel.indisponible()?.let { tunnel.preparer() }
+              if (aPreparer != null) refus.value = aPreparer
+              else (gestion.allumer() as? Issue.Refusee)?.let { refus.value = it.motif }
+            } else {
+              (gestion.eteindre() as? Issue.Refusee)?.let { refus.value = it.motif }
+            }
+          }
+        },
+      )
+    }
+    Ligne(
+      stringResource(MR.strings.ts_tunnel_etat),
+      when (etat.value) {
+        EtatTunnel.ETEINT -> stringResource(MR.strings.ts_tunnel_eteint)
+        EtatTunnel.DEMARRAGE -> stringResource(MR.strings.ts_tunnel_demarrage)
+        EtatTunnel.ALLUME -> stringResource(MR.strings.ts_tunnel_allume)
+        EtatTunnel.ARRET -> stringResource(MR.strings.ts_tunnel_arret)
+        EtatTunnel.ECHEC -> stringResource(MR.strings.ts_tunnel_echec)
+      },
+    )
+    // Le motif global et le refus local disent deux choses différentes : le premier vient
+    // de la plateforme ou de la passerelle, le second du geste qui vient d'être fait.
+    (refus.value ?: EtatTunnelCourant.motif.value)?.let { Avertissement(it) }
+    revocation.value?.let { Avertissement(GestionTunnel.motifLisible(it)) }
+  }
+  SectionTextFooter(stringResource(MR.strings.ts_tunnel_pied))
+
+  SectionDividerSpaced()
+
+  SectionView(stringResource(MR.strings.ts_tunnel_section_session)) {
+    val courante = session.value
+    if (courante == null) {
+      Ligne(stringResource(MR.strings.ts_tunnel_adresse), stringResource(MR.strings.ts_tunnel_sans_session))
+    } else {
+      Ligne(stringResource(MR.strings.ts_tunnel_adresse), courante.adresse)
+      Ligne(stringResource(MR.strings.ts_tunnel_echeance), courante.echeance.toString())
+    }
+    Ligne(stringResource(MR.strings.ts_tunnel_cle), gestion.clePubliqueCourante())
+    Champ(stringResource(MR.strings.ts_tunnel_bloc), bloc, null)
+    Row(Modifier.fillMaxWidth().padding(horizontal = DEFAULT_PADDING, vertical = 8.dp)) {
+      Button(
+        onClick = {
+          when (val issue = gestion.accepter(bloc.value)) {
+            is Issue.Faite -> {
+              bloc.value = ""
+              refus.value = null
+              session.value = gestion.session()
+              revocation.value = gestion.revocation()
+            }
+            is Issue.Refusee -> refus.value = issue.motif
+          }
+        },
+        modifier = Modifier.fillMaxWidth(),
+        enabled = bloc.value.isNotBlank(),
+      ) {
+        Text(stringResource(MR.strings.ts_tunnel_accepter))
+      }
+    }
+  }
+  SectionTextFooter(stringResource(MR.strings.ts_tunnel_pied_session))
+}
+
+@Composable
+private fun Avertissement(texte: String) {
+  Text(
+    texte,
+    color = MaterialTheme.colors.error,
+    style = MaterialTheme.typography.caption,
+    modifier = Modifier.fillMaxWidth().padding(horizontal = DEFAULT_PADDING, vertical = 4.dp),
+  )
 }
 
 @Composable

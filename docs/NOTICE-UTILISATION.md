@@ -186,6 +186,52 @@ Ce qu'il faut savoir, et que l'écran répète :
   passerelle jusqu'à ce qu'un administrateur vous révoque. Un appareil perdu se traite là bas, pas
   ici.
 
+### L'interrupteur du tunnel
+
+En haut du même écran, un interrupteur allume et éteint le tunnel, et l'état est affiché sous
+lui : éteint, démarrage, allumé, arrêt, ou en échec avec son motif.
+
+Trois choses à savoir, et elles comptent :
+
+- **la messagerie fonctionne tunnel éteint.** Le tunnel ne porte que la passerelle de votre
+  organisation, pas les serveurs de messagerie. Vous pouvez donc le couper pour retrouver votre
+  réseau local, votre imprimante ou votre partage de fichiers, sans perdre vos conversations ;
+- **tunnel allumé, tout passe dedans.** Aucune application n'est exclue, et il n'y a pas de
+  réglage pour en exclure une. C'est voulu ;
+- **l'étanchéité complète ne vient pas de cette application, et il faut le dire.** Sous Android,
+  si le tunnel tombe, le trafic ressort normalement, à moins que vous ayez activé **« VPN
+  permanent »** et **« Bloquer les connexions sans VPN »** dans les réglages d'Android, à la
+  rubrique réseau. Seuls vous, ou la politique d'administration de vos appareils, pouvez les
+  activer : une application ne peut pas se les accorder.
+
+### La session, et comment elle s'ouvre
+
+Une session dure **24 heures**, et son renouvellement produit une clé neuve, jamais une
+prolongation. Ce que cela achète est précis : un appareil perdu ou volé donne accès pendant 24
+heures au plus si personne ne le révoque.
+
+Votre clé privée est créée sur l'appareil à l'ouverture de la session, **vit en mémoire, et n'est
+jamais écrite**. Il n'y a donc aucun fichier de configuration WireGuard sur votre appareil, ni
+caché ni protégé : il n'y en a pas du tout.
+
+La première session vous est remise hors ligne, sous forme d'un **bloc d'amorçage** que votre
+administrateur vous donne et que vous collez dans le champ de la section « Session ». C'est ainsi
+parce que le canal d'accès n'est joignable que depuis le tunnel, et qu'il faut bien entrer une
+première fois. Les sessions suivantes arrivent sur ce canal. Un bloc d'amorçage ne contient jamais
+de clé privée.
+
+Si votre accès est révoqué, l'écran vous le dit, et il distingue trois cas : la clé de session a
+été révoquée, et vous pouvez en redemander une ; votre accès est suspendu, et aucune nouvelle clé
+ne sera délivrée ; votre accès a été supprimé, et il faut passer par votre administrateur.
+
+### Sur un ordinateur de bureau
+
+Sous Linux, le tunnel exige un composant séparé, `trustivpn-aide`, que votre administrateur
+installe une fois. La raison est simple : créer une interface réseau demande un privilège
+qu'une messagerie ne doit pas avoir. Si ce composant n'est pas installé, l'écran le dit au lieu
+de vous laisser appuyer sur un interrupteur qui ne ferait rien. Sous Windows et macOS, le tunnel
+n'est pas encore porté, et l'écran le dit aussi.
+
 ## 17. Les canaux de service
 
 Un canal de service est un correspondant ordinaire, confiné à une seule tâche. Il y en a trois

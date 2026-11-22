@@ -3063,6 +3063,23 @@
   <string name="trustiatis_updates_from_portal">Les mises à jour sont publiées sur le portail Trustiatis, downloads.trustiatis.com/trustiatis-secure. L\'application interroge ce portail, au plus une fois par jour, et vous invite à mettre à jour. Elle n\'installe jamais rien d\'elle même.</string>
 
   <!-- Trustiatis : passerelle TrustiVPN -->
+  <string name="ts_tunnel_section">Tunnel</string>
+  <string name="ts_tunnel_interrupteur">Tunnel TrustiVPN</string>
+  <string name="ts_tunnel_etat">État</string>
+  <string name="ts_tunnel_eteint">Éteint</string>
+  <string name="ts_tunnel_demarrage">Démarrage</string>
+  <string name="ts_tunnel_allume">Allumé</string>
+  <string name="ts_tunnel_arret">Arrêt</string>
+  <string name="ts_tunnel_echec">En échec</string>
+  <string name="ts_tunnel_adresse">Adresse réservée</string>
+  <string name="ts_tunnel_echeance">Fin de la session</string>
+  <string name="ts_tunnel_sans_session">Aucune session sur cet appareil</string>
+  <string name="ts_tunnel_cle">Clé publique de cet appareil</string>
+  <string name="ts_tunnel_section_session">Session</string>
+  <string name="ts_tunnel_bloc">Bloc d\'amorçage, ou message du canal d\'accès</string>
+  <string name="ts_tunnel_accepter">Lire ce bloc</string>
+  <string name="ts_tunnel_pied_session">Votre administrateur vous remet ce bloc hors canal pour le premier accès, parce que le canal d\'accès n\'est joignable que depuis le tunnel. Les sessions suivantes arrivent sur ce canal. Le bloc ne porte jamais de clé privée : cet appareil crée la sienne, la garde en mémoire seulement, et ne l\'écrit jamais.</string>
+  <string name="ts_tunnel_pied">Éteindre le tunnel vous rend votre réseau local, et la messagerie fonctionne dans les deux cas, parce que le tunnel ne porte que la passerelle de votre organisation. Allumé, tout passe dedans : aucune application n\'est exclue. L\'étanchéité complète ne vient pas de cette application : sous Android, ce sont « VPN permanent » et « Bloquer les connexions sans VPN », dans les réglages du système, que seuls vous ou la politique de votre organisation pouvez activer.</string>
   <string name="ts_vpn_titre">Passerelle TrustiVPN</string>
   <string name="ts_vpn_menu">Passerelle TrustiVPN</string>
   <string name="ts_vpn_section_passerelle">La passerelle de votre client</string>

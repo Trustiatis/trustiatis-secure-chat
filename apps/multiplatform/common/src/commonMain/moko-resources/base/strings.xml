@@ -3378,6 +3378,23 @@
   <string name="trustiatis_updates_from_portal">Updates are published on the Trustiatis portal, downloads.trustiatis.com/trustiatis-secure. The application checks that portal, at most once a day, and invites you to update. It never installs anything by itself.</string>
 
   <!-- Trustiatis : passerelle TrustiVPN -->
+  <string name="ts_tunnel_section">Tunnel</string>
+  <string name="ts_tunnel_interrupteur">TrustiVPN tunnel</string>
+  <string name="ts_tunnel_etat">State</string>
+  <string name="ts_tunnel_eteint">Off</string>
+  <string name="ts_tunnel_demarrage">Starting</string>
+  <string name="ts_tunnel_allume">On</string>
+  <string name="ts_tunnel_arret">Stopping</string>
+  <string name="ts_tunnel_echec">Failed</string>
+  <string name="ts_tunnel_adresse">Reserved address</string>
+  <string name="ts_tunnel_echeance">Session expires</string>
+  <string name="ts_tunnel_sans_session">No session on this device</string>
+  <string name="ts_tunnel_cle">This device public key</string>
+  <string name="ts_tunnel_section_session">Session</string>
+  <string name="ts_tunnel_bloc">Bootstrap block, or message from the access channel</string>
+  <string name="ts_tunnel_accepter">Read this block</string>
+  <string name="ts_tunnel_pied_session">Your administrator hands you this block out of band for the first access, because the access channel is only reachable from inside the tunnel. Later sessions arrive on that channel. The block never carries a private key: this device creates its own, keeps it in memory only, and never writes it down.</string>
+  <string name="ts_tunnel_pied">Turning the tunnel off gives you back your local network, and messaging keeps working either way, because the tunnel only carries your organisation gateway. Turned on, everything goes through it: no application is excluded. Full leak protection does not come from this application: on Android it is "Always-on VPN" and "Block connections without VPN", in the system settings, which only you or your organisation policy can turn on.</string>
   <string name="ts_vpn_titre">TrustiVPN gateway</string>
   <string name="ts_vpn_menu">TrustiVPN gateway</string>
   <string name="ts_vpn_section_passerelle">Your client gateway</string>

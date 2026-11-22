@@ -1,0 +1,38 @@
+[Unit]
+Description=Service privilegie du tunnel TrustiVPN de Trustiatis Secure
+Documentation=file:/usr/share/doc/trustivpn-aide/README
+# Le reseau n'est pas requis pour demarrer : le service attend une commande, et le tunnel
+# se monte quand l'utilisateur le demande, pas au demarrage du poste.
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/libexec/trustivpn-aide.py
+Restart=on-failure
+RestartSec=2
+
+# La socket vit dans un repertoire que systemd cree et nettoie, donc aucune socket morte
+# ne survit a un arret du service. Un client qui trouve la socket trouve un service vivant.
+RuntimeDirectory=trustivpn
+RuntimeDirectoryMode=0755
+
+# Le service a besoin de CAP_NET_ADMIN pour l'interface et les routes, et de rien d'autre.
+# Il tourne en root parce que `ip` et `nft` l'exigent, mais son pouvoir s'arrete la.
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_CHOWN
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_CHOWN
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelModules=no
+ProtectKernelTunables=no
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target
