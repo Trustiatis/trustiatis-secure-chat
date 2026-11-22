@@ -96,13 +96,46 @@ fi
 # 2. L'entree de bureau. jpackage n'y met ni URL ni type MIME : sans ces deux
 # substitutions, un lien d'invitation cliqué n'ouvre rien.
 ligne_mime='MimeType=x-scheme-handler/simplexchat;x-scheme-handler/simplex;'  # marque-ok: reseau, decision D-3
+
+# La classe X de la fenetre. Elle vient du nom de la classe principale, telle que la JVM
+# la donne a X11 : « chat.simplex.desktop.MainKt » devient « chat-simplex-desktop-MainKt ».
+# Elle est verifiee plus bas contre le .cfg du paquet, pour qu'un report d'amont qui
+# deplacerait la classe principale fasse echouer la construction au lieu de livrer une
+# entree de bureau qui ne designe plus aucune fenetre.
+classe_fenetre='chat-simplex-desktop-MainKt'
+classe_attendue="$(sed -n 's|^app.mainclass=\(.*\)|\1|p' "$cfg" | tr '.' '-')"
+if [ -n "$classe_attendue" ] && [ "$classe_attendue" != "$classe_fenetre" ]; then
+  echo "ERREUR : la classe principale du paquet est « $classe_attendue »," >&2
+  echo "         l'entree de bureau annonce « $classe_fenetre »." >&2
+  echo "         Reporter la nouvelle valeur dans ce script." >&2
+  exit 1
+fi
+
 entree="$(find "$racine_app"/lib -maxdepth 1 -name '*.desktop' | head -1)"
 [ -n "$entree" ] || { echo "ERREUR : entree de bureau introuvable." >&2; exit 1; }
 sed -i -e '/%[uU]/!s|^Exec=.*|& %u|' -e "s|^MimeType=.*|$ligne_mime|" "$entree"
+
+# Le nom affiche. jpackage y met le nom du paquet, « trustiatis-secure », et c'est ce que
+# le lanceur montre sous l'icone.
+sed -i -e 's|^Name=.*|Name=Trustiatis Secure|' "$entree"
+
+# StartupWMClass : sans elle, le bureau ne rattache pas la fenetre ouverte a l'icone du
+# lanceur. Il croit l'application fermee, lance un second processus, qui trouve le verrou
+# mono-instance, signale le premier et se termine aussitot. L'utilisateur voit l'icone
+# clignoter et rien d'autre, la fenetre restant derriere les autres. C'est le defaut que
+# le Membre a rapporte sur 7.1.2-ts1 puis sur 7.1.4-ts1 : il n'est pas dans le code de
+# l'application, qui demine, remonte et demande l'activation X11 comme il faut, mais dans
+# cette entree de bureau, que jpackage ecrit sans cette ligne.
+grep -q '^StartupWMClass=' "$entree" || printf 'StartupWMClass=%s\n' "$classe_fenetre" >> "$entree"
+grep -q '^SingleMainWindow=' "$entree" || printf 'SingleMainWindow=true\n' >> "$entree"
+grep -q '^StartupNotify=' "$entree" || printf 'StartupNotify=true\n' >> "$entree"
+
 grep -qxF "$ligne_mime" "$entree" || {
   echo "ERREUR : l'entree de bureau n'enregistre pas simplex: ni simplexchat:." >&2; exit 1; }
 grep -q '^Exec=.*%u' "$entree" || {
   echo "ERREUR : l'entree de bureau ne recoit aucune URL." >&2; exit 1; }
+grep -qxF "StartupWMClass=$classe_fenetre" "$entree" || {
+  echo "ERREUR : l'entree de bureau ne designe pas la classe de la fenetre." >&2; exit 1; }
 
 find ./extracted/ -exec touch -d "@$SOURCE_DATE_EPOCH" {} +
 
@@ -140,11 +173,15 @@ fi
 entree_livree="$(find "$tmp/opt" -type f -name '*.desktop' | head -1)"
 [ -n "$entree_livree" ] || { echo "ERREUR : aucune entree de bureau dans le paquet fini." >&2; exit 1; }
 echo "Entree de bureau du paquet fini :"
-grep -E '^(Exec|MimeType)=' "$entree_livree"
+grep -E '^(Name|Exec|MimeType|StartupWMClass)=' "$entree_livree"
 grep -q '^Exec=.*%u' "$entree_livree" || {
   echo "ERREUR : l'entree de bureau du paquet fini ne recoit aucune URL." >&2; exit 1; }
 grep -q '^MimeType=.*x-scheme-handler/simplex;' "$entree_livree" || {  # marque-ok: reseau, decision D-3
   echo "ERREUR : l'entree de bureau du paquet fini n'enregistre pas les liens." >&2; exit 1; }
+grep -qxF 'StartupWMClass=chat-simplex-desktop-MainKt' "$entree_livree" || {
+  echo "ERREUR : l'entree de bureau du paquet fini ne designe pas la classe de la fenetre." >&2; exit 1; }
+grep -qxF 'Name=Trustiatis Secure' "$entree_livree" || {
+  echo "ERREUR : l'entree de bureau du paquet fini n'affiche pas le nom du produit." >&2; exit 1; }
 
 # Le fichier d'empreintes, sous le nom que la chaine hebergee lui donne. Sans lui, le
 # paquet construit ici ne peut pas etre range par tools/nommer-livraison.py, qui exige
