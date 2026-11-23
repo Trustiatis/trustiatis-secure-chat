@@ -785,3 +785,51 @@ en double. Le rang ne fait que croître, et un test le garde solidaire des compt
 Un contrôle d'après construction refuse désormais un paquet dont la version ne porte pas
 `-ts<rang>` : le défaut était invisible à la construction, il se vérifie donc là où il
 pouvait sortir.
+
+## 17. Un paquet Debian ne peut pas servir deux familles de distributions
+
+Relevé juste après le chapitre 16, en posant sur deux stations Debian 13 le paquet sorti
+de la chaîne hébergée. `dpkg` l'a dépaqueté puis a refusé de le configurer :
+
+```
+trustiatis-secure dépend de libpcre3 ; cependant :
+  Le paquet libpcre3 n'est pas installé.
+```
+
+Et `libpcre3` n'est pas seulement absent des stations : il n'existe pas dans Debian 13,
+qui n'a que `pcre2`. Aucune installation ne pouvait donc aboutir.
+
+La cause n'est pas une dépendance oubliée, c'est jpackage qui calcule les dépendances sur
+la machine qui construit, par `dpkg-shlibdeps`. Les deux listes sont donc étrangères l'une
+à l'autre, et aucune n'est satisfiable chez l'autre :
+
+| Construit sur | Dépend entre autres de | Satisfiable sur Debian 13 | Satisfiable sur Ubuntu 22.04 |
+|---|---|---|---|
+| Ubuntu 22.04 (chaîne hébergée) | `libpcre3` | non, le paquet n'existe pas | oui |
+| Debian 13 (poste du groupe) | `libasound2t64`, `libglib2.0-0t64` | oui | non, noms et glibc trop récents |
+
+Le paquet embarque en plus son propre arbre VLC, pris sur la machine qui construit : même
+en forçant l'installation, les greffons d'Ubuntu réclameraient sur Debian des
+bibliothèques absentes. C'est pour cela que l'amont publie **un paquet par Ubuntu**, et
+non un seul.
+
+Ce qui a été fait pour la 7.1.4-ts3 : le paquet Linux vient du poste du groupe, donc de
+Debian 13, comme ceux des 7.1.4-ts1 et ts2 déjà publiés et déjà installés chez les
+clients. Changer de famille au milieu d'une série aurait rendu la mise à jour impossible
+pour ceux qui ont l'actuelle.
+
+Ce qui reste à décider, et qui appartient au Membre, parce que cela fixe les systèmes que
+Trustiatis sert sous Linux :
+
+1. **Garder Debian 13**, et le dire sur le portail. Le travail Linux de la chaîne
+   hébergée reste utile comme contrôle indépendant, mais son paquet n'est pas publiable :
+   il faudrait l'écrire dans le fichier du flux de travail, qui ne le dit pas.
+2. **Construire sur Debian 13 dans la chaîne**, par un conteneur `debian:trixie` sur le
+   coureur. On garde l'arbre neuf à chaque fois, qui est la raison d'être de ce travail,
+   et le paquet devient publiable.
+3. **Publier deux paquets**, un par famille, comme l'amont. C'est le plus juste pour les
+   clients et le plus coûteux : deux travaux, deux arbres VLC, deux empreintes, et le
+   portail doit apprendre à proposer le bon.
+
+Tant que rien n'est tranché, la 7.1.4-ts3 suit l'option 1, par continuité avec ce qui est
+déjà installé.
