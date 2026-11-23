@@ -85,13 +85,33 @@ cfg="$(find "$racine_app"/lib/app -maxdepth 1 -name '*.cfg' | head -1)"
 [ -n "$cfg" ] || { echo "ERREUR : fichier .cfg de l'application introuvable." >&2; exit 1; }
 sed -i -e '/skiko-awt-runtime-linux/d' "$cfg"
 
-# Suffixe de distribution sur la version, comme chez l'amont : deux paquets construits sur
-# deux Ubuntu differentes n'ont pas la meme glibc et ne doivent pas porter la meme version.
-if [ -r /etc/os-release ]; then
-  # shellcheck disable=SC1091
-  . /etc/os-release
-  [ -n "${VERSION_CODENAME:-}" ] && sed -i "/^Version/ s/\$/~$VERSION_CODENAME/" ./extracted/DEBIAN/control
-fi
+# La revision Debian porte NOTRE rang de version, et non le nom de la distribution qui a
+# compile.
+#
+# L'amont y met « ~jammy », « ~noble » : il publie un paquet par Ubuntu, et le suffixe les
+# distingue. Nous en publions UN, construit sur la glibc la plus ancienne que nous servons.
+# Ce suffixe faisait donc dependre l'ordre des versions de la machine qui compile, et c'est
+# un defaut qui ne se voit qu'au moment de la mise a jour : « 7.1.4-1~jammy », sorti de la
+# chaine hebergee, est ANTERIEUR a « 7.1.4-1~trixie », sorti du poste, pour dpkg. Un paquet
+# plus recent paraissait plus vieux que le precedent, et « apt install ./paquet.deb »
+# refusait la mise a jour en la prenant pour un retour en arriere.
+#
+# Le rang Trustiatis ne fait que croitre, et un test le garde solidaire des compteurs de
+# gradle.properties. On le relit a la source plutot que de le passer en argument : il n'y a
+# ainsi rien a tenir a jour en double.
+fichier_revision="$racine/apps/multiplatform/common/src/commonMain/kotlin/chat/simplex/common/trustiatis/MiseAJour.kt"
+revision="$(sed -n 's|^const val REVISION_TRUSTIATIS = \([0-9]\{1,\}\)$|\1|p' "$fichier_revision")"
+[ -n "$revision" ] || {
+  echo "ERREUR : REVISION_TRUSTIATIS introuvable dans $fichier_revision." >&2
+  exit 1
+}
+version_brute="$(sed -n 's|^Version: \(.*\)$|\1|p' ./extracted/DEBIAN/control)"
+version_amont="${version_brute%%-*}"
+[ -n "$version_amont" ] || {
+  echo "ERREUR : champ Version introuvable dans le control du paquet." >&2
+  exit 1
+}
+sed -i "s|^Version:.*|Version: ${version_amont}-ts${revision}|" ./extracted/DEBIAN/control
 
 # 2. L'entree de bureau. jpackage n'y met ni URL ni type MIME : sans ces deux
 # substitutions, un lien d'invitation cliqué n'ouvre rien.
@@ -182,6 +202,20 @@ grep -qxF 'StartupWMClass=chat-simplex-desktop-MainKt' "$entree_livree" || {
   echo "ERREUR : l'entree de bureau du paquet fini ne designe pas la classe de la fenetre." >&2; exit 1; }
 grep -qxF 'Name=Trustiatis Secure' "$entree_livree" || {
   echo "ERREUR : l'entree de bureau du paquet fini n'affiche pas le nom du produit." >&2; exit 1; }
+
+# La version du paquet fini porte notre rang, et pas le nom de la distribution qui a
+# compile. Un paquet qui sortirait avec « ~jammy » paraitrait plus vieux que le precedent,
+# et se refuserait a la mise a jour : le defaut est invisible a la construction et ne se
+# montre que chez l'utilisateur, donc il se verifie ici.
+version_finie="$(dpkg-deb -f "$final" Version)"
+echo "Version du paquet fini : $version_finie"
+case "$version_finie" in
+  *-ts[0-9]*) ;;
+  *)
+    echo "ERREUR : la version « $version_finie » ne porte pas le rang Trustiatis." >&2
+    exit 1
+    ;;
+esac
 
 # Le fichier d'empreintes, sous le nom que la chaine hebergee lui donne. Sans lui, le
 # paquet construit ici ne peut pas etre range par tools/nommer-livraison.py, qui exige

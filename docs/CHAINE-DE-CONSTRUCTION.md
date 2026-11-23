@@ -745,3 +745,43 @@ du compilateur Kotlin, et elle y met douze minutes : l'échec arrive à la fin, 
 début. Le réglage vit désormais dans `~/.gradle/gradle.properties`, hors du dépôt, pour
 qu'il s'applique aussi aux lancements qui ne passent pas par une ligne de commande à nous,
 `paquet-deb-trustiatis.sh` en premier.
+
+## 16. La version du paquet Linux dépendait de la machine qui compile
+
+Relevé au report de la 7.1.4-ts3, et jamais vu avant parce qu'il ne se montre qu'à la
+mise à jour, chez l'utilisateur.
+
+Le script d'empaquetage reprenait de l'amont le suffixe de distribution sur la version :
+`VERSION_CODENAME` de `/etc/os-release`, d'où `7.1.4-1~jammy` depuis la chaîne hébergée
+(Ubuntu 22.04) et `7.1.4-1~trixie` depuis le poste du groupe. Chez l'amont, c'est juste :
+il publie un paquet par Ubuntu, et le suffixe les distingue.
+
+Nous n'en publions qu'un, bâti sur la glibc la plus ancienne que nous servions. Le
+suffixe n'y distinguait donc rien, et il y faisait dépendre **l'ordre** des versions de
+l'endroit où le paquet avait été construit :
+
+```
+$ dpkg --compare-versions 7.1.4-1~jammy gt 7.1.4-1~trixie ; echo $?
+1
+```
+
+La 7.1.4-ts2 était sortie du poste, la ts3 de la chaîne : le paquet le plus récent
+paraissait le plus vieux. `dpkg -i` l'aurait installé sans rien dire, mais
+`apt install ./paquet.deb` refuse ce qu'il prend pour un retour en arrière, et c'est le
+geste que la notice d'utilisation donne.
+
+La révision Debian porte maintenant notre rang de version, relu dans
+`REVISION_TRUSTIATIS` plutôt que passé en argument, pour qu'il n'y ait rien à tenir à jour
+en double. Le rang ne fait que croître, et un test le garde solidaire des compteurs de
+`gradle.properties`. L'ordre attendu, vérifié par `dpkg` lui même :
+
+| Comparaison | Résultat |
+|---|---|
+| `7.1.4-ts3` contre `7.1.4-1~trixie` | plus récent |
+| `7.1.4-ts3` contre `7.1.4-1~jammy` | plus récent |
+| `7.1.4-ts10` contre `7.1.4-ts9` | plus récent |
+| `7.1.5-ts1` contre `7.1.4-ts9` | plus récent |
+
+Un contrôle d'après construction refuse désormais un paquet dont la version ne porte pas
+`-ts<rang>` : le défaut était invisible à la construction, il se vérifie donc là où il
+pouvait sortir.
