@@ -46,6 +46,25 @@ lanceur="$app/bin/trustiatis-secure"
 icone="$app/lib/Trustiatis Secure.png"
 [ -f "$icone" ] || icone="$(find "$app/lib" -maxdepth 1 -name '*.png' | head -1)"
 
+# 3. Il rattache la fenêtre à l'entrée de bureau, comme le fait le paquet.
+#    Sans `StartupWMClass`, le shell ne reconnaît pas la fenêtre déjà ouverte
+#    comme étant celle du lanceur : un deuxième processus démarre, signale le
+#    premier et s'arrête, et l'utilisateur voit l'application disparaître.
+#    La classe que X porte est celle de la classe principale, points remplacés
+#    par des tirets ; on la relit dans la configuration de jpackage plutôt que
+#    de la supposer, et on s'arrête si les deux divergent.
+classe_fenetre='chat-simplex-desktop-MainKt'
+cfg="$app/lib/app/trustiatis-secure.cfg"
+if [ -f "$cfg" ]; then
+  classe_attendue="$(sed -n 's|^app.mainclass=\(.*\)|\1|p' "$cfg" | tr '.' '-')"
+  if [ -n "$classe_attendue" ] && [ "$classe_attendue" != "$classe_fenetre" ]; then
+    echo "ERREUR : la classe principale du paquet est « $classe_attendue »," >&2
+    echo "         l'entree de bureau annonce « $classe_fenetre »." >&2
+    echo "         Corriger classe_fenetre dans ce script." >&2
+    exit 1
+  fi
+fi
+
 cat > "$entrees/trustiatis-secure.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
@@ -56,7 +75,15 @@ Icon=$icone
 Categories=Network;InstantMessaging;
 Terminal=false
 MimeType=x-scheme-handler/simplex;x-scheme-handler/simplexchat;
+StartupWMClass=$classe_fenetre
+SingleMainWindow=true
+StartupNotify=true
 DESKTOP
+
+grep -qxF "StartupWMClass=$classe_fenetre" "$entrees/trustiatis-secure.desktop" || {
+  echo "ERREUR : l'entree de bureau ne porte pas StartupWMClass." >&2
+  exit 1
+}
 
 command -v update-desktop-database >/dev/null && update-desktop-database "$entrees" || true
 
