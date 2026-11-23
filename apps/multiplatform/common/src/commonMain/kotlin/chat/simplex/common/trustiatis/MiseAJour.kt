@@ -32,7 +32,7 @@ const val URL_PORTAIL = "https://downloads.trustiatis.com/trustiatis-secure/"
  * nombre se relève en même temps que `android.version_code` et `desktop.version_code` de
  * `gradle.properties`, et un test vérifie qu'il n'a pas été oublié.
  */
-const val REVISION_TRUSTIATIS = 2
+const val REVISION_TRUSTIATIS = 3
 
 @Serializable
 data class ArtefactPublie(
