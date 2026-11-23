@@ -85,6 +85,39 @@ cfg="$(find "$racine_app"/lib/app -maxdepth 1 -name '*.cfg' | head -1)"
 [ -n "$cfg" ] || { echo "ERREUR : fichier .cfg de l'application introuvable." >&2; exit 1; }
 sed -i -e '/skiko-awt-runtime-linux/d' "$cfg"
 
+# 4. Le rendu logiciel de Skiko, imposé, et ce n'est pas un reglage de confort.
+#
+# Sans lui l'application meurt au PREMIER redessin, environ quatre secondes apres le
+# lancement, sur un materiel graphique parfaitement accelere. La fenetre s'ouvre, puis
+# disparait, et l'utilisateur ne voit qu'une application qui se ferme toute seule. Le
+# cadre fautif, releve dans onze fichiers hs_err sur une station :
+#
+#   C  [libHSzstd-0.1.3.0-...-ghc9.6.3.so]  ZSTD_customFree+0x1b
+#   j  org.jetbrains.skia.DirectContext.flush()
+#   j  org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer.redrawImmediately()
+#
+# C'est une collision de symboles ELF : la bibliotheque Haskell du coeur exporte ses
+# symboles « ZSTD_* » dans l'espace global, et le Skia de Skiko, qui porte son propre
+# zstd, se fait resoudre les siens vers ceux de Haskell. Les structures ne sont pas les
+# memes, d'ou l'acces memoire invalide. Le rendu logiciel n'emprunte pas ce chemin la.
+#
+# La vraie correction serait de lier la bibliotheque Haskell sans exporter ces symboles,
+# ou que Skia prefixe les siens. Les deux supposent de recompiler, ce que la decision D-2
+# interdit : les bibliotheques viennent des paquets publies par l'amont.
+#
+# Pourquoi dans le .cfg et non dans l'entree de bureau : l'entree ne couvre que le clic
+# sur l'icone. Le .cfg couvre TOUS les chemins, le lancement en ligne de commande et
+# l'ouverture d'un lien d'invitation par le gestionnaire d'URL compris. Le lanceur de
+# jpackage ne transmet pas un « -D » a la machine virtuelle, il le passe a l'application
+# comme argument : c'est donc bien ici, ou nulle part.
+option_rendu='java-options=-Dskiko.renderApi=SOFTWARE'
+grep -qxF "$option_rendu" "$cfg" || sed -i "/^\[JavaOptions\]$/a $option_rendu" "$cfg"
+grep -qxF "$option_rendu" "$cfg" || {
+  echo "ERREUR : impossible de poser le rendu logiciel dans $cfg." >&2
+  echo "         La section [JavaOptions] a-t-elle change de nom ?" >&2
+  exit 1
+}
+
 # La revision Debian porte NOTRE rang de version, et non le nom de la distribution qui a
 # compile.
 #
@@ -207,6 +240,15 @@ grep -qxF 'Name=Trustiatis Secure' "$entree_livree" || {
 # compile. Un paquet qui sortirait avec « ~jammy » paraitrait plus vieux que le precedent,
 # et se refuserait a la mise a jour : le defaut est invisible a la construction et ne se
 # montre que chez l'utilisateur, donc il se verifie ici.
+cfg_livre="$(find "$tmp/opt" -maxdepth 4 -name '*.cfg' -path '*lib/app*' | head -1)"
+[ -n "$cfg_livre" ] || { echo "ERREUR : aucun .cfg dans le paquet fini." >&2; exit 1; }
+grep -qxF 'java-options=-Dskiko.renderApi=SOFTWARE' "$cfg_livre" || {
+  echo "ERREUR : le paquet fini n'impose pas le rendu logiciel de Skiko." >&2
+  echo "         L'application mourrait au premier redessin." >&2
+  exit 1
+}
+echo "Rendu logiciel impose dans le paquet fini."
+
 version_finie="$(dpkg-deb -f "$final" Version)"
 echo "Version du paquet fini : $version_finie"
 case "$version_finie" in

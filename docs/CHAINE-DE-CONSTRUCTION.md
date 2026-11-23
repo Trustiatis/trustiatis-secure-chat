@@ -833,3 +833,51 @@ Trustiatis sert sous Linux :
 
 Tant que rien n'est tranché, la 7.1.4-ts3 suit l'option 1, par continuité avec ce qui est
 déjà installé.
+
+## 18. L'application mourait au premier redessin, et le paquet ne le disait pas
+
+Signalé six fois par le Membre, et mal diagnostiqué autant de fois : « elle tourne en
+arrière plan, l'affichage se ferme tout de suite ». Elle ne tournait pas en arrière plan,
+elle **mourait**, environ quatre secondes après le lancement.
+
+Ce que disent les onze fichiers `hs_err_pid*.log` trouvés dans le répertoire personnel de
+`ttt-stt-0004`, par séries de trois, aux heures des essais :
+
+```
+SIGSEGV (0xb)
+C  [libHSzstd-0.1.3.0-...-ghc9.6.3.so]  ZSTD_customFree+0x1b
+j  org.jetbrains.skia.DirectContext.flush()
+j  org.jetbrains.skiko.context.ContextHandler.draw()
+j  org.jetbrains.skiko.redrawer.LinuxOpenGLRedrawer.redrawImmediately()
+```
+
+C'est une collision de symboles ELF. La bibliothèque Haskell du cœur exporte ses symboles
+`ZSTD_*` dans l'espace global ; le Skia de Skiko, qui porte son propre zstd, se fait
+résoudre les siens vers ceux de Haskell, dont les structures diffèrent. Le rendu logiciel
+n'emprunte pas ce chemin, et c'est tout ce qui séparait les deux installations : celle
+sans root force `SKIKO_RENDER_API=SOFTWARE` depuis le début, le paquet Debian ne forçait
+rien.
+
+Ce qui a été corrigé : le paquet pose `-Dskiko.renderApi=SOFTWARE` dans les
+`[JavaOptions]` du `.cfg` de jpackage, et non dans l'entrée de bureau. L'entrée ne couvre
+que le clic sur l'icône ; le `.cfg` couvre aussi la ligne de commande et l'ouverture d'un
+lien d'invitation par le gestionnaire d'URL. Un contrôle d'après construction refuse un
+paquet qui ne le porte pas, parce que ce défaut est invisible à la construction.
+
+Mesures, sur l'arbre extrait du paquet, sans aucune variable d'environnement :
+
+| Configuration | Résultat |
+|---|---|
+| avec la ligne, trois essais | vivante à 60 s, fenêtre `IsViewable`, aucune trace |
+| la ligne retirée du même arbre | **morte à 3 s**, SIGSEGV sur `ZSTD_customFree` |
+
+La vraie correction serait de lier la bibliothèque Haskell sans exporter ces symboles, ou
+que Skia préfixe les siens. Les deux supposent de recompiler, ce que la décision D-2
+interdit : les bibliothèques viennent des paquets publiés par l'amont. Le contournement
+est donc assumé, et son coût est le rendu logiciel pour tout le monde sous Linux. Pour une
+messagerie, c'est sans conséquence perceptible ; un plantage au démarrage, non.
+
+Leçon de méthode, et c'est la vraie faute : le correctif précédent avait posé
+`StartupWMClass` dans l'entrée de bureau, qui traite le cas d'une fenêtre ouverte restée
+derrière. Il a été écrit sans avoir jamais reproduit la panne. Les `hs_err` étaient là
+depuis la veille.
